@@ -1,0 +1,429 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PCEC Connect Scorecard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#14203a; --ink-2:#4a5672; --muted:#7a849b;
+  --line:#e2e7f0; --track:#e7ecf4; --bar:#046cab; --navy:#1a2744; --gold:#cb820b;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --todo:#a3acbf;
+  --chip:#eef2f8; --shadow:0 1px 2px rgba(20,32,58,.06),0 4px 16px rgba(20,32,58,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11161f; --card:#1a1a19; --ink:#eef1f6; --ink-2:#b6bdcc; --muted:#8a93a6;
+    --line:#2c2f36; --track:#2b2e34; --bar:#3a8fd0; --navy:#0d1526; --gold:#e09a2a;
+    --todo:#5d6474; --chip:#24272d; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11161f; --card:#1a1a19; --ink:#eef1f6; --ink-2:#b6bdcc; --muted:#8a93a6;
+  --line:#2c2f36; --track:#2b2e34; --bar:#3a8fd0; --navy:#0d1526; --gold:#e09a2a;
+  --todo:#5d6474; --chip:#24272d; --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px 56px}
+header.top{background:linear-gradient(135deg,#1a2744 0%,#16386a 55%,#046cab 100%);color:#fff;padding:28px 0 84px}
+header.top .wrap{padding-bottom:0}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#f3c779;font-weight:700}
+h1{margin:6px 0 6px;font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.01em}
+.sub{margin:0;color:#d5def0;max-width:640px}
+.heroes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:-60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.hero{padding:20px 22px}
+.hero .label{font-size:13px;font-weight:600;color:var(--ink-2)}
+.hero .big{font-size:56px;font-weight:800;line-height:1.05;letter-spacing:-.03em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.hero .big small{font-size:26px;font-weight:700;color:var(--ink-2)}
+.hero p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px}
+.meter{height:12px;background:var(--track);border-radius:999px;overflow:hidden;margin-top:12px}
+.meter i{display:block;height:100%;border-radius:999px;background:var(--bar);transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.meter.gold i{background:var(--gold)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink);background:var(--chip);border-radius:999px;padding:3px 10px 3px 8px;white-space:nowrap}
+.chip svg{flex:none}
+h2{font-size:19px;margin:36px 0 4px;font-weight:700;letter-spacing:-.01em}
+.lead{margin:0 0 14px;color:var(--ink-2);font-size:14px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--ink-2);margin:0 0 12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.rows{padding:6px 0}
+.row{border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1.6fr) 56px 22px;gap:14px;align-items:center;padding:14px 20px}
+.row summary::-webkit-details-marker{display:none}
+.row summary:hover{background:color-mix(in srgb,var(--bar) 5%,transparent)}
+.row summary:focus-visible{outline:2px solid var(--bar);outline-offset:-2px;border-radius:12px}
+.name{font-weight:600;font-size:14.5px}
+.what{font-size:12.5px;color:var(--muted)}
+.bar{position:relative;height:14px;background:var(--track);border-radius:4px}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--bar);border-radius:4px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.bar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink-2);opacity:.5;border-radius:1px}
+.pct{font-weight:700;font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
+.caret{transition:transform .2s;color:var(--muted)}
+details[open] .caret{transform:rotate(180deg)}
+.detail{padding:2px 20px 18px}
+.detail .chiprow{margin:0 0 10px}
+ul.items{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+ul.items li{display:grid;grid-template-columns:20px 1fr;gap:9px;font-size:13.5px;align-items:start;color:var(--ink)}
+ul.items li.later{color:var(--muted)}
+ul.items li svg{margin-top:2px}
+.tag{font-size:11px;font-weight:600;color:var(--muted);margin-left:6px;white-space:nowrap}
+.wins{padding:8px 0}
+.win{display:grid;grid-template-columns:32px 1fr auto;gap:12px;align-items:center;padding:12px 20px;border-top:1px solid var(--line)}
+.win:first-child{border-top:0}
+.win .n{width:28px;height:28px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:700;font-size:13px}
+.win b{font-weight:600}
+.win .why{font-size:12.5px;color:var(--muted)}
+.win .plus{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.groups{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.group{padding:18px 18px 16px}
+.group h3{margin:0;font-size:15px;font-weight:700}
+.group .gp{display:flex;justify-content:space-between;align-items:baseline;margin-top:2px;color:var(--ink-2);font-size:13px}
+.group .gp strong{font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+.group .meter{height:8px;margin:8px 0 14px}
+.final{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:16px 20px;margin-top:16px;border-left:4px solid var(--gold)}
+.final .ic{width:40px;height:40px;border-radius:12px;background:color-mix(in srgb,var(--gold) 16%,transparent);display:grid;place-items:center;color:var(--gold)}
+.final h3{margin:0;font-size:15px}
+.final p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
+.note{padding:16px 20px;margin-top:16px;font-size:13.5px;color:var(--ink-2)}
+.note h3{margin:0 0 4px;font-size:15px;color:var(--ink)}
+.note ul{margin:6px 0 0;padding-left:18px}
+.foot{margin-top:28px;font-size:12.5px;color:var(--muted)}
+.tip{position:fixed;pointer-events:none;background:var(--navy);color:#fff;font-size:12px;padding:6px 9px;border-radius:8px;opacity:0;transition:opacity .12s;z-index:9;max-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.toggle{float:right;margin-top:-2px;background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 12px;font:600 12px Inter,system-ui,sans-serif;cursor:pointer}
+.toggle:hover{background:rgba(255,255,255,.1)}
+@media (max-width:760px){
+  .heroes{grid-template-columns:1fr}
+  .groups{grid-template-columns:1fr}
+  .row summary{grid-template-columns:minmax(0,1fr) 48px 18px;gap:6px 10px;padding:14px 16px}
+  .row summary .bar{grid-column:1 / -1;grid-row:2}
+  .detail{padding:2px 16px 16px}
+  .win{padding:12px 16px;grid-template-columns:28px 1fr auto}
+  h1{font-size:24px}
+  .hero .big{font-size:48px}
+}
+@media (prefers-reduced-motion: reduce){.meter i,.bar i{transition:none}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <button class="toggle" id="themeBtn" type="button" aria-label="Switch light or dark">Light / Dark</button>
+    <div class="eyebrow">PCEC Connect · Quality scorecard</div>
+    <h1>How good is the app, in numbers</h1>
+    <p class="sub">Measured against the nine qualities of ISO/IEC 25010:2023, plus a separate score for what's still needed before going live. As of 2 October 2026.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="heroes">
+    <div class="card hero">
+      <div class="label">App quality (ISO/IEC 25010)</div>
+      <div class="big" id="qBig">0<small>%</small></div>
+      <div class="meter" role="img" id="qMeter" aria-label=""><i style="width:0"></i></div>
+      <p id="qText"></p>
+    </div>
+    <div class="card hero">
+      <div class="label">Ready to launch</div>
+      <div class="big" id="lBig">0<small>%</small></div>
+      <div class="meter gold" role="img" id="lMeter" aria-label=""><i style="width:0"></i></div>
+      <p id="lText"></p>
+    </div>
+  </section>
+
+  <h2>The nine qualities</h2>
+  <p class="lead">Each bar is worked out from a short checklist: done counts in full, partly done counts half. Tap a row to see exactly what was counted. The thin mark on each bar is 80%, a good target for a church app at launch.</p>
+  <div class="legend" id="legend"></div>
+  <div class="card rows" id="rows"></div>
+
+  <h2>Biggest wins from here</h2>
+  <p class="lead">The tasks that would raise the app-quality score the most, worked out from the same checklists.</p>
+  <div class="card wins" id="wins"></div>
+
+  <h2>Before going live</h2>
+  <p class="lead">From the production checklist (handover doc 05). These are mostly decisions and paperwork for PCEC, not code.</p>
+  <div class="groups" id="groups"></div>
+
+  <div class="card final">
+    <div class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0L7 7zM17 7l-3 7a3 3 0 0 0 6 0l-3-7zM8 21h8"/></svg></div>
+    <div>
+      <h3>Last step: lawyer review</h3>
+      <p>The Terms, Community Rules, Privacy Notice and sign-up consent are drafts. PCEC's lawyer and Data Protection Officer read and approve them last, after everything above is settled. It counts as one item in the launch score.</p>
+    </div>
+  </div>
+
+  <div class="card note">
+    <h3>Reminder: Supabase pricing</h3>
+    The project is on the <b>Free plan</b> today: no backups, and it pauses after a week with no activity. Before real members join, move to <b>Pro, from USD 25 a month</b> (daily backups kept 7 days, no pausing). A second project for the sandbox adds roughly USD 10 a month on Pro.
+  </div>
+
+  <div class="card note">
+    <h3>What this score is, and isn't</h3>
+    <ul>
+      <li>ISO/IEC 25010 is a quality model, not a certificate. No one "passes" it; this is our own honest check against it.</li>
+      <li>The numbers come only from the checklists shown here, so anyone can recount them. Items marked "Phase 2" or "later" are listed but not counted.</li>
+      <li>Automated checks behind the "done" marks: 172 browser checks and 81 database checks, all passing on 2 October.</li>
+    </ul>
+  </div>
+
+  <p class="foot">Sources: docs/05-production-checklist.md, docs/07-device-test-guide.md and the daily log for 2 October 2026.</p>
+</main>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+// ---- The checklists. done = 1, part = 0.5, todo = 0, later = not counted.
+// "fix" groups items under one task, so the "biggest wins" list can add them up.
+const Q = [
+  { name: 'Functional suitability', what: 'Does what it should', items: [
+    ['done', 'All Phase 1 screens: Home, Events, About, Donate, Profile, Admin'],
+    ['done', 'Community feed: post, react, comment, report'],
+    ['done', 'Notifications page with unread count'],
+    ['done', '172 automated browser checks pass'],
+    ['todo', 'Tried by a small group of real members (pilot)', 'pilot'],
+    ['later', 'Recording donations in the app', null, 'Phase 2'],
+    ['later', 'QR attendance', null, 'Phase 2'],
+  ]},
+  { name: 'Performance efficiency', what: 'Fast and light', items: [
+    ['done', 'Small app: about 450 KB, no framework'],
+    ['done', 'Photos cropped and compressed (posts under 400 KB)'],
+    ['done', 'Feed loads 20 at a time; database indexes in place'],
+    ['todo', 'Speed checked on a real, mid-range phone on mobile data', 'device'],
+    ['todo', 'Load test with many members at once', 'load'],
+  ]},
+  { name: 'Compatibility', what: 'Works on the devices people use', items: [
+    ['done', 'Passes automated tests in a Chromium browser'],
+    ['done', 'Phone and desktop layouts'],
+    ['todo', 'Tested on a real Android phone', 'device'],
+    ['todo', 'Tested on a real iPhone', 'device'],
+    ['part', 'Play Store app: package prepared, not yet built and installed', 'twa'],
+  ]},
+  { name: 'Interaction capability', what: 'Easy to use, accessible', items: [
+    ['done', 'Matches the approved FlutterFlow design'],
+    ['done', 'Keyboard use and screen-reader labels'],
+    ['done', '"Reduce motion" respected; no jumping buttons on login'],
+    ['done', 'Clear error messages and empty screens'],
+    ['todo', 'Formal accessibility check (WCAG)', 'wcag'],
+    ['todo', 'Usability test with members', 'pilot'],
+    ['later', 'Filipino language option', null, 'later'],
+  ]},
+  { name: 'Reliability', what: 'Stays up, keeps data safe', items: [
+    ['done', 'Opens offline; prompts when a new version is out'],
+    ['done', 'One failing section doesn’t break the whole page'],
+    ['todo', 'Daily backups (Supabase Pro)', 'pro'],
+    ['todo', 'Never pauses when quiet (Supabase Pro)', 'pro'],
+    ['todo', 'Uptime monitor with an email alert', 'uptime'],
+    ['todo', 'Separate sandbox for testing', 'sandbox'],
+  ]},
+  { name: 'Security', what: 'Only the right people see things', items: [
+    ['done', 'Database rules on every table; 81 database checks pass'],
+    ['done', 'No secret keys in the app; deletion runs on the server'],
+    ['done', 'Strict content security policy and headers'],
+    ['done', 'Posting and comment limits'],
+    ['todo', 'Leaked-password protection on', 'auth'],
+    ['todo', '"Confirm email" on (needs the email sender)', 'auth'],
+    ['todo', 'QA test accounts deleted', 'qa'],
+    ['todo', '2-step login for admins', 'mfa'],
+    ['todo', 'Security check by someone outside the project', 'pentest'],
+  ]},
+  { name: 'Maintainability', what: 'Easy for the next developer', items: [
+    ['done', 'TypeScript throughout'],
+    ['done', 'Database code kept in one place (lib/supabase)'],
+    ['done', 'Automated tests for the app and the database'],
+    ['done', 'Handover docs and a day-by-day log'],
+    ['done', 'Database changes saved as migration files'],
+    ['todo', 'Code in version control (e.g. a private GitHub repo)', 'git'],
+  ]},
+  { name: 'Flexibility', what: 'Can move and grow', items: [
+    ['done', 'One app for web, desktop and phone'],
+    ['done', 'Play Store via a wrapper, no rewrite'],
+    ['done', 'Domain and keys in config files, not in the code'],
+    ['done', 'Installs from the browser as an app'],
+    ['later', 'Native iPhone App Store app', null, 'Phase 2'],
+  ]},
+  { name: 'Safety', what: 'Protects people', items: [
+    ['done', 'Report, hide and delete posts; suspend members'],
+    ['done', 'Block a member'],
+    ['done', 'Posting limits against spam'],
+    ['done', 'Delete account, in the app and on the web'],
+    ['done', 'Community Rules shown at sign-up and when posting'],
+    ['todo', 'Parent’s consent for members under 18', 'minors'],
+  ]},
+];
+
+const FIX = {
+  device: ['Do the real-phone test', 'Guide 07, about 45 minutes per phone'],
+  pro: ['Upgrade Supabase to Pro', 'From USD 25 a month'],
+  pilot: ['Pilot with a small group of members', 'A week or two, then fix what they find'],
+  auth: ['Turn on leaked-password protection and Confirm email', 'Needs the email sender set up first'],
+  git: ['Put the code in a private Git repo', 'About 15 minutes'],
+  sandbox: ['Set up the sandbox project', 'Needs Pro or a free project slot'],
+  uptime: ['Add an uptime monitor', 'Free monitors are enough'],
+  qa: ['Delete the QA test accounts', 'A few minutes in Supabase'],
+  minors: ['Decide on members under 18', 'Parent’s consent, or 18+ only'],
+  twa: ['Build and install the Play Store app', 'Steps in handover doc 06'],
+  wcag: ['Accessibility check', 'A free WCAG checker plus a screen-reader pass'],
+  mfa: ['2-step login for admins', 'Supabase supports it'],
+  load: ['Load test', 'Simulate many members at once'],
+  pentest: ['Outside security check', 'Worth it once membership grows'],
+};
+
+const L = [
+  { name: 'Google Play', items: [
+    ['done', 'Delete account in the app and on the web'],
+    ['done', 'Block a member'],
+    ['done', 'Community Rules (draft)'],
+    ['done', 'Privacy Notice page (draft)'],
+    ['done', 'Play Store package prepared'],
+    ['part', 'Data safety form: answers ready, not submitted'],
+    ['part', 'Content rating: answers ready, not submitted'],
+    ['todo', 'Organization developer account (needs D-U-N-S)'],
+    ['part', 'Donations outside Play Billing; tax-exempt papers on hand'],
+  ]},
+  { name: 'Data Privacy Act', items: [
+    ['done', 'Privacy notice in the app (draft)'],
+    ['done', 'Consent at sign-up naming sensitive data (draft)'],
+    ['todo', 'Appoint a Data Protection Officer'],
+    ['todo', 'NPC registration, or the exemption filing'],
+    ['todo', 'Breach plan (72-hour notice)'],
+    ['todo', 'Rule for members under 18'],
+  ]},
+  { name: 'Running it', items: [
+    ['todo', 'Supabase Pro plan'],
+    ['todo', 'Leaked-password protection and Confirm email'],
+    ['todo', 'Delete the QA test accounts and posts'],
+    ['todo', 'Separate sandbox project'],
+    ['todo', 'Real-phone test'],
+    ['todo', 'Uptime check and email alert'],
+  ]},
+];
+const LAWYER = ['todo', 'Lawyer review of the legal texts (last step)'];
+
+// ---- Scoring
+const val = s => s === 'done' ? 1 : s === 'part' ? 0.5 : 0;
+const counted = items => items.filter(i => i[0] !== 'later');
+const score = items => { const c = counted(items); return c.reduce((a, i) => a + val(i[0]), 0) / c.length; };
+
+Q.forEach(q => { q.score = score(q.items); });
+const quality = Q.reduce((a, q) => a + q.score, 0) / Q.length;
+
+const allLaunch = L.flatMap(g => g.items).concat([LAWYER]);
+const launch = score(allLaunch);
+
+// ---- Status bands (always shown with an icon and a word, never colour alone)
+const band = p => p >= 0.8 ? ['good', 'Strong'] : p >= 0.6 ? ['warn', 'Fair'] : ['serious', 'Needs work'];
+const ICON = {
+  good: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--good)"/><path d="M4.8 8.2l2.1 2.1 4.3-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--warn)"/><path d="M4.5 8h7" stroke="#1a1a19" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  serious: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l7 12.5H1z" fill="var(--serious)"/><path d="M8 6v3.6" stroke="#1a1a19" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="11.8" r=".95" fill="#1a1a19"/></svg>',
+};
+const ITEM = {
+  done: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Done"><circle cx="8" cy="8" r="7" fill="var(--good)"/><path d="M4.8 8.2l2.1 2.1 4.3-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  part: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Partly done"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--warn)" stroke-width="1.8"/><path d="M8 1.8a6.2 6.2 0 0 1 0 12.4z" fill="var(--warn)"/></svg>',
+  todo: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Not done yet"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--todo)" stroke-width="1.8"/></svg>',
+  later: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Later, not counted"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--todo)" stroke-width="1.6" stroke-dasharray="2.4 2.2"/></svg>',
+};
+const chip = p => { const [k, w] = band(p); return `<span class="chip">${ICON[k]}${w}</span>`; };
+const pct = p => Math.round(p * 100);
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const itemList = items => '<ul class="items">' + items.map(([s, t, , tag]) =>
+  `<li class="${s}">${ITEM[s]}<span>${esc(t)}${s === 'part' ? '<span class="tag">half</span>' : ''}${tag ? `<span class="tag">${tag}, not counted</span>` : ''}</span></li>`).join('') + '</ul>';
+
+// ---- Heroes
+const doneQ = Q.flatMap(q => counted(q.items)).filter(i => i[0] === 'done').length;
+const totalQ = Q.flatMap(q => counted(q.items)).length;
+document.getElementById('qText').innerHTML = `${chip(quality)} Average of the nine qualities. ${doneQ} of ${totalQ} checks done. Strongest: ${[...Q].sort((a, b) => b.score - a.score)[0].name.toLowerCase()}; weakest: ${[...Q].sort((a, b) => a.score - b.score)[0].name.toLowerCase()}.`;
+const doneL = allLaunch.filter(i => i[0] === 'done').length;
+document.getElementById('lText').innerHTML = `${chip(launch)} ${doneL} of ${allLaunch.length} launch items done, ${allLaunch.filter(i => i[0] === 'part').length} partly. Most of what's left is for PCEC to decide or sign up for.`;
+document.getElementById('qMeter').setAttribute('aria-label', `App quality ${pct(quality)} percent`);
+document.getElementById('lMeter').setAttribute('aria-label', `Ready to launch ${pct(launch)} percent`);
+
+// ---- Legend
+document.getElementById('legend').innerHTML =
+  `<span>${ICON.good} Strong, 80% and up</span><span>${ICON.warn} Fair, 60–79%</span><span>${ICON.serious} Needs work, under 60%</span>`;
+
+// ---- Rows, highest score first
+const rows = document.getElementById('rows');
+[...Q].sort((a, b) => b.score - a.score).forEach(q => {
+  const c = counted(q.items);
+  const d = c.filter(i => i[0] === 'done').length;
+  const p = c.filter(i => i[0] === 'part').length;
+  const el = document.createElement('details');
+  el.className = 'row';
+  el.innerHTML = `
+    <summary>
+      <div><div class="name">${q.name}</div><div class="what">${q.what}</div></div>
+      <div class="bar" data-tip="${q.name}: ${d} done${p ? `, ${p} partly` : ''} of ${c.length} → ${pct(q.score)}%" role="img" aria-label="${q.name} ${pct(q.score)} percent">
+        <i style="width:0" data-w="${pct(q.score)}"></i><span class="tick" style="left:calc(80% - 1px)" aria-hidden="true"></span>
+      </div>
+      <div class="pct">${pct(q.score)}%</div>
+      <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="detail"><div class="chiprow">${chip(q.score)} <span class="what">&nbsp;${d} done${p ? `, ${p} partly` : ''} of ${c.length} counted</span></div>${itemList(q.items)}</div>`;
+  rows.appendChild(el);
+});
+
+// ---- Biggest wins: how many points each task adds to the overall score
+const gains = {};
+Q.forEach(q => {
+  const n = counted(q.items).length;
+  q.items.forEach(([s, , fix]) => {
+    if (!fix || s === 'later') return;
+    gains[fix] = (gains[fix] || 0) + (1 - val(s)) / n / Q.length * 100;
+  });
+});
+const best = Object.entries(gains).sort((a, b) => b[1] - a[1]).slice(0, 6);
+let running = quality * 100;
+document.getElementById('wins').innerHTML = best.map(([k, g], i) => {
+  running += g;
+  return `<div class="win"><div class="n">${i + 1}</div><div><b>${FIX[k][0]}</b><div class="why">${FIX[k][1]}</div></div><div class="plus">+${g.toFixed(1)} pts</div></div>`;
+}).join('') + `<div class="win"><div class="n" aria-hidden="true">=</div><div><b>All six together</b><div class="why">App quality would go from ${pct(quality)}% to about ${Math.round(running)}%</div></div><div class="plus">${Math.round(running)}%</div></div>`;
+
+// ---- Launch groups
+document.getElementById('groups').innerHTML = L.map(g => {
+  const s = score(g.items);
+  const d = g.items.filter(i => i[0] === 'done').length;
+  return `<div class="card group"><h3>${g.name}</h3>
+    <div class="gp"><span>${d} of ${g.items.length} done</span><strong>${pct(s)}%</strong></div>
+    <div class="meter gold" role="img" aria-label="${g.name} ${pct(s)} percent" data-tip="${g.name}: ${pct(s)}% (half credit for partly done)"><i style="width:0" data-w="${pct(s)}"></i></div>
+    ${itemList(g.items)}</div>`;
+}).join('');
+
+// ---- Animate in: count up the big numbers, grow the bars
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function countUp(el, to) {
+  if (reduce) { el.innerHTML = `${to}<small>%</small>`; return; }
+  const t0 = performance.now();
+  const step = t => { const k = Math.min(1, (t - t0) / 900); const e = 1 - Math.pow(1 - k, 3);
+    el.innerHTML = `${Math.round(to * e)}<small>%</small>`; if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+requestAnimationFrame(() => {
+  countUp(document.getElementById('qBig'), pct(quality));
+  countUp(document.getElementById('lBig'), pct(launch));
+  document.querySelector('#qMeter i').style.width = pct(quality) + '%';
+  document.querySelector('#lMeter i').style.width = pct(launch) + '%';
+  document.querySelectorAll('[data-w]').forEach(i => { i.style.width = i.dataset.w + '%'; });
+});
+
+// ---- Hover tooltip on bars and meters
+const tip = document.getElementById('tip');
+document.addEventListener('pointermove', e => {
+  const t = e.target.closest('[data-tip]');
+  if (!t || e.pointerType === 'touch') { tip.style.opacity = 0; return; }
+  tip.textContent = t.dataset.tip;
+  const x = Math.min(innerWidth - tip.offsetWidth - 8, e.clientX + 12);
+  tip.style.left = x + 'px';
+  tip.style.top = (e.clientY - tip.offsetHeight - 10) + 'px';
+  tip.style.opacity = 1;
+});
+
+// ---- Light / dark switch (remembered on this device only)
+const root = document.documentElement;
+try { const s = localStorage.getItem('pcec-score-theme'); if (s) root.dataset.theme = s; } catch (e) {}
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('pcec-score-theme', root.dataset.theme); } catch (e) {}
+});
+</script>
+
+</body></html>
