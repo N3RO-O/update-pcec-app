@@ -149,6 +149,7 @@ ul.items li svg{margin-top:2px}
 
   <section class="card email-note"><div><h3>A separate check before paid launch.</h3><p>The production audit records 21 issues and 83 checks. Email verification, administrator protection, live upload controls and recovery still need attention.</p></div><a href="production-readiness.html">Review the launch audit &#8594;</a></section><h2 id="before-launch">Before members start using it</h2>
   <p class="lead">The remaining work includes live email and security setup, real-phone tests, and PCEC’s operational and privacy responsibilities.</p>
+  <section class="card note" aria-labelledby="launch-follow-up"><h3 id="launch-follow-up">Launch follow-up · 5 October</h3><p><strong>Draft owner: PCEC administrator.</strong> We will add the named contact and official email later. The incident response plan now explains escalation, recovery and when privacy notifications are required. It still needs approval and a practice exercise.</p><p>Member Management now has 25-person pages and searches older records. The release process also checks the deployed app’s version and essential files. Both changes passed local tests; live installation is pending.</p><p>Next: confirm the member-app address, arrange backup recovery, finish account email and administrator protection, and test on real phones. <a href="production-readiness.html#launch-progress">See the current launch work</a>.</p></section>
   <div class="groups" id="groups"></div>
 
   <div class="card final">
@@ -170,7 +171,7 @@ ul.items li svg{margin-top:2px}
       <li>ISO/IEC 25010 is a quality model, not a certificate. No one "passes" it; this is our own honest check against it.</li>
       <li>The numbers come only from the checklists shown here, so anyone can recount them. Items marked "Phase 2" or "later" are listed but not counted.</li>
       <li>Latest local checks: 173 checks in each of Chromium and WebKit, 60 automated accessibility scans and a 100-session local traffic test, together with database, upload and account-security checks. Automated accessibility checks need a screen-reader review; local traffic is not proof of live Supabase capacity. Firefox could not launch because of a Windows runtime error.</li>
-      <li>The member source is now in local Git, with secret/private-file checks. Its remote repository and active release checks remain open. Publishing this report does not deploy the member app.</li>
+      <li>The member source is in local Git. The deployment script now requires secret/security/browser checks and verifies the production website after upload. The member source remote, active CI and actual host release remain pending. Publishing this report does not deploy the member app.</li>
       <li>The categories use the <a href="https://www.iso.org/standard/78176.html" target="_blank" rel="noopener noreferrer">ISO/IEC 25010:2023 quality model</a>. The scores and 80% target belong to this project.</li>
     </ul>
   </div>
@@ -296,7 +297,7 @@ const L = [
     ['done', 'Consent at sign-up naming sensitive data (draft)'],
     ['todo', 'Appoint a Data Protection Officer'],
     ['todo', 'NPC registration, or the exemption filing'],
-    ['todo', 'Breach plan (72-hour notice)'],
+    ['part', 'Incident plan drafted; PCEC administrator as draft owner; approval and practice pending'],
     ['todo', 'Rule for members under 18'],
   ]},
   { name: 'Running it', items: [
