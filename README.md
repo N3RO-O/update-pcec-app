@@ -2,6 +2,8 @@
 
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
 
+Open **production-readiness.html** for the launch audit: 21 issues, 83 checklist requirements, an 11-category assessment, ten blockers, twenty fixes and a proposed 14-day plan. Labels distinguish live observations, unverified requirements and local fixes. The current verdict is **not production ready**. Technical file/line evidence stays in the member workspace's `PRODUCTION-AUDIT.md`; no member records or credentials are published.
+
 Open **income-plan.html** for the proposed funding plan: membership renewal collection, paid training, voluntary app support and sponsorship. Its peso calculator compares illustrative monthly support with an entered operating cost; an unknown cost is never treated as profit. No fees are approved or payments collected by this page. It also covers a small pilot, payment-handling work and a separate developer maintenance agreement.
 
 Open **api-cost-review.html** for the API audit, growth estimates and a local cost calculator. It distinguishes live settings from locally tested safeguards. No paid upgrade was enabled; email usage alerts still need a recipient. The calculator changes no settings and sends no requests.
@@ -26,7 +28,9 @@ The **email-templates** folder contains the HTML files and **subjects.json** lis
 
 ## For the maintainer
 
-Run `npm ci`, then `npm run build` to regenerate the email files and preview. `npm run preview` opens a local review server. After installing Chromium with `npx playwright install chromium`, `npm run check` checks the report and all eight emails at phone and desktop widths. The templates use inline styles and table layouts for email compatibility; final delivery still needs testing in actual inboxes.
+Run `npm ci`, then `npm run build` to regenerate the emails, audit and public output. Edit `scripts/readiness-data.mjs` for audit content; `scripts/build-readiness.mjs` produces its page. `npm run preview` serves the built public folder with the same CSP and security headers as Vercel. After installing Chromium with `npx playwright install chromium`, `npm run check` checks every page, calculators, audit filters/checklists, CSP enforcement, private-file exclusion and eight emails at phone and desktop widths. The templates use inline styles and table layouts for email compatibility; final delivery still needs testing in actual inboxes.
 
 The build also prepares `dist/` for Vercel. `vercel.json` selects that folder;
-only the report, income plan, API cost review, email preview, logo and downloadable templates are published.
+only the report, income plan, API cost review, readiness review, email preview, generated JavaScript, logo and downloadable templates are published. Build scripts, README files and private developer evidence are excluded.
+
+The report uses same-origin executable scripts, CSP `default-src 'self'`, `nosniff`, frame restrictions and a referrer policy. Inline CSS remains allowed for report/email layouts; inline scripts and handlers are blocked. These protections do not configure the member app host. Vercel supplies HSTS, verified during the live review.

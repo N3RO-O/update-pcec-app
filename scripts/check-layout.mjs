@@ -17,6 +17,31 @@ try{
   await page.route(/fonts\.(googleapis|gstatic)\.com/,r=>r.fulfill({status:200,body:''}));
   for(const size of [{width:1440,height:1000},{width:390,height:844}]){
     await page.setViewportSize(size);
+    const readinessResponse=await page.goto('http://localhost:5205/production-readiness.html');
+    assert.match(readinessResponse.headers()['content-security-policy'],/default-src 'self'; script-src 'self'/);
+    assert.equal(readinessResponse.headers()['x-content-type-options'],'nosniff');
+    assert.equal(readinessResponse.headers()['x-frame-options'],'DENY');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    assert.equal(await page.locator('.finding').count(),21);
+    assert.equal(await page.locator('.check-group').count(),11);
+    assert.equal(await page.locator('.check').count(),83);
+    assert.match(await page.locator('.verdict').textContent(),/Not production ready/);
+    await page.getByRole('button',{name:'Prepared fixes',exact:true}).click();
+    assert.equal(await page.locator('.finding:visible').count(),6);
+    assert.match(await page.locator('#issue-count').textContent(),/6 issues/);
+    await page.getByRole('button',{name:'Needs action',exact:true}).click();
+    assert.equal(await page.locator('.finding:visible').count(),15);
+    await page.getByRole('button',{name:'Everything',exact:true}).click();
+    await page.getByRole('button',{name:'Open all checklists',exact:true}).click();
+    assert.equal(await page.locator('.check-group[open]').count(),11);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    await page.getByRole('button',{name:'Close all checklists',exact:true}).click();
+    await page.screenshot({path:shots+`production-readiness-${size.width}.png`,fullPage:true});
+    assert.equal(await page.locator('script:not([src])').count(),0);
+    await page.evaluate(()=>{
+      const script=document.createElement('script');script.textContent='window.auditInlineExecuted=true';document.body.append(script);
+    });
+    assert.equal(await page.evaluate(()=>window.auditInlineExecuted===true),false,'CSP blocks inline execution');
     await page.goto('http://localhost:5205/index.html');
     await page.waitForTimeout(1100);
     assert.equal(await page.locator('#rows details').count(),9);
@@ -79,5 +104,6 @@ try{
   const subjects=JSON.parse(await readFile(new URL('../email-templates/subjects.json',import.meta.url),'utf8'));
   for(const m of subjects){const html=await readFile(new URL('../email-templates/'+m.file,import.meta.url),'utf8');assert.ok(html.includes('{{ .Email }}'));assert.ok(!html.includes('<script'));assert.ok(html.includes('PCEC'));}
   assert.deepEqual(errors,[]);
-  console.log('PASS: report, income plan, both calculators and all 8 emails fit desktop and phone; financial examples handle unknown/zero costs and invalid inputs; preview links are inert.');
+  for(const path of ['/scripts/readiness-data.mjs','/.env','/README.md','/PRODUCTION-AUDIT.md'])assert.equal((await fetch('http://localhost:5205'+path)).status,404);
+  console.log('PASS: production audit, filters, 83 checklist items, CSP enforcement, private-file denial, report, income plan, calculators and 8 emails fit desktop and phone.');
 }finally{await browser.close();server.kill()}

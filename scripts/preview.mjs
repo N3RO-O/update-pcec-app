@@ -1,8 +1,10 @@
 import { createServer } from 'node:http';
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, statSync, readFileSync } from 'node:fs';
 import { extname, join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
-const root=fileURLToPath(new URL('../',import.meta.url));
+const root=fileURLToPath(new URL('../dist/',import.meta.url));
+if(!existsSync(join(root,'index.html')))throw new Error('Run npm run build before previewing.');
+const securityHeaders=Object.fromEntries(JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8')).headers[0].headers.map(h=>[h.key,h.value]));
 const port=Number(process.env.PORT)||5204;
 createServer((req,res)=>{
   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405).end();return}
@@ -13,6 +15,6 @@ createServer((req,res)=>{
   const file=join(root,path),rel=relative(root,file);
   const types={'.html':'text/html; charset=utf-8','.png':'image/png','.json':'application/json; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8'};
   if(isAbsolute(rel)||rel.startsWith('..')||!types[extname(file)]||!existsSync(file)||!statSync(file).isFile()){res.writeHead(404).end();return}
-  res.writeHead(200,{'Content-Type':types[extname(file)],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+  res.writeHead(200,{...securityHeaders,'Content-Type':types[extname(file)],'Cache-Control':'no-store'});
   if(req.method==='HEAD'){res.end();return}createReadStream(file).pipe(res);
 }).listen(port,'127.0.0.1',()=>console.log(`PCEC review: http://localhost:${port}`));
