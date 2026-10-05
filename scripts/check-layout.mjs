@@ -24,6 +24,15 @@ try{
     assert.ok(await page.locator('#qBig').textContent());
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     await page.screenshot({path:shots+`report-${size.width}.png`,fullPage:true});
+    await page.goto('http://localhost:5205/api-cost-review.html');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    assert.equal(await page.locator('#estimate').textContent(),'$25.00');
+    await page.locator('#members').fill('10000');
+    assert.equal(await page.locator('#downloads').textContent(),'400 GB');
+    assert.equal(await page.locator('#estimate').textContent(),'$38.50');
+    await page.locator('#income').fill('20');
+    assert.match(await page.locator('#income-note').textContent(),/exceeds/);
+    await page.screenshot({path:shots+`api-costs-${size.width}.png`,fullPage:true});
     await page.goto('http://localhost:5205/email-preview.html');
     await page.waitForSelector('#mail');
     const titles=await page.locator('.choice').allTextContents();
@@ -48,5 +57,5 @@ try{
   const subjects=JSON.parse(await readFile(new URL('../email-templates/subjects.json',import.meta.url),'utf8'));
   for(const m of subjects){const html=await readFile(new URL('../email-templates/'+m.file,import.meta.url),'utf8');assert.ok(html.includes('{{ .Email }}'));assert.ok(!html.includes('<script'));assert.ok(html.includes('PCEC'));}
   assert.deepEqual(errors,[]);
-  console.log('PASS: report and all 8 emails fit desktop and phone; preview links are inert; template placeholders remain in downloadable files.');
+  console.log('PASS: report, cost calculator and all 8 emails fit desktop and phone; preview links are inert; template placeholders remain in downloadable files.');
 }finally{await browser.close();server.kill()}

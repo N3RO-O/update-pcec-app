@@ -2,6 +2,8 @@
 
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
 
+Open **api-cost-review.html** for the API audit, growth estimates and a local cost calculator. It distinguishes live settings from locally tested safeguards. No paid upgrade was enabled; email usage alerts still need a recipient. The calculator changes no settings and sends no requests.
+
 Open **index.html** for the supervisor’s progress report. Open **email-preview.html** to review eight account messages on a phone or desktop. The review page uses example information and does not send emails.
 
 The messages cover password recovery, email confirmation, verification codes, password changes, email-address changes, and notices about adding or removing 2-step verification. Each has the same PCEC letterhead, a clear action and a short explanation of what to do if the change was not requested.
@@ -25,4 +27,4 @@ The **email-templates** folder contains the HTML files and **subjects.json** lis
 Run `npm ci`, then `npm run build` to regenerate the email files and preview. `npm run preview` opens a local review server. After installing Chromium with `npx playwright install chromium`, `npm run check` checks the report and all eight emails at phone and desktop widths. The templates use inline styles and table layouts for email compatibility; final delivery still needs testing in actual inboxes.
 
 The build also prepares `dist/` for Vercel. `vercel.json` selects that folder;
-only the report, preview, logo and downloadable templates are published.
+only the report, API cost review, email preview, logo and downloadable templates are published.
