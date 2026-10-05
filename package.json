@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-emails.mjs",
+    "build": "node scripts/build-site.mjs",
     "preview": "node scripts/preview.mjs",
     "check": "node scripts/check-layout.mjs"
   },

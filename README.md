@@ -23,3 +23,6 @@ The **email-templates** folder contains the HTML files and **subjects.json** lis
 ## For the maintainer
 
 Run `npm ci`, then `npm run build` to regenerate the email files and preview. `npm run preview` opens a local review server. After installing Chromium with `npx playwright install chromium`, `npm run check` checks the report and all eight emails at phone and desktop widths. The templates use inline styles and table layouts for email compatibility; final delivery still needs testing in actual inboxes.
+
+The build also prepares `dist/` for Vercel. `vercel.json` selects that folder;
+only the report, preview, logo and downloadable templates are published.
