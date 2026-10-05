@@ -36,6 +36,25 @@ try{
     await page.locator('#members').fill('100000');
     await page.locator('#uploads').fill('30');
     assert.equal(await page.locator('#estimate').textContent(),'$515.73');
+    await page.goto('http://localhost:5205/income-plan.html');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    assert.match(await page.locator('#gross').textContent(),/5,000/);
+    assert.equal(await page.locator('#balance').textContent(),'Cost needed');
+    assert.match(await page.locator('#support-note').textContent(),/not confirmed income or profit/);
+    await page.screenshot({path:shots+`income-plan-${size.width}.png`,fullPage:true});
+    await page.locator('#monthly-cost').fill('6500');
+    assert.equal(await page.locator('#needed').textContent(),'26');
+    assert.match(await page.locator('#support-note').textContent(),/falls short by.*1,500/);
+    await page.locator('#monthly-cost').fill('5000');
+    assert.match(await page.locator('#support-note').textContent(),/exactly/);
+    await page.locator('#contribution').fill('0');
+    assert.equal(await page.locator('#needed').textContent(),'Contribution needed');
+    await page.locator('#contribution').fill('-1');
+    assert.equal(await page.locator('#input-error').isVisible(),true);
+    assert.equal(await page.locator('#gross').textContent(),'Check inputs');
+    await page.locator('#contribution').fill('0.01');
+    await page.locator('#monthly-cost').fill('0.07');
+    assert.equal(await page.locator('#needed').textContent(),'7');
     await page.goto('http://localhost:5205/email-preview.html');
     await page.waitForSelector('#mail');
     const titles=await page.locator('.choice').allTextContents();
@@ -60,5 +79,5 @@ try{
   const subjects=JSON.parse(await readFile(new URL('../email-templates/subjects.json',import.meta.url),'utf8'));
   for(const m of subjects){const html=await readFile(new URL('../email-templates/'+m.file,import.meta.url),'utf8');assert.ok(html.includes('{{ .Email }}'));assert.ok(!html.includes('<script'));assert.ok(html.includes('PCEC'));}
   assert.deepEqual(errors,[]);
-  console.log('PASS: report, cost calculator and all 8 emails fit desktop and phone; preview links are inert; template placeholders remain in downloadable files.');
+  console.log('PASS: report, income plan, both calculators and all 8 emails fit desktop and phone; financial examples handle unknown/zero costs and invalid inputs; preview links are inert.');
 }finally{await browser.close();server.kill()}
