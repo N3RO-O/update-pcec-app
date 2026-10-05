@@ -33,6 +33,9 @@ try{
     await page.locator('#income').fill('20');
     assert.match(await page.locator('#income-note').textContent(),/exceeds/);
     await page.screenshot({path:shots+`api-costs-${size.width}.png`,fullPage:true});
+    await page.locator('#members').fill('100000');
+    await page.locator('#uploads').fill('30');
+    assert.equal(await page.locator('#estimate').textContent(),'$515.73');
     await page.goto('http://localhost:5205/email-preview.html');
     await page.waitForSelector('#mail');
     const titles=await page.locator('.choice').allTextContents();
