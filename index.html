@@ -133,7 +133,8 @@ ul.items li svg{margin-top:2px}
     </div>
   </section>
 
-  <section class="card brief" aria-labelledby="brief-title"><h2 id="brief-title">For your review</h2><p>The latest work strengthens how member accounts are protected and gives account emails a consistent PCEC identity. Prepared work is shown separately from changes already running for members.</p><div class="brief-grid"><div><h3>Prepared and checked</h3><p>173 browser checks pass. New tests check who can access information, stop upload bypasses and enforce posting limits. Account emails now have a PCEC layout for password recovery, confirmation and security notices.</p></div><div><h3>Still needs live setup</h3><p>Email confirmation is currently off. Email delivery, the new server protections and administrator 2-step login need to be configured and tested before members rely on them.</p></div><div><h3>Decisions for PCEC</h3><p>Confirm the official sender address, assign the person responsible for account support, approve the email wording, and arrange a small member pilot on real phones.</p></div></div></section>
+  <section class="card brief" aria-labelledby="brief-title"><h2 id="brief-title">For your review</h2><p>The latest quality review improves readable labels, keyboard use and small-screen controls. Prepared work is shown separately from changes already running for members.</p><div class="brief-grid"><div><h3>Checked this round</h3><p>60 accessibility scans found no remaining automated violations after fixes. A bounded local test exercised 100 simulated sessions. The member-app source now has a local Git checkpoint.</p></div><div><h3>Still needs live setup</h3><p>Email confirmation is currently off. Email delivery, the new server protections and administrator 2-step login need to be configured and tested before members rely on them.</p></div><div><h3>Decisions for PCEC</h3><p>Confirm the member-app address, official sender and account-support owner. Arrange an Android phone, an iPhone and a small group of members to test a version with sample data.</p></div></div></section>
+  <section class="card brief" aria-labelledby="target-title"><h2 id="target-title">The path to 80%</h2><p id="target-progress"></p><div class="brief-grid"><div><h3>1. Try a real Android phone</h3><p>Check sign-in, pictures, events, installation and offline opening. Measure speed on a mid-range phone using mobile data. Save the phone model and results.</p></div><div><h3>2. Try a real iPhone</h3><p>Check the same member tasks in Safari, including Add to Home Screen, picture cropping and reopening the app. Save the iPhone model and results.</p></div><div><h3>3. Let members try it</h3><p>A small group uses the test version for one to two weeks. Record whether they can complete the main tasks, fix confusing steps and repeat failed tasks.</p></div></div><p>The score changes after results are recorded. Reaching 80% does not complete the separate launch and security checks.</p></section>
   <section class="card email-note"><div><h3>Account emails that look like PCEC.</h3><p>Eight examples, including forgot password and 2-step-login notices. View each on a phone or desktop. This review page does not send emails.</p></div><a href="email-preview.html">Open email review &#8594;</a></section>
   <section class="card email-note"><div><h3>A plan to fund the app’s work.</h3><p>Review membership renewals, paid training, voluntary support and sponsorship. Try a monthly support example and see the decisions needed before collecting payments.</p></div><a href="income-plan.html">Review the income plan &#8594;</a></section>
 
@@ -168,8 +169,9 @@ ul.items li svg{margin-top:2px}
     <ul>
       <li>ISO/IEC 25010 is a quality model, not a certificate. No one "passes" it; this is our own honest check against it.</li>
       <li>The numbers come only from the checklists shown here, so anyone can recount them. Items marked "Phase 2" or "later" are listed but not counted.</li>
-      <li>Latest local checks: 173 browser checks pass, together with the new database, upload and account-security checks on 5 October. They do not prove that live settings have been updated.</li>
-      <li>This page is the project report. The application’s source code is still in its separate local folder; publishing this report does not deploy the member app.</li>
+      <li>Latest local checks: 173 checks in each of Chromium and WebKit, 60 automated accessibility scans and a 100-session local traffic test, together with database, upload and account-security checks. Automated accessibility checks need a screen-reader review; local traffic is not proof of live Supabase capacity. Firefox could not launch because of a Windows runtime error.</li>
+      <li>The member source is now in local Git, with secret/private-file checks. Its remote repository and active release checks remain open. Publishing this report does not deploy the member app.</li>
+      <li>The categories use the <a href="https://www.iso.org/standard/78176.html" target="_blank" rel="noopener noreferrer">ISO/IEC 25010:2023 quality model</a>. The scores and 80% target belong to this project.</li>
     </ul>
   </div>
 
@@ -185,20 +187,20 @@ const Q = [
     ['done', 'All Phase 1 screens: Home, Events, About, Donate, Profile, Admin'],
     ['done', 'Community feed: post, react, comment, report'],
     ['done', 'Notifications page with unread count'],
-    ['done', '173 automated browser checks pass'],
+    ['done', '173 checks pass in each of Chromium and WebKit'],
     ['todo', 'Tried by a small group of real members (pilot)', 'pilot'],
     ['later', 'Recording donations in the app', null, 'Phase 2'],
     ['later', 'QR attendance', null, 'Phase 2'],
   ]},
   { name: 'Speed and size', what: 'Quick to open, lighter on mobile data', items: [
-    ['done', 'Small app: about 630 KB of app files in the latest build'],
+    ['done', 'Small app: about 639 KB of app files in the latest build'],
     ['done', 'Photos cropped and compressed (posts under 400 KB)'],
     ['done', 'Feed loads 20 at a time; database indexes in place'],
     ['todo', 'Speed checked on a real, mid-range phone on mobile data', 'device'],
-    ['todo', 'Load test with many members at once', 'load'],
+    ['part', '100 simulated sessions tested locally; live service capacity unverified', 'load'],
   ]},
   { name: 'Devices and browsers', what: 'Works on the devices people use', items: [
-    ['done', 'Passes automated tests in a Chromium browser'],
+    ['done', 'Passes automated tests in Chromium and WebKit; Firefox runtime blocked'],
     ['done', 'Phone and desktop layouts'],
     ['todo', 'Tested on a real Android phone', 'device'],
     ['todo', 'Tested on a real iPhone', 'device'],
@@ -210,7 +212,7 @@ const Q = [
     ['done', '"Reduce motion" respected; no jumping buttons on login'],
     ['done', 'Clear error messages and empty screens'],
     ['done', 'PCEC account email designs prepared for review'],
-    ['todo', 'Formal accessibility check (WCAG)', 'wcag'],
+    ['part', '60 accessibility scans and keyboard checks pass; screen-reader review pending', 'wcag'],
     ['todo', 'Usability test with members', 'pilot'],
     ['later', 'Filipino language option', null, 'later'],
   ]},
@@ -240,7 +242,7 @@ const Q = [
     ['done', 'Automated tests for the app and the database'],
     ['done', 'Handover docs and a day-by-day log'],
     ['done', 'Database changes saved as migration files'],
-    ['part', 'Report and email templates in GitHub; app source still separate', 'git'],
+    ['done', 'Member source saved in local Git; report and emails in GitHub'],
   ]},
   { name: 'Room to grow', what: 'Can adapt as PCEC needs change', items: [
     ['done', 'One app for web, desktop and phone'],
@@ -265,15 +267,15 @@ const FIX = {
   pilot: ['Pilot with a small group of members', 'A week or two, then fix what they find'],
   auth: ['Finish email delivery and account protection', 'Choose the official sender, enable confirmation and test real messages'],
   security: ['Install the prepared security improvements', 'Test in a separate environment, then coordinate the live update'],
-  git: ['Put the member-app source in version control', 'This GitHub repository currently holds the report and email designs'],
+  git: ['Connect the member repository to release checks', 'Local Git is ready; choose its remote repository and protect releases'],
   sandbox: ['Set up the sandbox project', 'Needs Pro or a free project slot'],
   uptime: ['Add an uptime monitor', 'Free monitors are enough'],
   qa: ['Delete the QA test accounts', 'A few minutes in Supabase'],
   minors: ['Decide on members under 18', 'Parent’s consent, or 18+ only'],
   twa: ['Build and install the Play Store app', 'Steps in handover doc 06'],
-  wcag: ['Accessibility check', 'A free WCAG checker plus a screen-reader pass'],
+  wcag: ['Complete the accessibility review', 'Automated rules and keyboard checks pass; test with a screen reader'],
   mfa: ['Set up 2-step login for administrators', 'The notification design is ready; the extra sign-in check still needs setup'],
-  load: ['Load test', 'Simulate many members at once'],
+  load: ['Verify capacity in a separate test environment', 'Local 100-session exercise passed; measure the real database and hosting service'],
   pentest: ['Outside security check', 'Worth it once membership grows'],
 };
 
@@ -317,6 +319,8 @@ const score = items => { const c = counted(items); return c.reduce((a, i) => a +
 
 Q.forEach(q => { q.score = score(q.items); });
 const quality = Q.reduce((a, q) => a + q.score, 0) / Q.length;
+const afterPhonePilot = Q.reduce((sum, q) => sum + score(q.items.map(i => ['device', 'pilot'].includes(i[2]) ? ['done', ...i.slice(1)] : i)), 0) / Q.length;
+document.getElementById('target-progress').textContent = `Verified checklist progress: ${(quality * 100).toFixed(1)}%. Completing the three steps below would bring it to ${(afterPhonePilot * 100).toFixed(1)}%, using the same checklist and scoring. No results have been assumed.`;
 
 const allLaunch = L.flatMap(g => g.items).concat([LAWYER]);
 const launch = score(allLaunch);

@@ -47,6 +47,9 @@ try{
     assert.equal(await page.locator('#rows details').count(),9);
     assert.equal(await page.locator('#groups .group').count(),3);
     assert.ok(await page.locator('#qBig').textContent());
+    assert.match(await page.locator('#qBig').textContent(),/^70/);
+    assert.match(await page.locator('#target-progress').textContent(),/70\.0%.*80\.5%/);
+    assert.equal(await page.locator('#target-title').textContent(),'The path to 80%');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     await page.screenshot({path:shots+`report-${size.width}.png`,fullPage:true});
     await page.goto('http://localhost:5205/api-cost-review.html');
