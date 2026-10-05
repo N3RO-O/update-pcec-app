@@ -1,11 +1,11 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <title>PCEC Connect Scorecard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f4f6fa; --card:#ffffff; --ink:#14203a; --ink-2:#4a5672; --muted:#7a849b;
+  --bg:#f3f0e9; --card:#ffffff; --ink:#14203a; --ink-2:#4a5672; --muted:#68738a;
   --line:#e2e7f0; --track:#e7ecf4; --bar:#046cab; --navy:#1a2744; --gold:#cb820b;
   --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --todo:#a3acbf;
   --chip:#eef2f8; --shadow:0 1px 2px rgba(20,32,58,.06),0 4px 16px rgba(20,32,58,.05);
@@ -25,13 +25,13 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 .wrap{max-width:960px;margin:0 auto;padding:0 16px 56px}
-header.top{background:linear-gradient(135deg,#1a2744 0%,#16386a 55%,#046cab 100%);color:#fff;padding:28px 0 84px}
+header.top{background:#1a2744;color:#fff;padding:32px 0 84px;border-top:5px solid #cb820b}
 header.top .wrap{padding-bottom:0}
 .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#f3c779;font-weight:700}
-h1{margin:6px 0 6px;font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.01em}
+h1{margin:14px 0 12px;font:400 38px/1.15 Georgia,serif;letter-spacing:-.6px}
 .sub{margin:0;color:#d5def0;max-width:640px}
 .heroes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:-60px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;box-shadow:none}
 .hero{padding:20px 22px}
 .hero .label{font-size:13px;font-weight:600;color:var(--ink-2)}
 .hero .big{font-size:56px;font-weight:800;line-height:1.05;letter-spacing:-.03em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
@@ -92,6 +92,7 @@ ul.items li svg{margin-top:2px}
 .tip{position:fixed;pointer-events:none;background:var(--navy);color:#fff;font-size:12px;padding:6px 9px;border-radius:8px;opacity:0;transition:opacity .12s;z-index:9;max-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .toggle{float:right;margin-top:-2px;background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 12px;font:600 12px Inter,system-ui,sans-serif;cursor:pointer}
 .toggle:hover{background:rgba(255,255,255,.1)}
+.report-nav{display:flex;gap:20px;align-items:center;margin-top:22px;font-size:12px}.report-nav a{color:#f5d4a0;text-decoration:none;border-bottom:1px solid #938c7c;padding-bottom:3px}.brief{margin-top:26px;padding:23px 24px;border-left:3px solid var(--gold)}.brief h2{margin:0 0 9px;font:400 25px Georgia,serif}.brief>p{color:var(--ink-2);font-size:14px;margin:0 0 20px;max-width:730px}.brief-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}.brief-grid h3{margin:0 0 7px;font-size:12px}.brief-grid p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.7}.email-note{padding:20px 24px;margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:22px}.email-note h3{margin:0 0 5px;font:400 22px Georgia,serif}.email-note p{margin:0;color:var(--ink-2);font-size:13px;max-width:560px}.email-note a{color:#fff;background:#1a2744;padding:11px 18px;text-decoration:none;white-space:nowrap;font-size:12px}.report-brand{width:66px;height:40px;object-fit:contain;display:block;margin-bottom:18px}@media(max-width:760px){.brief-grid{grid-template-columns:1fr;gap:16px}.email-note{display:block}.email-note a{display:inline-block;margin-top:15px}.report-nav{flex-wrap:wrap}h1{font-size:32px}}
 @media (max-width:760px){
   .heroes{grid-template-columns:1fr}
   .groups{grid-template-columns:1fr}
@@ -103,14 +104,16 @@ ul.items li svg{margin-top:2px}
   .hero .big{font-size:48px}
 }
 @media (prefers-reduced-motion: reduce){.meter i,.bar i{transition:none}}
-</style>
+</style></head><body>
 
 <header class="top">
   <div class="wrap">
     <button class="toggle" id="themeBtn" type="button" aria-label="Switch light or dark">Light / Dark</button>
-    <div class="eyebrow">PCEC Connect · Quality scorecard</div>
-    <h1>How good is the app, in numbers</h1>
-    <p class="sub">Measured against the nine qualities of ISO/IEC 25010:2023, plus a separate score for what's still needed before going live. As of 2 October 2026.</p>
+    <img class="report-brand" src="assets/pcec-logo-white.png" alt="PCEC">
+    <div class="eyebrow">PCEC Connect · Project update · 5 October 2026</div>
+    <h1>Progress you can review.<br>Next steps you can decide.</h1>
+    <p class="sub">The member app is working in local tests. Account messages and security improvements are prepared; live setup and member testing still need to be completed.</p>
+    <nav class="report-nav" aria-label="Report links"><a href="email-preview.html">Review the account emails &#8599;</a><a href="#before-launch">What remains before launch</a></nav>
   </div>
 </header>
 
@@ -130,8 +133,11 @@ ul.items li svg{margin-top:2px}
     </div>
   </section>
 
-  <h2>The nine qualities</h2>
-  <p class="lead">Each bar is worked out from a short checklist: done counts in full, partly done counts half. Tap a row to see exactly what was counted. The thin mark on each bar is 80%, a good target for a church app at launch.</p>
+  <section class="card brief" aria-labelledby="brief-title"><h2 id="brief-title">For your review</h2><p>The latest work strengthens how member accounts are protected and gives account emails a consistent PCEC identity. Prepared work is shown separately from changes already running for members.</p><div class="brief-grid"><div><h3>Prepared and checked</h3><p>172 browser checks pass. New tests check who can access information, stop upload bypasses and enforce posting limits. Account emails now have a PCEC layout for password recovery, confirmation and security notices.</p></div><div><h3>Still needs live setup</h3><p>Email confirmation is currently off. Email delivery, the new server protections and administrator 2-step login need to be configured and tested before members rely on them.</p></div><div><h3>Decisions for PCEC</h3><p>Confirm the official sender address, assign the person responsible for account support, approve the email wording, and arrange a small member pilot on real phones.</p></div></div></section>
+  <section class="card email-note"><div><h3>Account emails that look like PCEC.</h3><p>Eight examples, including forgot password and 2-step-login notices. View each on a phone or desktop. This review page does not send emails.</p></div><a href="email-preview.html">Open email review &#8594;</a></section>
+
+  <h2>How the app is shaping up</h2>
+  <p class="lead">These nine areas use the ISO/IEC 25010 quality framework. Open a row to see the checklist. Complete work counts in full; prepared work with setup remaining counts half. The 80% line is our own planning target, not a certification.</p>
   <div class="legend" id="legend"></div>
   <div class="card rows" id="rows"></div>
 
@@ -139,8 +145,8 @@ ul.items li svg{margin-top:2px}
   <p class="lead">The tasks that would raise the app-quality score the most, worked out from the same checklists.</p>
   <div class="card wins" id="wins"></div>
 
-  <h2>Before going live</h2>
-  <p class="lead">From the production checklist (handover doc 05). These are mostly decisions and paperwork for PCEC, not code.</p>
+  <h2 id="before-launch">Before members start using it</h2>
+  <p class="lead">The remaining work includes live email and security setup, real-phone tests, and PCEC’s operational and privacy responsibilities.</p>
   <div class="groups" id="groups"></div>
 
   <div class="card final">
@@ -152,8 +158,8 @@ ul.items li svg{margin-top:2px}
   </div>
 
   <div class="card note">
-    <h3>Reminder: Supabase pricing</h3>
-    The project is on the <b>Free plan</b> today: no backups, and it pauses after a week with no activity. Before real members join, move to <b>Pro, from USD 25 a month</b> (daily backups kept 7 days, no pausing). A second project for the sandbox adds roughly USD 10 a month on Pro.
+    <h3>Confirm the operating budget</h3>
+    Before launch, confirm the service plan, automatic backups, and a separate place to test changes. The current account plan and pricing have not been verified in this review; the project owner should confirm them before approving expenditure.
   </div>
 
   <div class="card note">
@@ -161,11 +167,12 @@ ul.items li svg{margin-top:2px}
     <ul>
       <li>ISO/IEC 25010 is a quality model, not a certificate. No one "passes" it; this is our own honest check against it.</li>
       <li>The numbers come only from the checklists shown here, so anyone can recount them. Items marked "Phase 2" or "later" are listed but not counted.</li>
-      <li>Automated checks behind the "done" marks: 172 browser checks and 81 database checks, all passing on 2 October.</li>
+      <li>Latest local checks: 172 browser checks pass, together with the new database, upload and account-security checks on 5 October. They do not prove that live settings have been updated.</li>
+      <li>This page is the project report. The application’s source code is still in its separate local folder; publishing this report does not deploy the member app.</li>
     </ul>
   </div>
 
-  <p class="foot">Sources: docs/05-production-checklist.md, docs/07-device-test-guide.md and the daily log for 2 October 2026.</p>
+  <p class="foot">Updated 5 October 2026. Based on the existing project checklist, local test results and the latest security review. Account email examples are ready for approval; live email delivery has not been changed.</p>
 </main>
 <div class="tip" id="tip" role="tooltip"></div>
 
@@ -173,7 +180,7 @@ ul.items li svg{margin-top:2px}
 // ---- The checklists. done = 1, part = 0.5, todo = 0, later = not counted.
 // "fix" groups items under one task, so the "biggest wins" list can add them up.
 const Q = [
-  { name: 'Functional suitability', what: 'Does what it should', items: [
+  { name: 'Works as intended', what: 'Members can do what they came to do', items: [
     ['done', 'All Phase 1 screens: Home, Events, About, Donate, Profile, Admin'],
     ['done', 'Community feed: post, react, comment, report'],
     ['done', 'Notifications page with unread count'],
@@ -182,64 +189,66 @@ const Q = [
     ['later', 'Recording donations in the app', null, 'Phase 2'],
     ['later', 'QR attendance', null, 'Phase 2'],
   ]},
-  { name: 'Performance efficiency', what: 'Fast and light', items: [
-    ['done', 'Small app: about 450 KB, no framework'],
+  { name: 'Speed and size', what: 'Quick to open, lighter on mobile data', items: [
+    ['done', 'Small app: about 630 KB of app files in the latest build'],
     ['done', 'Photos cropped and compressed (posts under 400 KB)'],
     ['done', 'Feed loads 20 at a time; database indexes in place'],
     ['todo', 'Speed checked on a real, mid-range phone on mobile data', 'device'],
     ['todo', 'Load test with many members at once', 'load'],
   ]},
-  { name: 'Compatibility', what: 'Works on the devices people use', items: [
+  { name: 'Devices and browsers', what: 'Works on the devices people use', items: [
     ['done', 'Passes automated tests in a Chromium browser'],
     ['done', 'Phone and desktop layouts'],
     ['todo', 'Tested on a real Android phone', 'device'],
     ['todo', 'Tested on a real iPhone', 'device'],
     ['part', 'Play Store app: package prepared, not yet built and installed', 'twa'],
   ]},
-  { name: 'Interaction capability', what: 'Easy to use, accessible', items: [
-    ['done', 'Matches the approved FlutterFlow design'],
+  { name: 'Ease of use', what: 'Clear screens and instructions', items: [
+    ['done', 'PCEC branding carried through the member screens'],
     ['done', 'Keyboard use and screen-reader labels'],
     ['done', '"Reduce motion" respected; no jumping buttons on login'],
     ['done', 'Clear error messages and empty screens'],
+    ['done', 'PCEC account email designs prepared for review'],
     ['todo', 'Formal accessibility check (WCAG)', 'wcag'],
     ['todo', 'Usability test with members', 'pilot'],
     ['later', 'Filipino language option', null, 'later'],
   ]},
-  { name: 'Reliability', what: 'Stays up, keeps data safe', items: [
+  { name: 'Dependability', what: 'Stays available and protects saved information', items: [
     ['done', 'Opens offline; prompts when a new version is out'],
     ['done', 'One failing section doesn’t break the whole page'],
-    ['todo', 'Daily backups (Supabase Pro)', 'pro'],
-    ['todo', 'Never pauses when quiet (Supabase Pro)', 'pro'],
+    ['todo', 'Automatic backups arranged and checked', 'pro'],
+    ['todo', 'Service plan checked for continuous availability', 'pro'],
     ['todo', 'Uptime monitor with an email alert', 'uptime'],
     ['todo', 'Separate sandbox for testing', 'sandbox'],
   ]},
   { name: 'Security', what: 'Only the right people see things', items: [
-    ['done', 'Database rules on every table; 81 database checks pass'],
-    ['done', 'No secret keys in the app; deletion runs on the server'],
-    ['done', 'Strict content security policy and headers'],
-    ['done', 'Posting and comment limits'],
+    ['part', 'Stronger access rules tested locally; live installation pending', 'security'],
+    ['done', 'Secret keys stay on the server'],
+    ['part', 'File checks and stricter web protections prepared', 'security'],
+    ['part', 'Stronger posting and upload limits tested locally', 'security'],
+    ['done', 'Login details stay in memory; reopening the app requires sign-in'],
     ['todo', 'Leaked-password protection on', 'auth'],
     ['todo', '"Confirm email" on (needs the email sender)', 'auth'],
     ['todo', 'QA test accounts deleted', 'qa'],
     ['todo', '2-step login for admins', 'mfa'],
     ['todo', 'Security check by someone outside the project', 'pentest'],
   ]},
-  { name: 'Maintainability', what: 'Easy for the next developer', items: [
-    ['done', 'TypeScript throughout'],
-    ['done', 'Database code kept in one place (lib/supabase)'],
+  { name: 'Future upkeep', what: 'Easy for the next developer to pick up', items: [
+    ['done', 'Consistent code structure'],
+    ['done', 'Data access kept in one place'],
     ['done', 'Automated tests for the app and the database'],
     ['done', 'Handover docs and a day-by-day log'],
     ['done', 'Database changes saved as migration files'],
-    ['todo', 'Code in version control (e.g. a private GitHub repo)', 'git'],
+    ['part', 'Report and email templates in GitHub; app source still separate', 'git'],
   ]},
-  { name: 'Flexibility', what: 'Can move and grow', items: [
+  { name: 'Room to grow', what: 'Can adapt as PCEC needs change', items: [
     ['done', 'One app for web, desktop and phone'],
     ['done', 'Play Store via a wrapper, no rewrite'],
     ['done', 'Domain and keys in config files, not in the code'],
     ['done', 'Installs from the browser as an app'],
     ['later', 'Native iPhone App Store app', null, 'Phase 2'],
   ]},
-  { name: 'Safety', what: 'Protects people', items: [
+  { name: 'Member wellbeing', what: 'Protects the community', items: [
     ['done', 'Report, hide and delete posts; suspend members'],
     ['done', 'Block a member'],
     ['done', 'Posting limits against spam'],
@@ -251,17 +260,18 @@ const Q = [
 
 const FIX = {
   device: ['Do the real-phone test', 'Guide 07, about 45 minutes per phone'],
-  pro: ['Upgrade Supabase to Pro', 'From USD 25 a month'],
+  pro: ['Confirm backups and the operating plan', 'Project owner to confirm needs and current cost'],
   pilot: ['Pilot with a small group of members', 'A week or two, then fix what they find'],
-  auth: ['Turn on leaked-password protection and Confirm email', 'Needs the email sender set up first'],
-  git: ['Put the code in a private Git repo', 'About 15 minutes'],
+  auth: ['Finish email delivery and account protection', 'Choose the official sender, enable confirmation and test real messages'],
+  security: ['Install the prepared security improvements', 'Test in a separate environment, then coordinate the live update'],
+  git: ['Put the member-app source in version control', 'This GitHub repository currently holds the report and email designs'],
   sandbox: ['Set up the sandbox project', 'Needs Pro or a free project slot'],
   uptime: ['Add an uptime monitor', 'Free monitors are enough'],
   qa: ['Delete the QA test accounts', 'A few minutes in Supabase'],
   minors: ['Decide on members under 18', 'Parent’s consent, or 18+ only'],
   twa: ['Build and install the Play Store app', 'Steps in handover doc 06'],
   wcag: ['Accessibility check', 'A free WCAG checker plus a screen-reader pass'],
-  mfa: ['2-step login for admins', 'Supabase supports it'],
+  mfa: ['Set up 2-step login for administrators', 'The notification design is ready; the extra sign-in check still needs setup'],
   load: ['Load test', 'Simulate many members at once'],
   pentest: ['Outside security check', 'Worth it once membership grows'],
 };
@@ -287,8 +297,10 @@ const L = [
     ['todo', 'Rule for members under 18'],
   ]},
   { name: 'Running it', items: [
-    ['todo', 'Supabase Pro plan'],
+    ['todo', 'Service plan and automatic backups confirmed'],
     ['todo', 'Leaked-password protection and Confirm email'],
+    ['part', 'Account email designs ready; official sender and delivery pending'],
+    ['part', 'New security improvements tested locally; live installation pending'],
     ['todo', 'Delete the QA test accounts and posts'],
     ['todo', 'Separate sandbox project'],
     ['todo', 'Real-phone test'],

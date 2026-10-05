@@ -1,0 +1,42 @@
+[
+  {
+    "file": "password-reset.html",
+    "subject": "Set a new password for PCEC Connect",
+    "template": "Reset password"
+  },
+  {
+    "file": "confirm-email.html",
+    "subject": "Welcome to PCEC Connect — confirm your email",
+    "template": "Confirm sign up"
+  },
+  {
+    "file": "verification-code.html",
+    "subject": "Your PCEC Connect verification code",
+    "template": "Reauthentication"
+  },
+  {
+    "file": "password-changed.html",
+    "subject": "Your PCEC Connect password was changed",
+    "template": "Password changed notification"
+  },
+  {
+    "file": "email-change.html",
+    "subject": "Confirm your new PCEC Connect email address",
+    "template": "Change email address"
+  },
+  {
+    "file": "mfa-enabled.html",
+    "subject": "2-step verification added to your PCEC Connect account",
+    "template": "Verification method added notification"
+  },
+  {
+    "file": "mfa-removed.html",
+    "subject": "A verification method was removed from PCEC Connect",
+    "template": "Verification method removed notification"
+  },
+  {
+    "file": "sign-in-link.html",
+    "subject": "Your sign-in link for PCEC Connect",
+    "template": "Magic link"
+  }
+]
