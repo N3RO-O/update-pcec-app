@@ -28,6 +28,20 @@ Open **income-plan.html** for the proposed funding plan: membership renewal coll
 
 Open **api-cost-review.html** for the API audit, growth estimates and a local cost calculator. It distinguishes live settings from locally tested safeguards. No paid upgrade was enabled; email usage alerts still need a recipient. The calculator changes no settings and sends no requests.
 
+Its **#service-budget** section adds the 6 October service recommendations:
+Supabase Pro plus monthly UptimeRobot Solo total $35 (₱2,205 at a stated
+planning rate of ₱63/USD); a ₱2,500–₱2,800 budget is proposed, not approved.
+All cost figures are estimates only, not final costs, provider quotations or
+approved spending. Final plans, usage, exchange rate, taxes and card fees must
+be confirmed. This label appears prominently on the Scorecard and cost guide.
+Resend, Cloudflare Pages and R2 start within free allowances. Optional VPS,
+test-project and paid-email costs, annual monitoring payment, nonprofit
+sponsorship, backup scope and billing limitations are explained with official
+sources. Staffing, actual taxes, card fees, domain renewals and excess usage
+are excluded. The hosting alternative needs a separately tested deployment.
+Updating this guidance does not buy, configure or deploy any service. The
+existing growth calculator still estimates photo-related Supabase cost only.
+
 Open **index.html** for the supervisor’s progress report. Open **email-preview.html** to review eight account messages on a phone or desktop. The review page uses example information and does not send emails.
 
 The messages cover password recovery, email confirmation, verification codes, password changes, email-address changes, and notices about adding or removing 2-step verification. Each has the same PCEC letterhead, a clear action and a short explanation of what to do if the change was not requested.

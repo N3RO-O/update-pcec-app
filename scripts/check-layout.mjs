@@ -81,6 +81,8 @@ try{
     assert.match(await page.locator('#launch-follow-up').locator('..').textContent(),/Draft owner: PCEC administrator/);
     assert.match(await page.locator('#target-progress').textContent(),/70\.0%.*80\.5%/);
     assert.equal(await page.locator('#target-title').textContent(),'The path to 80%');
+    assert.equal(await page.locator('#service-budget-note a').getAttribute('href'),'api-cost-review.html#service-budget');
+    assert.match(await page.locator('#service-budget-note').textContent(),/Estimates only—not final costs/);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     if(size.width===1440) await page.screenshot({path:shots+'launch-progress.png',fullPage:false});
     await page.screenshot({path:shots+`report-${size.width}.png`,fullPage:true});
@@ -112,6 +114,13 @@ try{
     await page.screenshot({path:shots+`system-guide-${size.width}.png`,fullPage:true});
     await page.goto('http://localhost:5205/api-cost-review.html');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    assert.match(await page.locator('#budget-summary').textContent(),/₱2,205.*\$35.*₱2,500–₱2,800/s);
+    assert.match(await page.locator('#budget-estimate-notice').textContent(),/Estimates only · not final costs/);
+    assert.match(await page.locator('#service-budget').textContent(),/₱63 per US\$1/);
+    assert.match(await page.locator('#service-budget').textContent(),/\$71 ≈ ₱4,473/);
+    assert.match(await page.locator('#service-budget').textContent(),/abnormal API usage and spending alerts still need their own setup/i);
+    assert.match(await page.locator('#service-budget').textContent(),/Supabase database backups do not include the actual uploaded photos/);
+    await page.locator('#budget-summary').screenshot({path:shots+`service-budget-${size.width}.png`});
     assert.equal(await page.locator('#estimate').textContent(),'$25.00');
     await page.locator('#members').fill('10000');
     assert.equal(await page.locator('#downloads').textContent(),'400 GB');
@@ -174,6 +183,8 @@ try{
   await page.goto('http://localhost:5205/system-guide.html');
   await page.locator('details').evaluateAll(nodes=>nodes.forEach(el=>el.open=true));
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Expanded documentation fits a narrow phone');
+  await page.goto('http://localhost:5205/api-cost-review.html#service-budget');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Service prices fit a narrow phone');
   for(const path of ['/scripts/readiness-data.mjs','/scripts/readiness-priorities.mjs','/.env','/README.md','/PRODUCTION-AUDIT.md','/docs/README.md','/docs/08-incident-response.md'])assert.equal((await fetch('http://localhost:5205'+path)).status,404);
   console.log('PASS: documentation links, architecture and keyboard instructions; desktop and narrow-phone layouts; audit priorities and all 83 results retained; CSP and private-file denial; calculators and 8 emails.');
 }finally{await browser.close();server.kill()}
