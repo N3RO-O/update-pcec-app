@@ -11,7 +11,7 @@ export const audit = {
     ['Error handling',5,'No tested production incident trail or complete rejection reporting.'],
     ['Dependencies',7,'npm audit found no high/critical advisories; other supply-chain checks remain incomplete.'],
     ['Infrastructure',2,'Member domain, recovery, monitoring and the production rollout remain unresolved.'],
-    ['AI safety','N/A','No AI feature in the member app. Optional development review is disabled and still needs an approved budget.'],
+    ['Optional review tools','N/A','The optional review tool is disabled. Approve a budget before enabling it.'],
     ['Observability',2,'No confirmed alert recipient, tested delivery or complete retention schedule.'],
   ],
   blockers:[
@@ -47,7 +47,7 @@ export const audit = {
     ['Minor','Account links could retain sensitive URL content','Fixed locally','Partial credential fragments are cleared; arbitrary error descriptions use a fixed message; signup addresses stay in memory instead of URLs. The implicit flow still uses token fragments.','Deploy the fix and plan a tested PKCE flow if the strict no-URL-token requirement must be met.'],
     ['Minor','Service pauses and retry guidance were missing','Fixed locally','Server upload/deletion pause switches and Retry-After headers are prepared. Database-trigger rate failures still need a consistent HTTP 429 response.','Deploy the functions, record how to use the switches, and normalize database rate errors.'],
     ['Minor','A support channel and export workflow are missing','Open','No security.txt contact or authenticated export workflow exists. Account deletion exists, but the hardened version is not deployed.','Choose a real security contact and implement an approved, ownership-checked export and deletion process.'],
-    ['Minor','Optional AI review needs a separate spending decision','Disabled by default','The development review has runtime limits, but no approved currency budget or provider-side dollar cap. There is no AI endpoint in the member app.','Keep it disabled until its provider budget and runner permissions are reviewed.'],
+    ['Minor','Optional review tool needs a spending limit','Disabled by default','The optional tool has a runtime limit, but no approved budget or provider spending cap. It is separate from member features.','Keep it disabled until its provider budget and runner permissions are reviewed.'],
   ],
   fixes:[
     'Publish and verify report browser-protection headers (prepared).',
@@ -114,7 +114,7 @@ export const audit = {
     ]],
     ['Sensitive data & secrets',[
       ['PASS','No hardcoded private keys in reviewed client','Build permits only public fields and publishable/anon Supabase keys; bundle scan passes. Public keys are intentionally public.'],
-      ['PASS','Server secrets use environment/secrets','Edge Functions read server environment; optional Claude workflow uses a repository secret.'],
+      ['PASS','Server secrets use environment/secrets','Edge Functions read server environment; the optional review workflow uses a repository secret.'],
       ['PASS','.env ignored and not committed','Local member Git excludes .env, signing keys, generated outputs and historical private QA notes. Staged-file scan passed.'],
       ['UNVERIFIED','Git history secret scan','Initial member checkpoint scanned; earlier unversioned work has no history to audit. Host credential inventory and exhaustive history review remain open.'],
       ['UNVERIFIED','Sensitive data encrypted at rest','Managed provider and host backup/key settings were not fully inspected. No payment data integration exists.'],
@@ -166,13 +166,13 @@ export const audit = {
       ['UNVERIFIED','Graceful shutdown','Static frontend / managed serverless functions; provider deployment lifecycle not verified. No app job queue.'],
       ['FAIL','Automated backups, restore test, retention','No verified restore evidence or approved retention/recovery targets.'],
     ]],
-    ['AI / LLM integrations',[
-      ['N/A','App prompt injection','No AI feature or user prompt endpoint in the member app. Optional review runs only on trusted same-repository PRs.'],
-      ['N/A','App model-output validation','No model output enters member UI or database.'],
-      ['FAIL','AI spending/token ceiling if enabled','Optional development Action is disabled; runtime limit is not a dollar cap.'],
-      ['N/A','App system-prompt leakage','No member-facing AI system prompt.'],
+    ['Optional external review',[
+      ['N/A','Untrusted integration instructions','No member endpoint accepts external-review instructions. The optional tool only reviews trusted repository changes.'],
+      ['N/A','External-review output validation','External review results do not enter member screens or records.'],
+      ['FAIL','Optional-service spending ceiling','Optional development Action is disabled; runtime limit is not a dollar cap.'],
+      ['N/A','Private review instructions','The member app has no private external-review instructions.'],
       ['UNVERIFIED','Development reviewer execution isolation','GitHub-hosted runner is separate from app server; Action tool permissions and network confinement need review before opt-in.'],
-      ['PASS','AI key server-side only','Optional workflow key comes from GitHub Secrets; no AI key in client build. Action remains disabled.'],
+      ['PASS','External-service secret storage','The optional workflow uses GitHub Secrets. Its key is absent from the member build; the tool remains disabled.'],
     ]],
     ['Missing operational systems',[
       ['FAIL','Complete audit trail','Auth provider audit exists; admin content/role changes lack a complete tested app audit trail.'],
