@@ -4,6 +4,16 @@ This is the project report and account-email review pack for PCEC. It is separat
 
 Open **production-readiness.html** for the launch audit: 21 issues, 83 checklist requirements, an 11-category assessment, ten blockers, twenty fixes and a proposed 14-day plan. Labels distinguish live observations, unverified requirements and local fixes. The current verdict is **not production ready**. Technical file/line evidence stays in the member workspace's `PRODUCTION-AUDIT.md`; no member records or credentials are published.
 
+The 6 October priority guide highlights six plain-language launch priorities.
+The checklist defaults to **Before launch** (64 checks), with filters for
+**Can follow later** (9), **Only if enabled** (3) and **Not used now** (7).
+Each later/conditional/unused item explains why and what still must work first.
+These are scheduling labels, not new PASS results or approval to release.
+All 83 original results, the 70% quality score and the 42% launch score are retained.
+Edit `scripts/readiness-priorities.mjs` for this guidance; the generator rejects
+references to missing checks and unexplained N/A items. The evidence remains
+dated 5 October; adding the guide is not a new production audit.
+
 Open **income-plan.html** for the proposed funding plan: membership renewal collection, paid training, voluntary app support and sponsorship. Its peso calculator compares illustrative monthly support with an entered operating cost; an unknown cost is never treated as profit. No fees are approved or payments collected by this page. It also covers a small pilot, payment-handling work and a separate developer maintenance agreement.
 
 Open **api-cost-review.html** for the API audit, growth estimates and a local cost calculator. It distinguishes live settings from locally tested safeguards. No paid upgrade was enabled; email usage alerts still need a recipient. The calculator changes no settings and sends no requests.

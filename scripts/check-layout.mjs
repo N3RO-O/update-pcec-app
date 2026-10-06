@@ -25,6 +25,30 @@ try{
     assert.equal(await page.locator('.finding').count(),21);
     assert.equal(await page.locator('.check-group').count(),11);
     assert.equal(await page.locator('.check').count(),83);
+    assert.equal(await page.locator('#launch-priorities .launch-work article').count(),6);
+    assert.equal(await page.locator('.check:not([hidden])').count(),64);
+    assert.equal(await page.getByRole('button',{name:'Before launch',exact:true}).getAttribute('aria-pressed'),'true');
+    assert.match(await page.locator('#check-count').textContent(),/64 of 83.*47 need work.*17 have PASS/);
+    const critical=page.locator('.check').filter({has:page.getByText('Privileged-account MFA',{exact:true})});
+    assert.equal(await critical.getAttribute('data-priority'),'launch');
+    assert.equal(await critical.getAttribute('data-result'),'FAIL');
+    await page.locator('#launch-priorities').screenshot({path:shots+`launch-priorities-${size.width}.png`});
+    for(const [label,key,count] of [['Can follow later','later',9],['Only if enabled','conditional',3],['Not used now','unused',7],['All checks','all',83]]){
+      await page.getByRole('button',{name:label,exact:true}).click();
+      assert.equal(await page.locator('.check:not([hidden])').count(),count);
+      if(key!=='all') assert.equal(await page.locator(`.check:not([hidden]):not([data-priority="${key}"])`).count(),0);
+      if(key!=='all') assert.equal(await critical.getAttribute('hidden'),'');
+      await page.getByRole('button',{name:'Open all checklists',exact:true}).click();
+      assert.equal(await page.locator('.check:visible').count(),count);
+      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+      if(key==='later'){
+        const rate=page.locator('.check').filter({has:page.getByText('Meaningful HTTP 429 Retry-After everywhere',{exact:true})});
+        assert.match(await rate.locator('.priority-note').textContent(),/live service actually blocks excess requests/);
+        assert.equal(await rate.locator('.status').textContent(),'FAIL');
+      }
+      if(key==='unused') assert.deepEqual(await page.locator('.check:visible .status').allTextContents(),Array(7).fill('N/A'));
+      await page.getByRole('button',{name:'Close all checklists',exact:true}).click();
+    }
     assert.match(await page.locator('.verdict').textContent(),/Not production ready/);
     await page.getByRole('button',{name:'Prepared fixes',exact:true}).click();
     assert.equal(await page.locator('.finding:visible').count(),6);
@@ -36,6 +60,11 @@ try{
     assert.equal(await page.locator('.check-group[open]').count(),11);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     await page.getByRole('button',{name:'Close all checklists',exact:true}).click();
+    await page.getByRole('button',{name:'Before launch',exact:true}).click();
+    await page.getByRole('button',{name:'Before launch',exact:true}).focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Enter');
+    assert.equal(await page.getByRole('button',{name:'All checks',exact:true}).getAttribute('aria-pressed'),'true','Keyboard can select a priority filter');
     await page.screenshot({path:shots+`production-readiness-${size.width}.png`,fullPage:true});
     assert.equal(await page.locator('script:not([src])').count(),0);
     await page.evaluate(()=>{
@@ -110,6 +139,12 @@ try{
   const subjects=JSON.parse(await readFile(new URL('../email-templates/subjects.json',import.meta.url),'utf8'));
   for(const m of subjects){const html=await readFile(new URL('../email-templates/'+m.file,import.meta.url),'utf8');assert.ok(html.includes('{{ .Email }}'));assert.ok(!html.includes('<script'));assert.ok(html.includes('PCEC'));}
   assert.deepEqual(errors,[]);
-  for(const path of ['/scripts/readiness-data.mjs','/.env','/README.md','/PRODUCTION-AUDIT.md'])assert.equal((await fetch('http://localhost:5205'+path)).status,404);
-  console.log('PASS: production audit, filters, 83 checklist items, CSP enforcement, private-file denial, report, income plan, calculators and 8 emails fit desktop and phone.');
+  await page.setViewportSize({width:320,height:800});
+  await page.goto('http://localhost:5205/production-readiness.html');
+  await page.getByRole('button',{name:'All checks',exact:true}).click();
+  await page.getByRole('button',{name:'Open all checklists',exact:true}).click();
+  assert.equal(await page.locator('.check:visible').count(),83);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Priority labels fit a narrow phone');
+  for(const path of ['/scripts/readiness-data.mjs','/scripts/readiness-priorities.mjs','/.env','/README.md','/PRODUCTION-AUDIT.md'])assert.equal((await fetch('http://localhost:5205'+path)).status,404);
+  console.log('PASS: audit priorities, filters and keyboard use; all 83 results retained; CSP and private-file denial; report, income plan, calculators and 8 emails fit desktop and phone.');
 }finally{await browser.close();server.kill()}
