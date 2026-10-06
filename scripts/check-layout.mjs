@@ -84,6 +84,32 @@ try{
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     if(size.width===1440) await page.screenshot({path:shots+'launch-progress.png',fullPage:false});
     await page.screenshot({path:shots+`report-${size.width}.png`,fullPage:true});
+    await page.getByRole('link',{name:'Open the documentation and system architecture →',exact:true}).click();
+    assert.match(page.url(),/\/system-guide\.html$/);
+    assert.equal(await page.locator('.diagram .node').count(),3);
+    assert.match(await page.locator('.architecture').textContent(),/Vercel Scorecard hosts reports/);
+    assert.match(await page.locator('.architecture').textContent(),/Updated functions and rules need a coordinated live rollout/);
+    for(const link of await page.locator('a[href^="#"]').all()){
+      const anchor=await link.getAttribute('href');
+      assert.equal(await page.locator(anchor).count(),1,'Guide anchor resolves: '+anchor);
+    }
+    for(const link of await page.locator('a[href$=".html"], a[href*=".html#"]').all()){
+      const target=await link.getAttribute('href');
+      assert.equal((await page.request.get('http://localhost:5205/'+target.split('#')[0])).status(),200,'Guide destination exists: '+target);
+      if(target.includes('#')){
+        const html=await readFile(new URL('../dist/'+target.split('#')[0],import.meta.url),'utf8');
+        assert.ok(html.includes('id="'+target.split('#')[1]+'"'),'Guide destination anchor exists: '+target);
+      }
+    }
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Guide fits viewport');
+    await page.locator('#architecture').screenshot({path:shots+`system-architecture-${size.width}.png`});
+    await page.locator('#how-to summary').first().focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.locator('#how-to details[open]').count(),1,'Guide instructions open with keyboard');
+    await page.locator('details').evaluateAll(nodes=>nodes.forEach(el=>el.open=true));
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Expanded guide fits viewport');
+    assert.equal(await page.locator('script:not([src])').count(),0);
+    await page.screenshot({path:shots+`system-guide-${size.width}.png`,fullPage:true});
     await page.goto('http://localhost:5205/api-cost-review.html');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     assert.equal(await page.locator('#estimate').textContent(),'$25.00');
@@ -145,6 +171,9 @@ try{
   await page.getByRole('button',{name:'Open all checklists',exact:true}).click();
   assert.equal(await page.locator('.check:visible').count(),83);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Priority labels fit a narrow phone');
-  for(const path of ['/scripts/readiness-data.mjs','/scripts/readiness-priorities.mjs','/.env','/README.md','/PRODUCTION-AUDIT.md'])assert.equal((await fetch('http://localhost:5205'+path)).status,404);
-  console.log('PASS: audit priorities, filters and keyboard use; all 83 results retained; CSP and private-file denial; report, income plan, calculators and 8 emails fit desktop and phone.');
+  await page.goto('http://localhost:5205/system-guide.html');
+  await page.locator('details').evaluateAll(nodes=>nodes.forEach(el=>el.open=true));
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Expanded documentation fits a narrow phone');
+  for(const path of ['/scripts/readiness-data.mjs','/scripts/readiness-priorities.mjs','/.env','/README.md','/PRODUCTION-AUDIT.md','/docs/README.md','/docs/08-incident-response.md'])assert.equal((await fetch('http://localhost:5205'+path)).status,404);
+  console.log('PASS: documentation links, architecture and keyboard instructions; desktop and narrow-phone layouts; audit priorities and all 83 results retained; CSP and private-file denial; calculators and 8 emails.');
 }finally{await browser.close();server.kill()}

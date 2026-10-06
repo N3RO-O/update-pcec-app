@@ -2,6 +2,16 @@
 
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
 
+Open **system-guide.html**, linked from the Scorecard's documentation section,
+for the plain-language documentation and system architecture. It includes the
+member/backend diagram, sign-in and record/upload flows, member/admin instructions,
+intended data-access map, launch operations and a directory of public reviews
+and private maintainer notes. Source references are filenames, not public copies
+of private documents. The guide describes the prepared source, labels pending
+live work and preserves the audit's 5 October evidence date. Update this page
+when the architecture or accepted deployment state changes; the older source
+handover notes should not override the latest audit.
+
 Open **production-readiness.html** for the launch audit: 21 issues, 83 checklist requirements, an 11-category assessment, ten blockers, twenty fixes and a proposed 14-day plan. Labels distinguish live observations, unverified requirements and local fixes. The current verdict is **not production ready**. Technical file/line evidence stays in the member workspace's `PRODUCTION-AUDIT.md`; no member records or credentials are published.
 
 The 6 October priority guide highlights six plain-language launch priorities.
@@ -41,6 +51,6 @@ The **email-templates** folder contains the HTML files and **subjects.json** lis
 Run `npm ci`, then `npm run build` to regenerate the emails, audit and public output. Edit `scripts/readiness-data.mjs` for audit content; `scripts/build-readiness.mjs` produces its page. `npm run preview` serves the built public folder with the same CSP and security headers as Vercel. After installing Chromium with `npx playwright install chromium`, `npm run check` checks every page, calculators, audit filters/checklists, CSP enforcement, private-file exclusion and eight emails at phone and desktop widths. The templates use inline styles and table layouts for email compatibility; final delivery still needs testing in actual inboxes.
 
 The build also prepares `dist/` for Vercel. `vercel.json` selects that folder;
-only the report, income plan, API cost review, readiness review, email preview, generated JavaScript, logo and downloadable templates are published. Build scripts, README files and private developer evidence are excluded.
+only the report, documentation/architecture guide, income plan, API cost review, readiness review, email preview, generated JavaScript, logo and downloadable templates are published. Build scripts, README files and private developer evidence are excluded.
 
 The report uses same-origin executable scripts, CSP `default-src 'self'`, `nosniff`, frame restrictions and a referrer policy. Inline CSS remains allowed for report/email layouts; inline scripts and handlers are blocked. These protections do not configure the member app host. Vercel supplies HSTS, verified during the live review.

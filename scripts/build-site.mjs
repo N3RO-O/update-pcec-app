@@ -11,7 +11,7 @@ await rm(output, { recursive: true, force: true });
 await mkdir(join(output, 'assets'), { recursive: true });
 await mkdir(join(output, 'email-templates'), { recursive: true });
 const files = [
-  'index.html', 'email-preview.html', 'api-cost-review.html', 'income-plan.html', 'production-readiness.html', 'assets/pcec-logo-white.png',
+  'index.html', 'email-preview.html', 'api-cost-review.html', 'income-plan.html', 'production-readiness.html', 'system-guide.html', 'assets/pcec-logo-white.png',
   'email-templates/subjects.json',
   ...['password-reset', 'confirm-email', 'verification-code', 'password-changed',
     'email-change', 'mfa-enabled', 'mfa-removed', 'sign-in-link']
