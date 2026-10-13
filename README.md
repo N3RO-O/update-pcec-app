@@ -2,6 +2,16 @@
 
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
 
+**13 October 2026 redesign:** `index.html` is now a short, plain summary for
+leadership: status at a glance, what's new, a 15-item launch checklist, the
+growth plan and budget from the *PCEC Connect Strategic Infrastructure Plan*
+(Phase 1 $0, Phase 2 ~$45/month, Phase 3 ~$80–150/month), the next three
+weeks, decisions for PCEC, an install QR code and links to the longer reports.
+The other pages (5–6 October) are kept as detailed background. To update the
+summary, edit `index.html` directly (no scripts); `assets/app-screens.webp`
+holds the app screenshots. `npm run check` verifies the sections, checklist
+counts, links and that the screenshot loads.
+
 Open **system-guide.html**, linked from the Scorecard's documentation section,
 for the plain-language documentation and system architecture. It includes the
 member/backend diagram, sign-in and record/upload flows, member/admin instructions,

@@ -1,452 +1,345 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>PCEC Connect Scorecard</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>PCEC Connect · Project Update</title>
+<meta name="description" content="Where the PCEC Connect member app stands, what changed, what's left before launch, and the growth plan and budget.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f3f0e9; --card:#ffffff; --ink:#14203a; --ink-2:#4a5672; --muted:#68738a;
-  --line:#e2e7f0; --track:#e7ecf4; --bar:#046cab; --navy:#1a2744; --gold:#cb820b;
-  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --todo:#a3acbf;
-  --chip:#eef2f8; --shadow:0 1px 2px rgba(20,32,58,.06),0 4px 16px rgba(20,32,58,.05);
+  --brand:#3368a0; --brand-deep:#1f4268; --sky:#66a3bf; --sage:#c8dfdb; --cream:#f2efe7;
+  --bg:#f2efe7; --surface:#ffffff; --surface-2:#f8f6f1; --ink:#1b2636; --ink-2:#4b5869; --muted:#5d6878;
+  --line:#e2ded4; --line-2:#ece9e1;
+  --done:#2e7d4f; --done-bg:#e2f1e8; --todo:#8a5a00; --todo-bg:#fbf0d9; --pcec:#2b5a8c; --pcec-bg:#e1ecf6; --plan:#5d6878; --plan-bg:#ecebe6;
+  --shadow:0 1px 2px rgba(31,66,104,.06),0 8px 24px rgba(31,66,104,.06);
+  --radius:18px;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#11161f; --card:#1a1a19; --ink:#eef1f6; --ink-2:#b6bdcc; --muted:#8a93a6;
-    --line:#2c2f36; --track:#2b2e34; --bar:#3a8fd0; --navy:#0d1526; --gold:#e09a2a;
-    --todo:#5d6474; --chip:#24272d; --shadow:none;
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1620; --surface:#18222e; --surface-2:#1d2836; --ink:#e8eef5; --ink-2:#b7c2d0; --muted:#97a3b3;
+    --line:#2a3646; --line-2:#243040; --cream:#18222e;
+    --done:#7fd3a0; --done-bg:#16301f; --todo:#f2c46b; --todo-bg:#33280f; --pcec:#9cc3e6; --pcec-bg:#1b2c40; --plan:#b7c2d0; --plan-bg:#232d3a;
+    --shadow:none;
   }
 }
-:root[data-theme="dark"]{
-  --bg:#11161f; --card:#1a1a19; --ink:#eef1f6; --ink-2:#b6bdcc; --muted:#8a93a6;
-  --line:#2c2f36; --track:#2b2e34; --bar:#3a8fd0; --navy:#0d1526; --gold:#e09a2a;
-  --todo:#5d6474; --chip:#24272d; --shadow:none;
-}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-.wrap{max-width:960px;margin:0 auto;padding:0 16px 56px}
-header.top{background:#1a2744;color:#fff;padding:32px 0 84px;border-top:5px solid #cb820b}
-header.top .wrap{padding-bottom:0}
-.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#f3c779;font-weight:700}
-h1{margin:14px 0 12px;font:400 38px/1.15 Georgia,serif;letter-spacing:-.6px}
-.sub{margin:0;color:#d5def0;max-width:640px}
-.heroes{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:-60px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:4px;box-shadow:none}
-.hero{padding:20px 22px}
-.hero .label{font-size:13px;font-weight:600;color:var(--ink-2)}
-.hero .big{font-size:56px;font-weight:800;line-height:1.05;letter-spacing:-.03em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
-.hero .big small{font-size:26px;font-weight:700;color:var(--ink-2)}
-.hero p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px}
-.meter{height:12px;background:var(--track);border-radius:999px;overflow:hidden;margin-top:12px}
-.meter i{display:block;height:100%;border-radius:999px;background:var(--bar);transition:width .9s cubic-bezier(.2,.7,.2,1)}
-.meter.gold i{background:var(--gold)}
-.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink);background:var(--chip);border-radius:999px;padding:3px 10px 3px 8px;white-space:nowrap}
-.chip svg{flex:none}
-h2{font-size:19px;margin:36px 0 4px;font-weight:700;letter-spacing:-.01em}
-.lead{margin:0 0 14px;color:var(--ink-2);font-size:14px}
-.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--ink-2);margin:0 0 12px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.rows{padding:6px 0}
-.row{border-top:1px solid var(--line)}
-.row:first-child{border-top:0}
-.row summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1.6fr) 56px 22px;gap:14px;align-items:center;padding:14px 20px}
-.row summary::-webkit-details-marker{display:none}
-.row summary:hover{background:color-mix(in srgb,var(--bar) 5%,transparent)}
-.row summary:focus-visible{outline:2px solid var(--bar);outline-offset:-2px;border-radius:12px}
-.name{font-weight:600;font-size:14.5px}
-.what{font-size:12.5px;color:var(--muted)}
-.bar{position:relative;height:14px;background:var(--track);border-radius:4px}
-.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--bar);border-radius:4px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
-.bar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink-2);opacity:.5;border-radius:1px}
-.pct{font-weight:700;font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
-.caret{transition:transform .2s;color:var(--muted)}
-details[open] .caret{transform:rotate(180deg)}
-.detail{padding:2px 20px 18px}
-.detail .chiprow{margin:0 0 10px}
-ul.items{list-style:none;margin:0;padding:0;display:grid;gap:7px}
-ul.items li{display:grid;grid-template-columns:20px 1fr;gap:9px;font-size:13.5px;align-items:start;color:var(--ink)}
-ul.items li.later{color:var(--muted)}
-ul.items li svg{margin-top:2px}
-.tag{font-size:11px;font-weight:600;color:var(--muted);margin-left:6px;white-space:nowrap}
-.wins{padding:8px 0}
-.win{display:grid;grid-template-columns:32px 1fr auto;gap:12px;align-items:center;padding:12px 20px;border-top:1px solid var(--line)}
-.win:first-child{border-top:0}
-.win .n{width:28px;height:28px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:700;font-size:13px}
-.win b{font-weight:600}
-.win .why{font-size:12.5px;color:var(--muted)}
-.win .plus{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
-.groups{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.group{padding:18px 18px 16px}
-.group h3{margin:0;font-size:15px;font-weight:700}
-.group .gp{display:flex;justify-content:space-between;align-items:baseline;margin-top:2px;color:var(--ink-2);font-size:13px}
-.group .gp strong{font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
-.group .meter{height:8px;margin:8px 0 14px}
-.final{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:16px 20px;margin-top:16px;border-left:4px solid var(--gold)}
-.final .ic{width:40px;height:40px;border-radius:12px;background:color-mix(in srgb,var(--gold) 16%,transparent);display:grid;place-items:center;color:var(--gold)}
-.final h3{margin:0;font-size:15px}
-.final p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
-.note{padding:16px 20px;margin-top:16px;font-size:13.5px;color:var(--ink-2)}
-.note h3{margin:0 0 4px;font-size:15px;color:var(--ink)}
-.note ul{margin:6px 0 0;padding-left:18px}
-.foot{margin-top:28px;font-size:12.5px;color:var(--muted)}
-.tip{position:fixed;pointer-events:none;background:var(--navy);color:#fff;font-size:12px;padding:6px 9px;border-radius:8px;opacity:0;transition:opacity .12s;z-index:9;max-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
-.toggle{float:right;margin-top:-2px;background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 12px;font:600 12px Inter,system-ui,sans-serif;cursor:pointer}
-.toggle:hover{background:rgba(255,255,255,.1)}
-.report-nav{display:flex;gap:20px;align-items:center;margin-top:22px;font-size:12px}.report-nav a{color:#f5d4a0;text-decoration:none;border-bottom:1px solid #938c7c;padding-bottom:3px}.brief{margin-top:26px;padding:23px 24px;border-left:3px solid var(--gold)}.brief h2{margin:0 0 9px;font:400 25px Georgia,serif}.brief>p{color:var(--ink-2);font-size:14px;margin:0 0 20px;max-width:730px}.brief-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}.brief-grid h3{margin:0 0 7px;font-size:12px}.brief-grid p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.7}.email-note{padding:20px 24px;margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:22px}.email-note h3{margin:0 0 5px;font:400 22px Georgia,serif}.email-note p{margin:0;color:var(--ink-2);font-size:13px;max-width:560px}.email-note a{color:#fff;background:#1a2744;padding:11px 18px;text-decoration:none;white-space:nowrap;font-size:12px}.report-brand{width:66px;height:40px;object-fit:contain;display:block;margin-bottom:18px}@media(max-width:760px){.brief-grid{grid-template-columns:1fr;gap:16px}.email-note{display:block}.email-note a{display:inline-block;margin-top:15px}.report-nav{flex-wrap:wrap}h1{font-size:32px}}
-@media (max-width:760px){
-  .heroes{grid-template-columns:1fr}
-  .groups{grid-template-columns:1fr}
-  .row summary{grid-template-columns:minmax(0,1fr) 48px 18px;gap:6px 10px;padding:14px 16px}
-  .row summary .bar{grid-column:1 / -1;grid-row:2}
-  .detail{padding:2px 16px 16px}
-  .win{padding:12px 16px;grid-template-columns:28px 1fr auto}
-  h1{font-size:24px}
-  .hero .big{font-size:48px}
-}
-@media (prefers-reduced-motion: reduce){.meter i,.bar i{transition:none}}
-</style></head><body>
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}
+@media (prefers-color-scheme:dark){a{color:#9cc3e6}}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-999px;top:8px;background:#fff;color:#1f4268;padding:8px 12px;border-radius:8px;z-index:20}
+.skip:focus{left:12px}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 
-<header class="top">
+/* Top */
+.hero{background:var(--brand-deep);color:#fff;padding:28px 0 120px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:auto -10% -40% auto;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(102,163,191,.35),rgba(102,163,191,0) 70%);pointer-events:none}
+.brandline{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:-.01em}
+.brandline img{width:56px;height:auto}
+.brandline span{font-size:15px;opacity:.92}
+.date{margin-left:auto;font-size:13px;font-weight:600;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);padding:5px 12px;border-radius:999px;white-space:nowrap}
+.hero h1{margin:34px 0 10px;font-size:clamp(30px,5vw,46px);line-height:1.1;letter-spacing:-.03em;font-weight:800;max-width:780px}
+.hero p.lede{margin:0;max-width:640px;color:#d8e4f0;font-size:17px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;position:relative;z-index:1}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none}
+.btn-light{background:#fff;color:#1f4268}
+.btn-ghost{border:1px solid rgba(255,255,255,.5);color:#fff}
+.btn-light:hover{background:#eaf2f9}.btn-ghost:hover{background:rgba(255,255,255,.1)}
+
+/* Sticky section nav */
+.nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-top:8px;padding-bottom:8px}
+.nav .wrap::-webkit-scrollbar{display:none}
+.nav a{flex:none;color:var(--ink-2);text-decoration:none;font-size:14px;font-weight:600;padding:8px 12px;border-radius:999px}
+.nav a:hover{background:var(--surface);color:var(--ink)}
+
+/* Cards */
+.lift{margin-top:-92px;position:relative;z-index:2}
+.card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--radius);box-shadow:var(--shadow)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{padding:18px 18px 16px}
+.stat .k{font-size:13px;font-weight:600;color:var(--muted)}
+.stat .v{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:4px 0 2px;line-height:1.1}
+.stat .s{font-size:13.5px;color:var(--ink-2)}
+.v.good{color:var(--done)}
+section{margin-top:44px}
+h2{font-size:26px;letter-spacing:-.02em;margin:0 0 6px;font-weight:800}
+.sub{margin:0 0 18px;color:var(--ink-2);max-width:720px}
+h3{margin:0 0 6px;font-size:17px;letter-spacing:-.01em}
+
+/* Screens */
+.screens{margin:16px 0 0;padding:14px;overflow:hidden}
+.screens .scroller{overflow-x:auto;border-radius:12px;scrollbar-width:thin}
+.screens img{display:block;width:100%;min-width:880px;height:auto;border-radius:12px}
+.screens figcaption{font-size:13px;color:var(--muted);padding:10px 4px 0}
+
+/* What's new */
+.news{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.new{padding:16px 18px;display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
+.ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--pcec-bg);color:var(--pcec)}
+.ic svg{width:22px;height:22px}
+.new p{margin:0;color:var(--ink-2);font-size:14.5px}
+
+/* Checklist */
+.progress{padding:20px 22px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.ring{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--done) 0 53%,var(--line) 53% 100%);display:grid;place-items:center}
+.ring b{width:64px;height:64px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:20px}
+.progress p{margin:2px 0 0;color:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.pill.done{background:var(--done-bg);color:var(--done)}
+.pill.todo{background:var(--todo-bg);color:var(--todo)}
+.pill.pcec{background:var(--pcec-bg);color:var(--pcec)}
+.pill.plan{background:var(--plan-bg);color:var(--plan)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.list{margin-top:12px;overflow:hidden}
+.item{display:grid;grid-template-columns:1fr auto;gap:6px 16px;padding:14px 20px;border-top:1px solid var(--line-2);align-items:center}
+.item:first-child{border-top:0}
+.item b{font-weight:650}
+.item span.d{grid-column:1;color:var(--ink-2);font-size:14px}
+.item .pill{grid-row:1 / span 2;grid-column:2}
+
+/* Plan */
+.phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.phase{padding:20px;position:relative}
+.phase.now{border:2px solid var(--brand)}
+.phase .tag{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.phase.now .tag{color:var(--brand)}
+@media (prefers-color-scheme:dark){.phase.now{border-color:#9cc3e6}.phase.now .tag{color:#9cc3e6}}
+.phase .price{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:6px 0 0}
+.phase .price small{font-size:15px;font-weight:600;color:var(--muted)}
+.phase .peso{font-size:13.5px;color:var(--muted);margin:0 0 10px}
+.phase ul{margin:10px 0 0;padding-left:18px;color:var(--ink-2);font-size:14.5px}
+.phase li{margin:3px 0}
+.users{display:inline-block;margin-top:2px;font-weight:700;font-size:14px}
+.note{font-size:13px;color:var(--muted);margin:10px 2px 0}
+
+.flow{padding:20px;margin-top:12px}
+.flowrow{display:grid;grid-template-columns:1fr auto 1fr auto 1.4fr;gap:10px;align-items:center}
+.node{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface-2)}
+.node b{display:block;font-size:14.5px}
+.node span{font-size:13px;color:var(--muted)}
+.node.app{border-color:var(--brand);background:var(--pcec-bg)}
+.node.planned{border-style:dashed}
+.arrow{color:var(--muted);font-weight:800;text-align:center}
+.svc{display:grid;gap:8px}
+
+table{width:100%;min-width:600px;border-collapse:collapse;font-size:14.5px}
+th,td{text-align:left;padding:12px 16px;border-top:1px solid var(--line-2);vertical-align:top}
+thead th{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-top:0;background:var(--surface-2)}
+tbody th{font-weight:700}
+.tablewrap{overflow-x:auto;margin-top:12px}
+.safe{color:var(--done);font-weight:700}
+
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.step{padding:18px}
+.step .when{font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--brand)}
+@media (prefers-color-scheme:dark){.step .when{color:#9cc3e6}}
+.step ul{margin:8px 0 0;padding-left:18px;font-size:14.5px;color:var(--ink-2)}
+.step li{margin:4px 0}
+.step li.ok{list-style:"✓  ";color:var(--done)}
+
+.decisions{counter-reset:d;display:grid;gap:10px}
+.decision{padding:16px 18px 16px 62px;position:relative}
+.decision::before{counter-increment:d;content:counter(d);position:absolute;left:18px;top:16px;width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.decision p{margin:2px 0 0;color:var(--ink-2);font-size:14.5px}
+
+.install{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;padding:20px}
+.install .qr{width:150px;height:150px;border-radius:12px;border:1px solid var(--line)}
+.install p{margin:4px 0 0;color:var(--ink-2)}
+
+.more{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.more a{display:block;padding:16px 18px;text-decoration:none;color:var(--ink)}
+.more a:hover{border-color:var(--brand)}
+.more a span{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.foot{margin:44px 0 40px;font-size:13px;color:var(--muted)}
+
+@media (max-width:880px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .phases,.more{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flowrow{grid-template-columns:1fr;gap:8px}
+  .arrow{transform:rotate(90deg)}
+}
+@media (max-width:620px){
+  .news{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .stat .v{font-size:26px}
+  .item{grid-template-columns:1fr;padding:14px 16px}
+  .item .pill{grid-row:auto;grid-column:1;justify-self:start}
+  .install{grid-template-columns:1fr;justify-items:start}
+  .date{display:none}
+  th,td{padding:10px 12px}
+}
+@media print{.nav,.cta{display:none}.hero{padding-bottom:40px}.lift{margin-top:16px}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#summary">Skip to the summary</a>
+
+<nav class="nav" aria-label="Sections">
   <div class="wrap">
-    <button class="toggle" id="themeBtn" type="button" aria-label="Switch light or dark">Light / Dark</button>
-    <img class="report-brand" src="assets/pcec-logo-white.png" alt="PCEC">
-    <div class="eyebrow">PCEC Connect · Project update · 5 October 2026</div>
-    <h1>Progress you can review.<br>Next steps you can decide.</h1>
-    <p class="sub">The member app is working in local tests. Account messages and security improvements are prepared; live setup and member testing still need to be completed.</p>
-    <nav class="report-nav" aria-label="Report links"><a href="email-preview.html">Review the account emails &#8599;</a><a href="api-cost-review.html">API costs and safeguards &#8599;</a><a href="income-plan.html">Income and funding plan &#8599;</a><a href="system-guide.html">Documentation and architecture &#8599;</a><a href="#before-launch">What remains before launch</a><a href="production-readiness.html">Launch readiness review</a></nav>
+    <a href="#summary">Summary</a><a href="#new">What's new</a><a href="#launch">Before launch</a><a href="#plan">Growth plan &amp; budget</a><a href="#next">Next 3 weeks</a><a href="#decisions">Decisions</a><a href="#details">Details</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brandline"><img src="assets/pcec-logo-white.png" alt="PCEC"><span>PCEC Connect · Project Update</span><span class="date">13 October 2026</span></div>
+    <h1>The member app is online and ready for a pilot.</h1>
+    <p class="lede">PCEC Connect now runs on the web, installs on Android and iPhone, and costs ₱0 a month. What's left before launch is a small member pilot, real-phone checks and a few decisions from PCEC.</p>
+    <div class="cta">
+      <a class="btn btn-light" href="https://pcec-connect.vercel.app" target="_blank" rel="noopener">Open the app ↗</a>
+      <a class="btn btn-ghost" href="#install">Install on your phone</a>
+    </div>
   </div>
 </header>
 
+
+
 <main class="wrap">
-  <section class="heroes">
-    <div class="card hero">
-      <div class="label">App quality (ISO/IEC 25010)</div>
-      <div class="big" id="qBig">0<small>%</small></div>
-      <div class="meter" role="img" id="qMeter" aria-label=""><i style="width:0"></i></div>
-      <p id="qText"></p>
+  <div class="lift" id="summary">
+    <div class="stats">
+      <div class="card stat"><div class="k">Status</div><div class="v good">Online</div><div class="s">Live for testing at pcec-connect.vercel.app</div></div>
+      <div class="card stat"><div class="k">Launch checklist</div><div class="v">8 of 15</div><div class="s">done; the rest are listed below</div></div>
+      <div class="card stat"><div class="k">Monthly cost now</div><div class="v">₱0</div><div class="s">Free plans (pilot phase)</div></div>
+      <div class="card stat"><div class="k">Automated checks</div><div class="v good">All pass</div><div class="s">229 app journeys, 121 accessibility scans</div></div>
     </div>
-    <div class="card hero">
-      <div class="label">Ready to launch</div>
-      <div class="big" id="lBig">0<small>%</small></div>
-      <div class="meter gold" role="img" id="lMeter" aria-label=""><i style="width:0"></i></div>
-      <p id="lText"></p>
+    <figure class="card screens">
+      <div class="scroller" role="region" tabindex="0" aria-label="App screens, scroll sideways"><img src="assets/app-screens.webp" width="1364" height="562" alt="Five phone screens of PCEC Connect: log in, home, menu, events and prayer requests"></div>
+      <figcaption>Log in · Home · Menu · Events · Prayer Requests (sample data). On a phone, swipe sideways.</figcaption>
+    </figure>
+  </div>
+
+  <section id="new" aria-labelledby="new-h">
+    <h2 id="new-h">What's new</h2>
+    <p class="sub">Everything below is live in the test app.</p>
+    <div class="news">
+      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18"/></svg></span><div><h3>A fresh, simple look</h3><p>PCEC's blue palette, light mode by default, a clean Home and a Menu that holds every shortcut.</p></div></div>
+      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><h3>Easier sign-in</h3><p>Sign up with email or Google, and stay signed in after closing the app.</p></div></div>
+      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z"/></svg></span><div><h3>Prayer, Resources, Churches</h3><p>Share prayer requests (optionally anonymous), browse resources and find member churches.</p></div></div>
+      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 7 8-7"/></svg></span><div><h3>Branded account emails</h3><p>Confirmation and password-reset emails in PCEC's design, sent through Resend.</p></div></div>
+      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/></svg></span><div><h3>Install from a QR code</h3><p>No app store needed yet: scan, tap Install, and it sits on the home screen.</p></div></div>
+      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><h3>Clear messages</h3><p>Pop-ups for success, errors and duplicate emails, so members always know what happened.</p></div></div>
     </div>
   </section>
 
-  <section class="card brief" aria-labelledby="brief-title"><h2 id="brief-title">For your review</h2><p>The latest app polish improves phone, tablet and desktop layouts, readable forms and reliable icons. Prepared work is shown separately from changes already running for members.</p><div class="brief-grid"><div><h3>Checked this round</h3><p>282 layout checks passed in each of two browser engines, including long names and links, landscape screens and pop-up forms. The member-app source has a local Git checkpoint.</p></div><div><h3>Still needs live setup</h3><p>Email confirmation is currently off. Email delivery, the new server protections and administrator 2-step login need to be configured and tested before members rely on them.</p></div><div><h3>Decisions for PCEC</h3><p>Confirm the member-app address, official sender and account-support owner. Arrange an Android phone, an iPhone and a small group of members to test a version with sample data.</p></div></div></section>
-  <section class="card note" id="app-polish" aria-labelledby="app-polish-title"><h3 id="app-polish-title">App polish · 6 October</h3><p>Long names, church names and shared links now fit their pages. Small-screen reaction buttons retain their words, forms are easier to read, and connection or update notices no longer cover page controls. Fonts and icons are included with the app and its offline shell.</p><p>The donation button now opens clearly labelled payment instructions. Transfers still happen in the member’s bank or wallet app; PCEC Connect does not process the transfer or confirm receipt.</p><p><strong>Prepared and checked locally.</strong> These improvements have not been installed in a live member app. Real-phone tests, member testing and live launch setup remain necessary. The quality and launch scores are unchanged. <a href="system-guide.html#architecture">See how the member app and this Scorecard fit together</a>.</p></section>
-  <section class="card brief" aria-labelledby="target-title"><h2 id="target-title">The path to 80%</h2><p id="target-progress"></p><div class="brief-grid"><div><h3>1. Try a real Android phone</h3><p>Check sign-in, pictures, events, installation and offline opening. Measure speed on a mid-range phone using mobile data. Save the phone model and results.</p></div><div><h3>2. Try a real iPhone</h3><p>Check the same member tasks in Safari, including Add to Home Screen, picture cropping and reopening the app. Save the iPhone model and results.</p></div><div><h3>3. Let members try it</h3><p>A small group uses the test version for one to two weeks. Record whether they can complete the main tasks, fix confusing steps and repeat failed tasks.</p></div></div><p>The score changes after results are recorded. Reaching 80% does not complete the separate launch and security checks.</p></section>
-  <section class="card email-note"><div><h3>Account emails that look like PCEC.</h3><p>Eight examples, including forgot password and 2-step-login notices. View each on a phone or desktop. This review page does not send emails.</p></div><a href="email-preview.html">Open email review &#8594;</a></section>
-  <section class="card email-note"><div><h3>A plan to fund the app’s work.</h3><p>Review membership renewals, paid training, voluntary support and sponsorship. Try a monthly support example and see the decisions needed before collecting payments.</p></div><a href="income-plan.html">Review the income plan &#8594;</a></section>
-  <section class="card email-note" id="service-budget-note"><div><h3>An estimated budget to keep PCEC running.</h3><p><strong>Estimates only—not final costs.</strong> Discuss ₱2,500–₱2,800 per month for initial services. The example subscriptions total about ₱2,205 before taxes. Final costs depend on chosen plans, usage, exchange rates and fees; staffing is separate. No purchase is approved.</p></div><a href="api-cost-review.html#service-budget">Review estimated costs &#8594;</a></section>
-  <section class="card email-note" id="cloudflare-note"><div><h3>Why consider Cloudflare?</h3><p>It can help protect website traffic, bring files closer to members and show unusual activity. Setup is proposed; account and database requests still need their own protections. Free and paid options are explained with their limits and estimated costs.</p></div><a href="api-cost-review.html#why-cloudflare">Read Cloudflare’s role &#8594;</a></section>
-
-  <section class="card brief" id="system-documentation" aria-labelledby="system-title"><h2 id="system-title">The app, explained.</h2><p>A guide to what members and administrators can do, how the system connects, and who needs to keep it running. Prepared components and pending live setup are clearly identified.</p><div class="brief-grid"><div><h3>System architecture</h3><p>A visual map connects the phone or computer, PCEC’s member app and Supabase’s account, database and file services. It also shows how sign-in, event registration and photo uploads work.</p></div><div><h3>Member and office guide</h3><p>Instructions for the main screens, account recovery, community activity and administration. Important limits explain what offline opening, donations and notifications actually provide.</p></div><div><h3>Operations and handover</h3><p>Find the data-access map, testing and release steps, draft support roles, recovery needs and documentation directory. Internal technical notes remain in the member-app workspace.</p></div></div><p style="margin:20px 0 0"><a href="system-guide.html">Open the documentation and system architecture &#8594;</a></p></section>
-
-  <h2>How the app is shaping up</h2>
-  <p class="lead">These nine areas use the ISO/IEC 25010 quality framework. Open a row to see the checklist. Complete work counts in full; prepared work with setup remaining counts half. The 80% line is our own planning target, not a certification.</p>
-  <div class="legend" id="legend"></div>
-  <div class="card rows" id="rows"></div>
-
-  <h2>Biggest wins from here</h2>
-  <p class="lead">The tasks that would raise the app-quality score the most, worked out from the same checklists.</p>
-  <div class="card wins" id="wins"></div>
-
-  <section class="card email-note"><div><h3>A separate check before paid launch.</h3><p>The production audit records 21 issues and 83 checks. Email verification, administrator protection, live upload controls and recovery still need attention.</p></div><a href="production-readiness.html">Review the launch audit &#8594;</a></section><h2 id="before-launch">Before members start using it</h2>
-  <p class="lead">The remaining work includes live email and security setup, real-phone tests, and PCEC’s operational and privacy responsibilities. <a href="production-readiness.html#launch-priorities">See what must come first, what can follow later, and what the app does not use.</a></p>
-  <section class="card note" aria-labelledby="launch-follow-up"><h3 id="launch-follow-up">Launch follow-up · 5 October</h3><p><strong>Draft owner: PCEC administrator.</strong> We will add the named contact and official email later. The incident response plan now explains escalation, recovery and when privacy notifications are required. It still needs approval and a practice exercise.</p><p>Member Management now has 25-person pages and searches older records. The release process also checks the deployed app’s version and essential files. Both changes passed local tests; live installation is pending.</p><p>Next: confirm the member-app address, arrange backup recovery, finish account email and administrator protection, and test on real phones. <a href="production-readiness.html#launch-progress">See the current launch work</a>.</p></section>
-  <div class="groups" id="groups"></div>
-
-  <div class="card final">
-    <div class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0L7 7zM17 7l-3 7a3 3 0 0 0 6 0l-3-7zM8 21h8"/></svg></div>
-    <div>
-      <h3>Last step: lawyer review</h3>
-      <p>The Terms, Community Rules, Privacy Notice and sign-up consent are drafts. PCEC's lawyer and Data Protection Officer read and approve them last, after everything above is settled. It counts as one item in the launch score.</p>
+  <section id="launch" aria-labelledby="launch-h">
+    <h2 id="launch-h">Before launch</h2>
+    <p class="sub">Fifteen things must be true before we invite all members. Eight are done.</p>
+    <div class="card progress">
+      <div class="ring" role="img" aria-label="8 of 15 done"><b>53%</b></div>
+      <div><h3>8 of 15 done</h3><p>3 are developer work, 4 need a decision or help from PCEC.</p>
+        <div class="legend"><span class="pill done">Done</span><span class="pill todo">Developer, to do</span><span class="pill pcec">Needs PCEC</span></div></div>
     </div>
-  </div>
+    <div class="card list">
+      <div class="item"><b>App online for testing</b><span class="d">Hosted on Vercel; updates go live automatically.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Email links open the app</b><span class="d">Confirmation and reset links land on the live app.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Email confirmation with PCEC-branded emails</b><span class="d">Sent through Resend.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Google sign-in</b><span class="d">Published; anyone with a Google account can join.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Database protection on every table</b><span class="d">Members only see what they're allowed to see.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Stay signed in</b><span class="d">No more logging in after every refresh.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Automated checks pass</b><span class="d">App journeys, accessibility, phone sizes, security and offline.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Install page and QR code</b><span class="d">Android and iPhone steps.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Photo uploads from the live app</b><span class="d">Allow the app's web address in the upload service.</span><span class="pill todo">To do</span></div>
+      <div class="item"><b>Real-phone tests</b><span class="d">One Android phone and one iPhone, following the test guide.</span><span class="pill todo">To do</span></div>
+      <div class="item"><b>Spending alerts and cheaper photo storage</b><span class="d">Budget alerts; Cloudflare R2 for photos.</span><span class="pill todo">To do</span></div>
+      <div class="item"><b>Official sender email</b><span class="d">A verified PCEC address so every member receives emails.</span><span class="pill pcec">Needs PCEC</span></div>
+      <div class="item"><b>Member pilot</b><span class="d">10–30 members use the app for one to two weeks.</span><span class="pill pcec">Needs PCEC</span></div>
+      <div class="item"><b>Support contact</b><span class="d">Who answers account and app questions.</span><span class="pill pcec">Needs PCEC</span></div>
+      <div class="item"><b>Legal review</b><span class="d">Lawyer and Data Protection Officer approve the Terms and Privacy Notice.</span><span class="pill pcec">Needs PCEC</span></div>
+    </div>
+  </section>
 
-  <div class="card note">
-    <h3>Confirm the operating budget</h3>
-    Supabase Free was verified on 5 October. API safeguards and growth estimates are now prepared; the live rollout, alert recipient and monthly budget remain open. Free avoids Supabase overage bills but can restrict service. <a href="api-cost-review.html">Review costs and safeguards</a> before approving paid services, backups or a separate test project.
-  </div>
+  <section id="plan" aria-labelledby="plan-h">
+    <h2 id="plan-h">Growth plan &amp; budget</h2>
+    <p class="sub">Start free, and pay only as members join. From the Strategic Infrastructure Plan (target: 55,000+ members). Figures are estimates, not quotes.</p>
+    <div class="phases">
+      <div class="card phase now"><div class="tag">Phase 1 · Pilot · Now</div><div class="price">$0<small> / month</small></div><div class="peso">₱0</div><span class="users">Up to 1,000 members</span><ul><li>Vercel, Supabase and Cloudflare free plans</li><li>Prove the app with zero spending</li></ul></div>
+      <div class="card phase"><div class="tag">Phase 2 · Launch</div><div class="price">~$45<small> / month</small></div><div class="peso">≈ ₱2,800</div><span class="users">1,000 – 10,000 members</span><ul><li>Vercel Pro ($20) + Supabase Pro ($25)</li><li>Daily backups, no project pauses, 100k sign-ins a month</li></ul></div>
+      <div class="card phase"><div class="tag">Phase 3 · Scale</div><div class="price">~$80–150<small> / month</small></div><div class="peso">≈ ₱5,000–9,500</div><span class="users">10,000 – 55,000+ members</span><ul><li>Dedicated database computer</li><li>Cloudflare R2 for photos (no download fees)</li></ul></div>
+    </div>
+    <p class="note">Pesos at ₱63 per US dollar, before taxes and card fees. Move to Phase 2 at 1,000 registered members, or earlier if daily backups are wanted before launch.</p>
 
-  <div class="card note">
-    <h3>What this score is, and isn't</h3>
-    <ul>
-      <li>ISO/IEC 25010 is a quality model, not a certificate. No one "passes" it; this is our own honest check against it.</li>
-      <li>The numbers come only from the checklists shown here, so anyone can recount them. Items marked "Phase 2" or "later" are listed but not counted.</li>
-      <li>Latest local checks: 173 checks in each of Chromium and WebKit, 60 automated accessibility scans and a 100-session local traffic test, together with database, upload and account-security checks. Automated accessibility checks need a screen-reader review; local traffic is not proof of live Supabase capacity. Firefox could not launch because of a Windows runtime error.</li>
-      <li>The member source is in local Git. The deployment script now requires secret/security/browser checks and verifies the production website after upload. The member source remote, active CI and actual host release remain pending. Publishing this report does not deploy the member app.</li>
-      <li>The categories use the <a href="https://www.iso.org/standard/78176.html" target="_blank" rel="noopener noreferrer">ISO/IEC 25010:2023 quality model</a>. The scores and 80% target belong to this project.</li>
-    </ul>
-  </div>
-
-  <p class="foot">Evidence reviewed 5 October 2026; documentation, architecture and service-budget guidance added 6 October. Based on the existing project checklist, local test results and the latest security review. Account email examples are ready for approval; live email delivery has not been changed.</p>
-</main>
-<div class="tip" id="tip" role="tooltip"></div>
-
-<script>
-// ---- The checklists. done = 1, part = 0.5, todo = 0, later = not counted.
-// "fix" groups items under one task, so the "biggest wins" list can add them up.
-const Q = [
-  { name: 'Works as intended', what: 'Members can do what they came to do', items: [
-    ['done', 'All Phase 1 screens: Home, Events, About, Donate, Profile, Admin'],
-    ['done', 'Community feed: post, react, comment, report'],
-    ['done', 'Notifications page with unread count'],
-    ['done', '173 checks pass in each of Chromium and WebKit'],
-    ['todo', 'Tried by a small group of real members (pilot)', 'pilot'],
-    ['later', 'Recording donations in the app', null, 'Phase 2'],
-    ['later', 'QR attendance', null, 'Phase 2'],
-  ]},
-  { name: 'Speed and size', what: 'Quick to open, lighter on mobile data', items: [
-    ['done', 'Small app: about 639 KB of app files in the latest build'],
-    ['done', 'Photos cropped and compressed (posts under 400 KB)'],
-    ['done', 'Feed loads 20 at a time; database indexes in place'],
-    ['todo', 'Speed checked on a real, mid-range phone on mobile data', 'device'],
-    ['part', '100 simulated sessions tested locally; live service capacity unverified', 'load'],
-  ]},
-  { name: 'Devices and browsers', what: 'Works on the devices people use', items: [
-    ['done', 'Passes automated tests in Chromium and WebKit; Firefox runtime blocked'],
-    ['done', 'Phone and desktop layouts'],
-    ['todo', 'Tested on a real Android phone', 'device'],
-    ['todo', 'Tested on a real iPhone', 'device'],
-    ['part', 'Play Store app: package prepared, not yet built and installed', 'twa'],
-  ]},
-  { name: 'Ease of use', what: 'Clear screens and instructions', items: [
-    ['done', 'PCEC branding carried through the member screens'],
-    ['done', 'Keyboard use and screen-reader labels'],
-    ['done', '"Reduce motion" respected; no jumping buttons on login'],
-    ['done', 'Clear error messages and empty screens'],
-    ['done', 'PCEC account email designs prepared for review'],
-    ['part', '60 accessibility scans and keyboard checks pass; screen-reader review pending', 'wcag'],
-    ['todo', 'Usability test with members', 'pilot'],
-    ['later', 'Filipino language option', null, 'later'],
-  ]},
-  { name: 'Dependability', what: 'Stays available and protects saved information', items: [
-    ['done', 'Opens offline; prompts when a new version is out'],
-    ['done', 'One failing section doesn’t break the whole page'],
-    ['todo', 'Automatic backups arranged and checked', 'pro'],
-    ['todo', 'Service plan checked for continuous availability', 'pro'],
-    ['todo', 'Uptime monitor with an email alert', 'uptime'],
-    ['todo', 'Separate sandbox for testing', 'sandbox'],
-  ]},
-  { name: 'Security', what: 'Only the right people see things', items: [
-    ['part', 'Stronger access rules tested locally; live installation pending', 'security'],
-    ['done', 'Secret keys stay on the server'],
-    ['part', 'File checks and stricter web protections prepared', 'security'],
-    ['part', 'Stronger posting and upload limits tested locally', 'security'],
-    ['done', 'Login details stay in memory; reopening the app requires sign-in'],
-    ['todo', 'Leaked-password protection on', 'auth'],
-    ['todo', '"Confirm email" on (needs the email sender)', 'auth'],
-    ['todo', 'QA test accounts deleted', 'qa'],
-    ['todo', '2-step login for admins', 'mfa'],
-    ['todo', 'Security check by someone outside the project', 'pentest'],
-  ]},
-  { name: 'Future upkeep', what: 'Easy for the next developer to pick up', items: [
-    ['done', 'Consistent code structure'],
-    ['done', 'Data access kept in one place'],
-    ['done', 'Automated tests for the app and the database'],
-    ['done', 'Handover docs and a day-by-day log'],
-    ['done', 'Database changes saved as migration files'],
-    ['done', 'Member source saved in local Git; report and emails in GitHub'],
-  ]},
-  { name: 'Room to grow', what: 'Can adapt as PCEC needs change', items: [
-    ['done', 'One app for web, desktop and phone'],
-    ['done', 'Play Store via a wrapper, no rewrite'],
-    ['done', 'Domain and keys in config files, not in the code'],
-    ['done', 'Installs from the browser as an app'],
-    ['later', 'Native iPhone App Store app', null, 'Phase 2'],
-  ]},
-  { name: 'Member wellbeing', what: 'Protects the community', items: [
-    ['done', 'Report, hide and delete posts; suspend members'],
-    ['done', 'Block a member'],
-    ['done', 'Posting limits against spam'],
-    ['done', 'Delete account, in the app and on the web'],
-    ['done', 'Community Rules shown at sign-up and when posting'],
-    ['todo', 'Parent’s consent for members under 18', 'minors'],
-  ]},
-];
-
-const FIX = {
-  device: ['Do the real-phone test', 'Guide 07, about 45 minutes per phone'],
-  pro: ['Confirm backups and the operating plan', 'Project owner to confirm needs and current cost'],
-  pilot: ['Pilot with a small group of members', 'A week or two, then fix what they find'],
-  auth: ['Finish email delivery and account protection', 'Choose the official sender, enable confirmation and test real messages'],
-  security: ['Install the prepared security improvements', 'Test in a separate environment, then coordinate the live update'],
-  git: ['Connect the member repository to release checks', 'Local Git is ready; choose its remote repository and protect releases'],
-  sandbox: ['Set up the sandbox project', 'Needs Pro or a free project slot'],
-  uptime: ['Add an uptime monitor', 'Free monitors are enough'],
-  qa: ['Delete the QA test accounts', 'A few minutes in Supabase'],
-  minors: ['Decide on members under 18', 'Parent’s consent, or 18+ only'],
-  twa: ['Build and install the Play Store app', 'Steps in handover doc 06'],
-  wcag: ['Complete the accessibility review', 'Automated rules and keyboard checks pass; test with a screen reader'],
-  mfa: ['Set up 2-step login for administrators', 'The notification design is ready; the extra sign-in check still needs setup'],
-  load: ['Verify capacity in a separate test environment', 'Local 100-session exercise passed; measure the real database and hosting service'],
-  pentest: ['Outside security check', 'Worth it once membership grows'],
-};
-
-const L = [
-  { name: 'Google Play', items: [
-    ['done', 'Delete account in the app and on the web'],
-    ['done', 'Block a member'],
-    ['done', 'Community Rules (draft)'],
-    ['done', 'Privacy Notice page (draft)'],
-    ['done', 'Play Store package prepared'],
-    ['part', 'Data safety form: answers ready, not submitted'],
-    ['part', 'Content rating: answers ready, not submitted'],
-    ['todo', 'Organization developer account (needs D-U-N-S)'],
-    ['part', 'Donations outside Play Billing; tax-exempt papers on hand'],
-  ]},
-  { name: 'Data Privacy Act', items: [
-    ['done', 'Privacy notice in the app (draft)'],
-    ['done', 'Consent at sign-up naming sensitive data (draft)'],
-    ['todo', 'Appoint a Data Protection Officer'],
-    ['todo', 'NPC registration, or the exemption filing'],
-    ['part', 'Incident plan drafted; PCEC administrator as draft owner; approval and practice pending'],
-    ['todo', 'Rule for members under 18'],
-  ]},
-  { name: 'Running it', items: [
-    ['todo', 'Service plan and automatic backups confirmed'],
-    ['todo', 'Leaked-password protection and Confirm email'],
-    ['part', 'Account email designs ready; official sender and delivery pending'],
-    ['part', 'New security improvements tested locally; live installation pending'],
-    ['todo', 'Delete the QA test accounts and posts'],
-    ['todo', 'Separate sandbox project'],
-    ['todo', 'Real-phone test'],
-    ['todo', 'Uptime check and email alert'],
-  ]},
-];
-const LAWYER = ['todo', 'Lawyer review of the legal texts (last step)'];
-
-// ---- Scoring
-const val = s => s === 'done' ? 1 : s === 'part' ? 0.5 : 0;
-const counted = items => items.filter(i => i[0] !== 'later');
-const score = items => { const c = counted(items); return c.reduce((a, i) => a + val(i[0]), 0) / c.length; };
-
-Q.forEach(q => { q.score = score(q.items); });
-const quality = Q.reduce((a, q) => a + q.score, 0) / Q.length;
-const afterPhonePilot = Q.reduce((sum, q) => sum + score(q.items.map(i => ['device', 'pilot'].includes(i[2]) ? ['done', ...i.slice(1)] : i)), 0) / Q.length;
-document.getElementById('target-progress').textContent = `Verified checklist progress: ${(quality * 100).toFixed(1)}%. Completing the three steps below would bring it to ${(afterPhonePilot * 100).toFixed(1)}%, using the same checklist and scoring. No results have been assumed.`;
-
-const allLaunch = L.flatMap(g => g.items).concat([LAWYER]);
-const launch = score(allLaunch);
-
-// ---- Status bands (always shown with an icon and a word, never colour alone)
-const band = p => p >= 0.8 ? ['good', 'Strong'] : p >= 0.6 ? ['warn', 'Fair'] : ['serious', 'Needs work'];
-const ICON = {
-  good: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--good)"/><path d="M4.8 8.2l2.1 2.1 4.3-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  warn: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--warn)"/><path d="M4.5 8h7" stroke="#1a1a19" stroke-width="1.8" stroke-linecap="round"/></svg>',
-  serious: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l7 12.5H1z" fill="var(--serious)"/><path d="M8 6v3.6" stroke="#1a1a19" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="11.8" r=".95" fill="#1a1a19"/></svg>',
-};
-const ITEM = {
-  done: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Done"><circle cx="8" cy="8" r="7" fill="var(--good)"/><path d="M4.8 8.2l2.1 2.1 4.3-4.5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  part: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Partly done"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--warn)" stroke-width="1.8"/><path d="M8 1.8a6.2 6.2 0 0 1 0 12.4z" fill="var(--warn)"/></svg>',
-  todo: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Not done yet"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--todo)" stroke-width="1.8"/></svg>',
-  later: '<svg width="16" height="16" viewBox="0 0 16 16" aria-label="Later, not counted"><circle cx="8" cy="8" r="6.2" fill="none" stroke="var(--todo)" stroke-width="1.6" stroke-dasharray="2.4 2.2"/></svg>',
-};
-const chip = p => { const [k, w] = band(p); return `<span class="chip">${ICON[k]}${w}</span>`; };
-const pct = p => Math.round(p * 100);
-const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const itemList = items => '<ul class="items">' + items.map(([s, t, , tag]) =>
-  `<li class="${s}">${ITEM[s]}<span>${esc(t)}${s === 'part' ? '<span class="tag">half</span>' : ''}${tag ? `<span class="tag">${tag}, not counted</span>` : ''}</span></li>`).join('') + '</ul>';
-
-// ---- Heroes
-const doneQ = Q.flatMap(q => counted(q.items)).filter(i => i[0] === 'done').length;
-const totalQ = Q.flatMap(q => counted(q.items)).length;
-document.getElementById('qText').innerHTML = `${chip(quality)} Average of the nine qualities. ${doneQ} of ${totalQ} checks done. Strongest: ${[...Q].sort((a, b) => b.score - a.score)[0].name.toLowerCase()}; weakest: ${[...Q].sort((a, b) => a.score - b.score)[0].name.toLowerCase()}.`;
-const doneL = allLaunch.filter(i => i[0] === 'done').length;
-document.getElementById('lText').innerHTML = `${chip(launch)} ${doneL} of ${allLaunch.length} launch items done, ${allLaunch.filter(i => i[0] === 'part').length} partly. Most of what's left is for PCEC to decide or sign up for.`;
-document.getElementById('qMeter').setAttribute('aria-label', `App quality ${pct(quality)} percent`);
-document.getElementById('lMeter').setAttribute('aria-label', `Ready to launch ${pct(launch)} percent`);
-
-// ---- Legend
-document.getElementById('legend').innerHTML =
-  `<span>${ICON.good} Strong, 80% and up</span><span>${ICON.warn} Fair, 60–79%</span><span>${ICON.serious} Needs work, under 60%</span>`;
-
-// ---- Rows, highest score first
-const rows = document.getElementById('rows');
-[...Q].sort((a, b) => b.score - a.score).forEach(q => {
-  const c = counted(q.items);
-  const d = c.filter(i => i[0] === 'done').length;
-  const p = c.filter(i => i[0] === 'part').length;
-  const el = document.createElement('details');
-  el.className = 'row';
-  el.innerHTML = `
-    <summary>
-      <div><div class="name">${q.name}</div><div class="what">${q.what}</div></div>
-      <div class="bar" data-tip="${q.name}: ${d} done${p ? `, ${p} partly` : ''} of ${c.length} → ${pct(q.score)}%" role="img" aria-label="${q.name} ${pct(q.score)} percent">
-        <i style="width:0" data-w="${pct(q.score)}"></i><span class="tick" style="left:calc(80% - 1px)" aria-hidden="true"></span>
+    <div class="card flow" aria-label="How the system fits together">
+      <h3>How it fits together</h3>
+      <div class="flowrow">
+        <div class="node"><b>Member's phone</b><span>Installed app or browser; photos shrunk on the phone first</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="node app"><b>PCEC Connect app</b><span>Hosted on Vercel</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="svc">
+          <div class="node"><b>Supabase</b><span>Sign-in, database (protected per member), files</span></div>
+          <div class="node"><b>Resend · Google</b><span>Account emails · Sign in with Google</span></div>
+          <div class="node planned"><b>Cloudflare R2 (planned)</b><span>Photo storage with no download fees</span></div>
+        </div>
       </div>
-      <div class="pct">${pct(q.score)}%</div>
-      <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-    </summary>
-    <div class="detail"><div class="chiprow">${chip(q.score)} <span class="what">&nbsp;${d} done${p ? `, ${p} partly` : ''} of ${c.length} counted</span></div>${itemList(q.items)}</div>`;
-  rows.appendChild(el);
-});
+    </div>
 
-// ---- Biggest wins: how many points each task adds to the overall score
-const gains = {};
-Q.forEach(q => {
-  const n = counted(q.items).length;
-  q.items.forEach(([s, , fix]) => {
-    if (!fix || s === 'later') return;
-    gains[fix] = (gains[fix] || 0) + (1 - val(s)) / n / Q.length * 100;
-  });
-});
-const best = Object.entries(gains).sort((a, b) => b[1] - a[1]).slice(0, 6);
-let running = quality * 100;
-document.getElementById('wins').innerHTML = best.map(([k, g], i) => {
-  running += g;
-  return `<div class="win"><div class="n">${i + 1}</div><div><b>${FIX[k][0]}</b><div class="why">${FIX[k][1]}</div></div><div class="plus">+${g.toFixed(1)} pts</div></div>`;
-}).join('') + `<div class="win"><div class="n" aria-hidden="true">=</div><div><b>All six together</b><div class="why">App quality would go from ${pct(quality)}% to about ${Math.round(running)}%</div></div><div class="plus">${Math.round(running)}%</div></div>`;
+    <div class="card tablewrap">
+      <table>
+        <caption class="note" style="caption-side:bottom;text-align:left;padding:0 16px 12px">Free-plan limits from the Strategic Infrastructure Plan.</caption>
+        <thead><tr><th scope="col">Resource</th><th scope="col">Free limit</th><th scope="col">At 1,000 members</th><th scope="col">At 55,000+ members</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Database</th><td>500 MB</td><td><span class="safe">Safe</span></td><td>Supabase Pro + dedicated computer ($60–80)</td></tr>
+          <tr><th scope="row">Sign-ins</th><td>50,000 active a month</td><td><span class="safe">Safe</span> (under 2%)</td><td>Supabase Pro, 100,000 a month ($25)</td></tr>
+          <tr><th scope="row">Photos</th><td>1 GB Supabase / 10 GB R2</td><td><span class="safe">Safe</span> (~3,000 photos)</td><td>R2 at $0.015 per GB ($5–15)</td></tr>
+          <tr><th scope="row">Website traffic</th><td>100 GB a month</td><td><span class="safe">Safe</span> (under 10 GB)</td><td>Vercel Pro, 1 TB ($20)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-// ---- Launch groups
-document.getElementById('groups').innerHTML = L.map(g => {
-  const s = score(g.items);
-  const d = g.items.filter(i => i[0] === 'done').length;
-  return `<div class="card group"><h3>${g.name}</h3>
-    <div class="gp"><span>${d} of ${g.items.length} done</span><strong>${pct(s)}%</strong></div>
-    <div class="meter gold" role="img" aria-label="${g.name} ${pct(s)} percent" data-tip="${g.name}: ${pct(s)}% (half credit for partly done)"><i style="width:0" data-w="${pct(s)}"></i></div>
-    ${itemList(g.items)}</div>`;
-}).join('');
+  <section id="next" aria-labelledby="next-h">
+    <h2 id="next-h">Next 3 weeks</h2>
+    <p class="sub">The plan's action steps, with what's already done ticked.</p>
+    <div class="steps">
+      <div class="card step"><div class="when">Week 1 · 13–19 Oct</div><ul><li class="ok">Database protection on every table</li><li class="ok">Photos compressed on the phone</li><li class="ok">Online, branded emails, Google sign-in</li><li>Allow photo uploads from the live app</li><li>Test on one Android and one iPhone</li></ul></div>
+      <div class="card step"><div class="when">Week 2 · 20–26 Oct</div><ul><li>Connect Cloudflare R2 for photos</li><li>Spending alerts on every service</li><li>Smaller photos (WebP)</li><li>Verified PCEC sender email</li></ul></div>
+      <div class="card step"><div class="when">Week 3 · 27 Oct–2 Nov</div><ul><li>Member pilot runs</li><li>Present pilot results to leadership</li><li>Approve Phase 2 at 1,000 members</li></ul></div>
+      <div class="card step"><div class="when">After the pilot</div><ul><li>Google Play listing</li><li>iPhone App Store version</li><li>Legal review, then public launch</li></ul></div>
+    </div>
+  </section>
 
-// ---- Animate in: count up the big numbers, grow the bars
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-function countUp(el, to) {
-  if (reduce) { el.innerHTML = `${to}<small>%</small>`; return; }
-  const t0 = performance.now();
-  const step = t => { const k = Math.min(1, (t - t0) / 900); const e = 1 - Math.pow(1 - k, 3);
-    el.innerHTML = `${Math.round(to * e)}<small>%</small>`; if (k < 1) requestAnimationFrame(step); };
-  requestAnimationFrame(step);
-}
-requestAnimationFrame(() => {
-  countUp(document.getElementById('qBig'), pct(quality));
-  countUp(document.getElementById('lBig'), pct(launch));
-  document.querySelector('#qMeter i').style.width = pct(quality) + '%';
-  document.querySelector('#lMeter i').style.width = pct(launch) + '%';
-  document.querySelectorAll('[data-w]').forEach(i => { i.style.width = i.dataset.w + '%'; });
-});
+  <section id="decisions" aria-labelledby="dec-h">
+    <h2 id="dec-h">Decisions for PCEC</h2>
+    <p class="sub">These move the launch forward and only PCEC can make them.</p>
+    <div class="decisions">
+      <div class="card decision"><h3>Official web address and sender email</h3><p>For example app.pcec.org.ph and a no-reply@ address on PCEC's domain.</p></div>
+      <div class="card decision"><h3>Pilot group</h3><p>10–30 members with a mix of Android phones and iPhones.</p></div>
+      <div class="card decision"><h3>Support contact</h3><p>The person who answers account and app questions.</p></div>
+      <div class="card decision"><h3>Phase 2 budget</h3><p>About $45 (≈ ₱2,800) a month from 1,000 members, or earlier for daily backups.</p></div>
+      <div class="card decision"><h3>Legal review</h3><p>Lawyer and Data Protection Officer approval of the Terms, Community Rules and Privacy Notice.</p></div>
+    </div>
+  </section>
 
-// ---- Hover tooltip on bars and meters
-const tip = document.getElementById('tip');
-document.addEventListener('pointermove', e => {
-  const t = e.target.closest('[data-tip]');
-  if (!t || e.pointerType === 'touch') { tip.style.opacity = 0; return; }
-  tip.textContent = t.dataset.tip;
-  const x = Math.min(innerWidth - tip.offsetWidth - 8, e.clientX + 12);
-  tip.style.left = x + 'px';
-  tip.style.top = (e.clientY - tip.offsetHeight - 10) + 'px';
-  tip.style.opacity = 1;
-});
+  <section id="install" aria-labelledby="install-h">
+    <h2 id="install-h">Try it on your phone</h2>
+    <div class="card install">
+      <svg class="qr" viewBox="0 0 37 37" role="img" aria-label="QR code: pcec-connect.vercel.app/install" shape-rendering="crispEdges"><rect width="37" height="37" fill="#fff"/><path d="M4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM27 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM31 4h1v1h-1zM32 4h1v1h-1zM4 5h1v1h-1zM10 5h1v1h-1zM13 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM19 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM18 6h1v1h-1zM19 6h1v1h-1zM20 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM15 7h1v1h-1zM16 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM19 7h1v1h-1zM20 7h1v1h-1zM21 7h1v1h-1zM24 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM29 7h1v1h-1zM30 7h1v1h-1zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM16 8h1v1h-1zM17 8h1v1h-1zM20 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h1v1h-1zM29 8h1v1h-1zM30 8h1v1h-1zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM21 9h1v1h-1zM22 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM30 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM12 11h1v1h-1zM14 11h1v1h-1zM22 11h1v1h-1zM23 11h1v1h-1zM24 11h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM15 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM19 12h1v1h-1zM20 12h1v1h-1zM21 12h1v1h-1zM23 12h1v1h-1zM26 12h1v1h-1zM27 12h1v1h-1zM28 12h1v1h-1zM29 12h1v1h-1zM30 12h1v1h-1zM5 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM13 13h1v1h-1zM15 13h1v1h-1zM16 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM22 13h1v1h-1zM23 13h1v1h-1zM25 13h1v1h-1zM26 13h1v1h-1zM28 13h1v1h-1zM32 13h1v1h-1zM5 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM13 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM21 14h1v1h-1zM22 14h1v1h-1zM26 14h1v1h-1zM27 14h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM7 15h1v1h-1zM9 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM15 15h1v1h-1zM16 15h1v1h-1zM20 15h1v1h-1zM24 15h1v1h-1zM28 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM4 16h1v1h-1zM5 16h1v1h-1zM6 16h1v1h-1zM7 16h1v1h-1zM9 16h1v1h-1zM10 16h1v1h-1zM11 16h1v1h-1zM16 16h1v1h-1zM21 16h1v1h-1zM24 16h1v1h-1zM29 16h1v1h-1zM30 16h1v1h-1zM5 17h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM17 17h1v1h-1zM20 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM27 17h1v1h-1zM28 17h1v1h-1zM32 17h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM6 18h1v1h-1zM9 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM12 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM17 18h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM24 18h1v1h-1zM25 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM29 18h1v1h-1zM30 18h1v1h-1zM4 19h1v1h-1zM5 19h1v1h-1zM8 19h1v1h-1zM9 19h1v1h-1zM12 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM19 19h1v1h-1zM23 19h1v1h-1zM26 19h1v1h-1zM27 19h1v1h-1zM28 19h1v1h-1zM31 19h1v1h-1zM5 20h1v1h-1zM8 20h1v1h-1zM9 20h1v1h-1zM10 20h1v1h-1zM11 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM18 20h1v1h-1zM21 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM4 21h1v1h-1zM5 21h1v1h-1zM6 21h1v1h-1zM8 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM25 21h1v1h-1zM26 21h1v1h-1zM27 21h1v1h-1zM28 21h1v1h-1zM30 21h1v1h-1zM32 21h1v1h-1zM4 22h1v1h-1zM7 22h1v1h-1zM10 22h1v1h-1zM11 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM24 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM30 22h1v1h-1zM4 23h1v1h-1zM6 23h1v1h-1zM8 23h1v1h-1zM9 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM15 23h1v1h-1zM16 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM24 23h1v1h-1zM26 23h1v1h-1zM28 23h1v1h-1zM31 23h1v1h-1zM4 24h1v1h-1zM7 24h1v1h-1zM9 24h1v1h-1zM10 24h1v1h-1zM12 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM21 24h1v1h-1zM22 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM30 24h1v1h-1zM31 24h1v1h-1zM32 24h1v1h-1zM12 25h1v1h-1zM13 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM18 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM30 25h1v1h-1zM31 25h1v1h-1zM32 25h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM9 26h1v1h-1zM10 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM15 26h1v1h-1zM16 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM21 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM29 26h1v1h-1zM30 26h1v1h-1zM4 27h1v1h-1zM10 27h1v1h-1zM12 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM17 27h1v1h-1zM19 27h1v1h-1zM22 27h1v1h-1zM23 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM32 27h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM7 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM14 28h1v1h-1zM18 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM21 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM7 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM12 29h1v1h-1zM13 29h1v1h-1zM15 29h1v1h-1zM16 29h1v1h-1zM20 29h1v1h-1zM22 29h1v1h-1zM24 29h1v1h-1zM29 29h1v1h-1zM30 29h1v1h-1zM31 29h1v1h-1zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM7 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM12 30h1v1h-1zM15 30h1v1h-1zM16 30h1v1h-1zM19 30h1v1h-1zM22 30h1v1h-1zM23 30h1v1h-1zM24 30h1v1h-1zM25 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM28 30h1v1h-1zM29 30h1v1h-1zM30 30h1v1h-1zM31 30h1v1h-1zM4 31h1v1h-1zM10 31h1v1h-1zM16 31h1v1h-1zM17 31h1v1h-1zM18 31h1v1h-1zM19 31h1v1h-1zM24 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM29 31h1v1h-1zM31 31h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM7 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM10 32h1v1h-1zM12 32h1v1h-1zM13 32h1v1h-1zM14 32h1v1h-1zM16 32h1v1h-1zM17 32h1v1h-1zM19 32h1v1h-1zM20 32h1v1h-1zM21 32h1v1h-1zM23 32h1v1h-1zM25 32h1v1h-1zM26 32h1v1h-1zM28 32h1v1h-1zM29 32h1v1h-1zM30 32h1v1h-1z" fill="#1f4268"/></svg>
+      <div><h3>Scan with your phone's camera</h3><p>It opens the install page. On Android tap <b>Install</b>; on iPhone use Share → <b>Add to Home Screen</b>.</p><p><a href="https://pcec-connect.vercel.app/install" target="_blank" rel="noopener">pcec-connect.vercel.app/install</a></p></div>
+    </div>
+  </section>
 
-// ---- Light / dark switch (remembered on this device only)
-const root = document.documentElement;
-try { const s = localStorage.getItem('pcec-score-theme'); if (s) root.dataset.theme = s; } catch (e) {}
-document.getElementById('themeBtn').addEventListener('click', () => {
-  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-  root.dataset.theme = dark ? 'light' : 'dark';
-  try { localStorage.setItem('pcec-score-theme', root.dataset.theme); } catch (e) {}
-});
-</script>
+  <section id="details" aria-labelledby="details-h">
+    <h2 id="details-h">Details</h2>
+    <p class="sub">The earlier, longer reports (5–6 October). Some details there have since changed; this page is the current summary.</p>
+    <div class="more">
+      <a class="card" href="email-preview.html">Account emails<span>Preview the eight PCEC-branded emails.</span></a>
+      <a class="card" href="system-guide.html">How the system works<span>Architecture and member/office guide.</span></a>
+      <a class="card" href="production-readiness.html">Launch audit<span>The full 83-point readiness checklist.</span></a>
+      <a class="card" href="api-cost-review.html">Costs and safeguards<span>Usage limits and the earlier budget.</span></a>
+      <a class="card" href="income-plan.html">Income and funding<span>Ways to fund the app's running costs.</span></a>
+    </div>
+  </section>
 
-</body></html>
+  <p class="foot">Updated 13 October 2026. Costs are estimates from the Strategic Infrastructure Plan and providers' public prices, not quotations or approved spending. Screens show sample data.</p>
+</main>
+</body>
+</html>

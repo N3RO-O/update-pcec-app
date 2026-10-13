@@ -73,20 +73,20 @@ try{
     assert.equal(await page.evaluate(()=>window.auditInlineExecuted===true),false,'CSP blocks inline execution');
     await page.goto('http://localhost:5205/index.html');
     await page.waitForTimeout(1100);
-    assert.equal(await page.locator('#rows details').count(),9);
-    assert.equal(await page.locator('#groups .group').count(),3);
-    assert.ok(await page.locator('#qBig').textContent());
-    assert.match(await page.locator('#qBig').textContent(),/^70/);
-    assert.match(await page.locator('#lBig').textContent(),/^42/);
-    assert.match(await page.locator('#launch-follow-up').locator('..').textContent(),/Draft owner: PCEC administrator/);
-    assert.match(await page.locator('#target-progress').textContent(),/70\.0%.*80\.5%/);
-    assert.equal(await page.locator('#target-title').textContent(),'The path to 80%');
-    assert.equal(await page.locator('#service-budget-note a').getAttribute('href'),'api-cost-review.html#service-budget');
-    assert.match(await page.locator('#service-budget-note').textContent(),/Estimates only—not final costs/);
+    assert.equal(await page.locator('#launch .item').count(),15);
+    assert.equal(await page.locator('#launch .item .pill.done').count(),8);
+    assert.match(await page.locator('#summary').textContent(),/8 of 15/);
+    assert.equal(await page.locator('.phase').count(),3);
+    assert.match(await page.locator('#plan').textContent(),/~\$45/);
+    assert.equal(await page.locator('#decisions .decision').count(),5);
+    assert.equal(await page.locator('#install svg.qr').count(),1);
+    assert.equal(await page.locator('.screens img').evaluate(i=>i.complete&&i.naturalWidth>0),true,'App screens picture loads');
+    for(const a of await page.locator('.nav a').all()){const h=await a.getAttribute('href');assert.equal(await page.locator(h).count(),1,'Section exists: '+h);}
+    for(const a of await page.locator('#details a[href$=".html"]').all()){const h=await a.getAttribute('href');assert.equal((await page.request.get('http://localhost:5205/'+h)).status(),200,'Detail page exists: '+h);}
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     if(size.width===1440) await page.screenshot({path:shots+'launch-progress.png',fullPage:false});
     await page.screenshot({path:shots+`report-${size.width}.png`,fullPage:true});
-    await page.getByRole('link',{name:'Open the documentation and system architecture →',exact:true}).click();
+    await page.locator('#details a[href="system-guide.html"]').click();
     assert.match(page.url(),/\/system-guide\.html$/);
     assert.equal(await page.locator('.diagram .node').count(),3);
     assert.match(await page.locator('.architecture').textContent(),/Vercel Scorecard hosts reports/);
