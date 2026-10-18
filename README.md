@@ -56,6 +56,10 @@ Open **index.html** for the supervisor’s progress report. Open **email-preview
 
 The messages cover password recovery, email confirmation, verification codes, password changes, email-address changes, and notices about adding or removing 2-step verification. Each has the same PCEC letterhead, a clear action and a short explanation of what to do if the change was not requested.
 
+## 18 October 2026 status update
+
+The summary now records the deployed PCEC branding, visible Menu and reaction-name list, with local validation evidence. It explicitly retains the open private-path release check and marks the one-time launch cleanup as unfinished, on hold and not executed. No private account email, member data or credentials are included. Earlier screenshots and audit pages retain their evidence dates.
+
 ## What needs approval
 
 - The email wording and official sender address.

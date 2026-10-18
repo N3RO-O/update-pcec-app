@@ -73,10 +73,12 @@ try{
     assert.equal(await page.evaluate(()=>window.auditInlineExecuted===true),false,'CSP blocks inline execution');
     await page.goto('http://localhost:5205/index.html');
     await page.waitForTimeout(1100);
-    assert.equal(await page.locator('#launch .item').count(),15);
+    assert.equal(await page.locator('#launch .item').count(),17);
     assert.equal(await page.locator('#launch .item .pill.done').count(),8);
-    assert.match(await page.locator('#summary').textContent(),/8 of 15/);
-    assert.equal(await page.locator('.phase').count(),3);
+    assert.match(await page.locator('#summary').textContent(),/8 of 17/);
+    assert.equal(await page.locator('#plan .phase').count(),3);
+    assert.match(await page.locator('#cleanup-status').textContent(),/not ready to run/);
+    assert.match(await page.locator('#latest').textContent(),/330 responsive checks and 121 accessibility scans/);
     assert.match(await page.locator('#plan').textContent(),/~\$45/);
     assert.equal(await page.locator('#decisions .decision').count(),5);
     assert.equal(await page.locator('#install svg.qr').count(),1);

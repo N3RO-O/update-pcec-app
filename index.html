@@ -88,7 +88,7 @@ h3{margin:0 0 6px;font-size:17px;letter-spacing:-.01em}
 
 /* Checklist */
 .progress{padding:20px 22px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
-.ring{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--done) 0 53%,var(--line) 53% 100%);display:grid;place-items:center}
+.ring{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--done) 0 47%,var(--line) 47% 100%);display:grid;place-items:center}
 .ring b{width:64px;height:64px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:20px}
 .progress p{margin:2px 0 0;color:var(--ink-2)}
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
@@ -185,15 +185,15 @@ tbody th{font-weight:700}
 
 <nav class="nav" aria-label="Sections">
   <div class="wrap">
-    <a href="#summary">Summary</a><a href="#new">What's new</a><a href="#launch">Before launch</a><a href="#plan">Growth plan &amp; budget</a><a href="#next">Next 3 weeks</a><a href="#decisions">Decisions</a><a href="#details">Details</a>
+    <a href="#summary">Summary</a><a href="#latest">18 Oct update</a><a href="#new">What's new</a><a href="#launch">Before launch</a><a href="#plan">Growth plan &amp; budget</a><a href="#next">Next 3 weeks</a><a href="#decisions">Decisions</a><a href="#details">Details</a>
   </div>
 </nav>
 
 <header class="hero">
   <div class="wrap">
-    <div class="brandline"><img src="assets/pcec-logo-white.png" alt="PCEC"><span>PCEC Connect · Project Update</span><span class="date">13 October 2026</span></div>
-    <h1>The member app is online and ready for a pilot.</h1>
-    <p class="lede">PCEC Connect now runs on the web, installs on Android and iPhone, and costs ₱0 a month. What's left before launch is a small member pilot, real-phone checks and a few decisions from PCEC.</p>
+    <div class="brandline"><img src="assets/pcec-logo-white.png" alt="PCEC"><span>PCEC Connect · Project Update</span><span class="date">18 October 2026</span></div>
+    <h1>The member app is online for testing.</h1>
+    <p class="lede">PCEC Connect now runs on the web, installs on Android and iPhone, and costs ₱0 a month. The latest branding and community improvements are live. Launch checks and a small member pilot are still pending.</p>
     <div class="cta">
       <a class="btn btn-light" href="https://pcec-connect.vercel.app" target="_blank" rel="noopener">Open the app ↗</a>
       <a class="btn btn-ghost" href="#install">Install on your phone</a>
@@ -207,21 +207,33 @@ tbody th{font-weight:700}
   <div class="lift" id="summary">
     <div class="stats">
       <div class="card stat"><div class="k">Status</div><div class="v good">Online</div><div class="s">Live for testing at pcec-connect.vercel.app</div></div>
-      <div class="card stat"><div class="k">Launch checklist</div><div class="v">8 of 15</div><div class="s">done; the rest are listed below</div></div>
+      <div class="card stat"><div class="k">Launch checklist</div><div class="v">8 of 17</div><div class="s">done; the rest are listed below</div></div>
       <div class="card stat"><div class="k">Monthly cost now</div><div class="v">₱0</div><div class="s">Free plans (pilot phase)</div></div>
-      <div class="card stat"><div class="k">Automated checks</div><div class="v good">All pass</div><div class="s">229 app journeys, 121 accessibility scans</div></div>
+      <div class="card stat"><div class="k">Automated checks</div><div class="v">1 open check</div><div class="s">Local checks passed; live routing needs correction</div></div>
     </div>
     <figure class="card screens">
       <div class="scroller" role="region" tabindex="0" aria-label="App screens, scroll sideways"><img src="assets/app-screens.webp" width="1364" height="562" alt="Five phone screens of PCEC Connect: log in, home, menu, events and prayer requests"></div>
-      <figcaption>Log in · Home · Menu · Events · Prayer Requests (sample data). On a phone, swipe sideways.</figcaption>
+      <figcaption>Earlier screen samples (13 October): Log in · Home · Menu · Events · Prayer Requests. These predate the latest branding. On a phone, swipe sideways.</figcaption>
     </figure>
   </div>
+
+  <section id="latest" aria-labelledby="latest-h">
+    <h2 id="latest-h">18 October · Latest progress</h2>
+    <p class="sub">Verified on the testing site. This update is not approval for public launch.</p>
+    <div class="news">
+      <article class="card phase"><span class="pill done">Live</span><h3>PCEC branding applied</h3><p>The supplied guide sets the blue, cloud, charcoal and orange palette, with Montserrat headings and DM Sans body text. The original logo is preserved; fonts are bundled for offline use.</p></article>
+      <article class="card phase"><span class="pill done">Live</span><h3>Testing feedback addressed</h3><p>Home and member headers now show a labelled Menu button. Tap a post's reaction count to see names and reaction types, with more results loaded as needed. The testing badge no longer covers Home's menu.</p></article>
+      <article class="card phase"><span class="pill todo">Developer follow-up</span><h3>One release check remains</h3><p>Requests for private-file paths currently return the app page rather than a proper not-found response. The check did not return a credential file. Correct routing and repeat the release check before launch.</p></article>
+      <article class="card phase" id="cleanup-status"><span class="pill plan">On hold · not run</span><h3>One-time launch cleanup</h3><p>The one-click utility is still being prepared, not ready to run. No data has been erased and no account has been promoted. The agreed plan preserves one chosen administrator's existing password and grants approved admin access only during the future cleanup. No permanent reset button will be added to the app.</p></article>
+    </div>
+    <p class="note">Local validation for this release: 330 responsive checks and 121 accessibility scans passed, together with navigation, reaction permissions, offline assets and type checks. These do not replace testing on real Android and iPhone devices.</p>
+  </section>
 
   <section id="new" aria-labelledby="new-h">
     <h2 id="new-h">What's new</h2>
     <p class="sub">Everything below is live in the test app.</p>
     <div class="news">
-      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18"/></svg></span><div><h3>A fresh, simple look</h3><p>PCEC's blue palette, light mode by default, a clean Home and a Menu that holds every shortcut.</p></div></div>
+      <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18"/></svg></span><div><h3>A fresh, simple look</h3><p>The supplied PCEC brand guide, light mode by default, a clean Home and a visible Menu button.</p></div></div>
       <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><div><h3>Easier sign-in</h3><p>Sign up with email or Google, and stay signed in after closing the app.</p></div></div>
       <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z"/></svg></span><div><h3>Prayer, Resources, Churches</h3><p>Share prayer requests (optionally anonymous), browse resources and find member churches.</p></div></div>
       <div class="card new"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 7 8-7"/></svg></span><div><h3>Branded account emails</h3><p>Confirmation and password-reset emails in PCEC's design, sent through Resend.</p></div></div>
@@ -232,10 +244,10 @@ tbody th{font-weight:700}
 
   <section id="launch" aria-labelledby="launch-h">
     <h2 id="launch-h">Before launch</h2>
-    <p class="sub">Fifteen things must be true before we invite all members. Eight are done.</p>
+    <p class="sub">Seventeen things must be true before we invite all members. Eight are done.</p>
     <div class="card progress">
-      <div class="ring" role="img" aria-label="8 of 15 done"><b>53%</b></div>
-      <div><h3>8 of 15 done</h3><p>3 are developer work, 4 need a decision or help from PCEC.</p>
+      <div class="ring" role="img" aria-label="8 of 17 done"><b>47%</b></div>
+      <div><h3>8 of 17 done</h3><p>5 are developer work, 4 need a decision or help from PCEC.</p>
         <div class="legend"><span class="pill done">Done</span><span class="pill todo">Developer, to do</span><span class="pill pcec">Needs PCEC</span></div></div>
     </div>
     <div class="card list">
@@ -247,6 +259,8 @@ tbody th{font-weight:700}
       <div class="item"><b>Stay signed in</b><span class="d">No more logging in after every refresh.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Automated checks pass</b><span class="d">App journeys, accessibility, phone sizes, security and offline.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Install page and QR code</b><span class="d">Android and iPhone steps.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Private-path release check</b><span class="d">Correct the app fallback for private paths and repeat live verification.</span><span class="pill todo">To do</span></div>
+      <div class="item"><b>One-time launch cleanup preparation</b><span class="d">Finish and review the one-click utility. Execution is on hold until the owner chooses launch timing; all current data stays.</span><span class="pill todo">To do</span></div>
       <div class="item"><b>Photo uploads from the live app</b><span class="d">Allow the app's web address in the upload service.</span><span class="pill todo">To do</span></div>
       <div class="item"><b>Real-phone tests</b><span class="d">One Android phone and one iPhone, following the test guide.</span><span class="pill todo">To do</span></div>
       <div class="item"><b>Spending alerts and cheaper photo storage</b><span class="d">Budget alerts; Cloudflare R2 for photos.</span><span class="pill todo">To do</span></div>
@@ -339,7 +353,7 @@ tbody th{font-weight:700}
     </div>
   </section>
 
-  <p class="foot">Updated 13 October 2026. Costs are estimates from the Strategic Infrastructure Plan and providers' public prices, not quotations or approved spending. Screens show sample data.</p>
+  <p class="foot">Updated 18 October 2026. Costs are estimates from the Strategic Infrastructure Plan and providers' public prices, not quotations or approved spending. Screens show sample data.</p>
 </main>
 </body>
 </html>
