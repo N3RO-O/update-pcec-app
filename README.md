@@ -2,6 +2,12 @@
 
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
 
+**19 October 2026:** the summary and `system-guide.html#social-features` document
+friends and accepted requests, post/group privacy, group ownership/admins,
+invitations, suggestions and ranking, notification modals, typing and emoji
+controls. Public means approved members only. Existing audit evidence dates
+are retained, and the one-time launch cleanup remains unfinished and on hold.
+
 **13 October 2026 redesign:** `index.html` is now a short, plain summary for
 leadership: status at a glance, what's new, a 15-item launch checklist, the
 growth plan and budget from the *PCEC Connect Strategic Infrastructure Plan*
