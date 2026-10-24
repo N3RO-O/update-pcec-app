@@ -2,6 +2,14 @@
 
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
 
+**23 October 2026 redesign:** `index.html` was rewritten for easier reading:
+larger text, one column, and a fixed order (at a glance, what members can do,
+recent changes by date, what's left before launch grouped by who it waits on,
+next steps, decisions, budget, install, longer reports). Status updated to the
+19 October record: 11 of 17 launch items done (private-path check, live photo
+uploads and account deletion, and real-phone tests closed). The architecture
+and free-plan limits sit in a collapsible section. No JavaScript on the page.
+
 **19 October 2026:** the summary and `system-guide.html#social-features` document
 friends and accepted requests, post/group privacy, group ownership/admins,
 invitations, suggestions and ranking, notification modals, typing and emoji
