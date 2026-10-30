@@ -1,5 +1,15 @@
 # PCEC Connect project update
 
+**30 October 2026:** summary, system guide and readiness follow-up describe
+Surgebox QR giving with manual Finance review, scanner/Resources removal and
+current launch gates. Read-only dashboard observations show Free, healthy, no
+backups, Gmail SMTP with a deliverability warning, and leaked-password protection
+disabled. Historical audit scores retain their original dates. No passwords,
+member records or private receipt files are published. The current broad
+community regression stops at an unread indicator; focused checks alone are
+not launch approval.
+
+
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
 
 **23 October 2026 redesign:** `index.html` was rewritten for easier reading:

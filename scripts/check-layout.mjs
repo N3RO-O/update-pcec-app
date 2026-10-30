@@ -73,10 +73,13 @@ try{
     assert.equal(await page.evaluate(()=>window.auditInlineExecuted===true),false,'CSP blocks inline execution');
     await page.goto('http://localhost:5205/index.html');
     await page.waitForTimeout(1100);
-    assert.equal(await page.locator('#launch .item').count(),17);
-    assert.equal(await page.locator('#launch .item .pill.done').count(),11);
-    assert.match(await page.locator('#summary').textContent(),/11 of 17/);
+    assert.equal(await page.locator('#launch .item').count(),20);
+    assert.equal(await page.locator('#launch .item .pill.done').count(),10);
+    assert.match(await page.locator('#summary').textContent(),/On hold/);
     assert.equal(await page.locator('#plan .phase').count(),3);
+    assert.match(await page.locator('#oct30-update').textContent(),/Not production ready/);
+    assert.match(await page.locator('#latest').textContent(),/No Surgebox API/);
+    assert.match(await page.locator('#launch').textContent(),/Backup and restore/);
     assert.match(await page.locator('#cleanup-status').textContent(),/not ready to run/);
     assert.match(await page.locator('#latest').textContent(),/330 responsive checks and 121 accessibility scans/);
     assert.match(await page.locator('#plan').textContent(),/~\$45/);

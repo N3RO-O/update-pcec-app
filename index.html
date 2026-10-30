@@ -208,9 +208,9 @@ tbody th{font-weight:700}
 
 <header class="top">
   <div class="wrap">
-    <div class="brandline"><img src="assets/pcec-logo-white.png" alt="PCEC"><span>PCEC Connect · Project update</span><span class="date">23 October 2026</span></div>
-    <h1>The app is online for testing, and the first week of launch work is done.</h1>
-    <p class="lede">Members can already sign up, post, chat, pray together and install the app on Android or iPhone. It costs ₱0 a month. What's left before launch is mostly cheaper photo storage, a small member pilot and a few decisions only PCEC can make.</p>
+    <div class="brandline"><img src="assets/pcec-logo-white.png" alt="PCEC"><span>PCEC Connect · Project update</span><span class="date">30 October 2026</span></div>
+    <h1>The app is updated. Public launch still needs approval.</h1>
+    <p class="lede">Members can sign up, post, chat, pray and report a Surgebox donation for Finance to verify. The latest update removes Resources. Public launch is on hold while email delivery, recovery, administrator security and the member pilot are accepted.</p>
     <div class="cta">
       <a class="btn btn-light" href="https://pcec-connect.vercel.app" target="_blank" rel="noopener">Open the app ↗</a>
       <a class="btn btn-ghost" href="#install">Install on your phone</a>
@@ -230,10 +230,9 @@ tbody th{font-weight:700}
     <h2 id="summary-h" class="eyebrow">At a glance</h2>
     <div class="tiles">
       <div class="card tile">
-        <div class="k">Launch checklist</div>
-        <div class="v">11 of 17</div>
-        <div class="bar" role="img" aria-label="11 of 17 done, 65 percent"><i></i></div>
-        <div class="s">done. 2 are developer work; 4 need PCEC.</div>
+        <div class="k">Public launch</div>
+        <div class="v">On hold</div>
+        <div class="s">Working features are available for testing. Launch gates below still need evidence.</div>
       </div>
       <div class="card tile">
         <div class="k">Monthly cost now</div>
@@ -243,7 +242,7 @@ tbody th{font-weight:700}
       <div class="card tile">
         <div class="k">Next milestone</div>
         <div class="v">Pilot</div>
-        <div class="s">10–30 members try the app for 1–2 weeks (from 27 October, once PCEC picks the group).</div>
+        <div class="s">Close the launch gates, then have 10–30 members try the app for 1–2 weeks.</div>
       </div>
     </div>
   </section>
@@ -259,8 +258,8 @@ tbody th{font-weight:700}
         <li><div><b>Share and react.</b> <span>Posts with photos, reactions and comments, for everyone, friends only or just you.</span></div></li>
         <li><div><b>Talk together.</b> <span>A community chat room and private group chats by invitation.</span></div></li>
         <li><div><b>Pray for one another.</b> <span>Prayer requests, anonymous if wanted, with "praying" counts.</span></div></li>
-        <li><div><b>Find help and churches.</b> <span>Resources and a directory of member churches.</span></div></li>
-        <li><div><b>Give.</b> <span>PCEC's official payment channels and QR codes. The app doesn't handle money.</span></div></li>
+        <li><div><b>Find member churches.</b> <span>A searchable church directory. The Resources module has been removed.</span></div></li>
+        <li><div><b>Give what you can.</b> <span>Pay using the Surgebox QR in a bank or wallet, then report the amount and reference. Finance confirms the transfer before it counts in totals.</span></div></li>
         <li><div><b>Install it like an app.</b> <span>Scan a QR code; no app store needed yet.</span></div></li>
       </ul>
     </div>
@@ -273,8 +272,16 @@ tbody th{font-weight:700}
   <section id="latest" aria-labelledby="latest-h">
     <span class="eyebrow">Recent changes</span>
     <h2 id="latest-h">What changed since 13 October</h2>
-    <p class="intro">Newest first. All of it is live on the testing site.</p>
+    <p class="intro">Newest first. Feature updates and open launch requirements are tracked separately.</p>
     <div class="timeline">
+      <article class="card entry" id="oct30-update">
+        <time datetime="2026-10-30">30 Oct</time>
+        <div><h3>A simpler app and a clear launch decision</h3><ul><li>Resources removed from member/admin pages and global search; the church directory and prayer requests remain.</li><li>Domain setup handover prepared: DNS belongs to the DNS provider, the app domain to Vercel, and sign-in URLs to Supabase. The app's own domain is still pending.</li><li><strong>Not production ready:</strong> the live dashboard shows no backups; Gmail SMTP has a deliverability warning. Email delivery/recovery, admin MFA, alerts and pilot acceptance still need evidence.</li><li>The current broad community test stops at an unread-message indicator. Passing focused checks do not close that regression.</li></ul></div>
+      </article>
+      <article class="card entry">
+        <time datetime="2026-10-29">28–29 Oct</time>
+        <div><h3>Surgebox giving, chat and app updates</h3><ul><li>Use the supplied Surgebox QR, pay any supported amount in a bank or wallet, then record the actual amount, reference, date and an optional private receipt.</li><li>Reports are linked to the signed-in donor. Finance checks provider/bank records and confirms, corrects or rejects each report. Only confirmed gifts enter totals.</li><li>No Surgebox API is connected. The app cannot automatically verify that money arrived. The in-app QR scanner was removed; QR display/download remain.</li><li>Recent releases improve chat controls, update notices, About statements and glass styling.</li></ul></div>
+      </article>
       <article class="card entry">
         <time datetime="2026-10-19">19 Oct</time>
         <div>
@@ -311,41 +318,44 @@ tbody th{font-weight:700}
         </div>
       </article>
     </div>
-    <p class="note">Checks on the latest code: 231 app journeys, 330 responsive checks and 121 accessibility scans passed, plus security, offline and database checks. These don't replace a pilot with real members.</p>
+    <p class="note">Earlier release evidence: 231 app journeys, 330 responsive checks and 121 accessibility scans were reported before this update. On 30 October, TypeScript, 116 automated accessibility/layout scans, focused donation/database security and API-policy checks passed; the broad community suite stopped at an unread indicator. These results are not public-launch approval.</p>
   </section>
 
   <section id="launch" aria-labelledby="launch-h">
     <span class="eyebrow">Before launch</span>
-    <h2 id="launch-h">11 of 17 launch items are done</h2>
-    <p class="intro">Seventeen things must be true before we invite all members. Here is what's left, and who it's waiting on.</p>
+    <h2 id="launch-h">Public launch: not ready yet</h2>
+    <p class="intro">This working list contains 20 implementation and acceptance items, including optional cleanup preparation. Completed implementation is not proof of public-launch readiness. The current blockers need recorded acceptance.</p>
 
     <div class="card group">
-      <h3><span class="pill todo">Developer</span> Next for the developer <span class="count">2 items</span></h3>
-      <div class="item"><b>Spending alerts and cheaper photo storage</b><span class="d">Budget alerts on every service, and Cloudflare R2 for photos (no download fees). Planned for this week.</span><span class="pill todo">To do</span></div>
-      <div class="item" id="cleanup-status"><b>One-time launch cleanup</b><span class="d">A tool to start launch with clean data. It is not ready to run and stays on hold until PCEC chooses the launch date. No data has been erased.</span><span class="pill hold">On hold</span></div>
+      <h3><span class="pill todo">Developer</span> Next for the maintainer <span class="count">5 items</span></h3>
+      <div class="item"><b>Operational alerts</b><span class="d">Name an alert recipient and verify outage/usage alerts. Cheaper photo storage is a separate optimization, not a launch requirement.</span><span class="pill todo">To do</span></div>
+      <div class="item"><b>Backup and restore</b><span class="d">The dashboard shows no backups. Establish a database and file backup process, then prove recovery in an isolated restore exercise.</span><span class="pill todo">To do</span></div>
+      <div class="item"><b>Administrator security</b><span class="d">Complete admin second-step login, enrollment/recovery and server enforcement. Leaked-password protection is currently disabled.</span><span class="pill todo">To do</span></div>
+      <div class="item"><b>Current regression checks</b><span class="d">Resolve the unread-message test failure and complete the current release checks. Older passing totals are historical evidence.</span><span class="pill todo">To do</span></div>
+      <div class="item" id="cleanup-status"><b>One-time launch cleanup</b><span class="d">An optional cleanup tool is not ready to run and stays on hold. No data has been erased; launching does not authorize deleting existing member records.</span><span class="pill hold">On hold</span></div>
     </div>
 
     <div class="card group">
-      <h3><span class="pill pcec">Needs PCEC</span> Waiting on PCEC <span class="count">4 items</span></h3>
-      <div class="item"><b>Official sender email</b><span class="d">A verified PCEC address, so every member receives account emails. Today only the test inbox gets them.</span><span class="pill pcec">Needs PCEC</span></div>
+      <h3><span class="pill pcec">Needs PCEC</span> Waiting on PCEC <span class="count">5 items</span></h3>
+      <div class="item"><b>Account email acceptance</b><span class="d">Gmail SMTP is configured and the provider warns about deliverability. Verify the approved sender, actual signup confirmation delivery and completed password recovery with agreed test accounts.</span><span class="pill pcec">Needs PCEC</span></div>
+      <div class="item"><b>Official app domain</b><span class="d">Confirm the hostname and maintainer, grant DNS/Vercel/Supabase access, then test HTTPS, account callbacks and uploads on that address.</span><span class="pill pcec">Needs PCEC</span></div>
       <div class="item"><b>Member pilot</b><span class="d">10–30 members, Android and iPhone, for one to two weeks.</span><span class="pill pcec">Needs PCEC</span></div>
       <div class="item"><b>Support contact</b><span class="d">The person who answers account and app questions.</span><span class="pill pcec">Needs PCEC</span></div>
       <div class="item"><b>Legal review</b><span class="d">Lawyer and Data Protection Officer approve the Terms, Community Rules and Privacy Notice.</span><span class="pill pcec">Needs PCEC</span></div>
     </div>
 
     <details class="card group">
-      <summary><span class="pill done">Done</span> Already done <span class="count">11 items</span></summary>
+      <summary><span class="pill done">Done</span> Implemented / earlier acceptance <span class="count">10 items</span></summary>
       <div class="item"><b>App online for testing</b><span class="d">Hosted on Vercel; updates go live automatically.</span><span class="pill done">Done</span></div>
-      <div class="item"><b>Email links open the app</b><span class="d">Confirmation and password-reset links land on the live app.</span><span class="pill done">Done</span></div>
-      <div class="item"><b>PCEC-branded account emails</b><span class="d">Sent through Resend.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Account callback configured</b><span class="d">The current Vercel callback is configured. Delivery and complete recovery acceptance remain open above.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>PCEC-branded account emails</b><span class="d">Templates are prepared. Current SMTP uses Gmail; sender/delivery acceptance remains open.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Google sign-in</b><span class="d">Published; anyone with a Google account can join.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Database protection on every table</b><span class="d">Members only see what they're allowed to see.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Stay signed in</b><span class="d">No logging in again after every refresh.</span><span class="pill done">Done</span></div>
-      <div class="item"><b>Automated checks pass</b><span class="d">App journeys, accessibility, phone sizes, security and offline.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Install page and QR code</b><span class="d">Android and iPhone steps.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Private files are refused</b><span class="d">Fixed and checked on the live site, 19 October.</span><span class="pill done">Done</span></div>
       <div class="item"><b>Photo uploads and account deletion from the live app</b><span class="d">Fixed and checked on the live site, 19 October.</span><span class="pill done">Done</span></div>
-      <div class="item"><b>Real-phone tests</b><span class="d">Done by the owner on Android and iPhone, 19 October.</span><span class="pill done">Done</span></div>
+      <div class="item"><b>Earlier real-phone tests</b><span class="d">Reported complete by the owner on 19 October. The latest release and final domain still need pilot acceptance.</span><span class="pill done">Done</span></div>
     </details>
   </section>
 
@@ -353,8 +363,8 @@ tbody th{font-weight:700}
     <span class="eyebrow">Next steps</span>
     <h2 id="next-h">The next few weeks</h2>
     <div class="steps">
-      <div class="card step now"><div class="when">This week · 20–26 Oct</div><h3>Cheaper and safer</h3><ul><li>Cloudflare R2 for photos</li><li>Spending alerts on every service</li><li>Smaller photos (WebP)</li><li>Verified PCEC sender email</li></ul></div>
-      <div class="card step"><div class="when">27 Oct – 2 Nov</div><h3>Member pilot</h3><ul><li>10–30 members use the app</li><li>Collect feedback and fix issues</li><li>Present results to leadership</li></ul></div>
+      <div class="card step now"><div class="when">Next · close launch gates</div><h3>Verify recovery and access</h3><ul><li>Backups and an isolated restore</li><li>Account email delivery and recovery</li><li>Admin MFA and regression checks</li><li>Official domain and operating alerts</li></ul></div>
+      <div class="card step"><div class="when">After the launch gates</div><h3>Member pilot</h3><ul><li>10–30 members use the app</li><li>Collect feedback and fix issues</li><li>Present results to leadership</li></ul></div>
       <div class="card step"><div class="when">After the pilot</div><h3>Launch</h3><ul><li>Legal review</li><li>Google Play listing</li><li>Open to all members</li></ul></div>
     </div>
   </section>
@@ -429,7 +439,7 @@ tbody th{font-weight:700}
     </div>
   </section>
 
-  <p class="foot">Updated 23 October 2026, with test results last verified on 19 October. Costs are estimates from the Strategic Infrastructure Plan and providers' public prices, not quotations or approved spending. Screens show sample data.</p>
+  <p class="foot">Updated 30 October 2026. Current focused checks are described above; older test totals retain their earlier dates. Costs are estimates from the Strategic Infrastructure Plan and providers' public prices, not quotations or approved spending. Screens show sample data.</p>
 </main>
 </body>
 </html>
