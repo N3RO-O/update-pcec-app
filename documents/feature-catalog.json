@@ -1,0 +1,2874 @@
+{
+  "date": "2026-10-31",
+  "baseline": "1.1.10",
+  "features": [
+    {
+      "id": "AUTH-001",
+      "name": "Welcome and first visit",
+      "module": "Access",
+      "role": "A visitor",
+      "purpose": "understand the app and reach login",
+      "description": "Show the three existing welcome slides on the first device visit.",
+      "userStory": "As a visitor, I want to understand the app and reach login.",
+      "functionalRequirements": [
+        "Show the three existing welcome slides on the first device visit.",
+        "Get Started or Skip leads to login; subsequent visits retain the welcome preference."
+      ],
+      "businessRules": "The welcome flag is a device preference, not authorization. Signed-in users follow the session guard.",
+      "validation": "Storage failure must not trap the visitor in repeated onboarding.",
+      "inputs": "First-visit local preference and navigation action",
+      "outputs": "Welcome slides or login form",
+      "errorAndEmptyStates": "If local storage is unavailable, permit login. Public guides remain readable without a member account.",
+      "acceptanceCriteria": [
+        "First visit can finish the welcome flow.",
+        "A later visit reaches login without repeating the slides."
+      ],
+      "relatedTables": [],
+      "api": [],
+      "components": [
+        "welcomePage",
+        "welcome slides",
+        "Skip/Get Started"
+      ],
+      "tests": [
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A visitor. The welcome flag is a device preference, not authorization. Signed-in users follow the session guard.",
+      "dependencies": [],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "AUTH-002",
+      "name": "Email registration and consent",
+      "module": "Access",
+      "role": "A visitor",
+      "purpose": "create an account using accurate details and consent",
+      "description": "Collect first/last names, email, country/phone, optional church, password and confirmation.",
+      "userStory": "As a visitor, I want to create an account using accurate details and consent.",
+      "functionalRequirements": [
+        "Collect first/last names, email, country/phone, optional church, password and confirmation.",
+        "Validate agreement to the Terms, Community Rules and Privacy Notice before signup."
+      ],
+      "businessRules": "New accounts are bound to the Auth user; caller-supplied metadata cannot grant an admin role or bypass setup.",
+      "validation": "Required names/email/E.164-compatible phone; password minimum eight characters; matching confirmation; explicit consent.",
+      "inputs": "Registration fields and consent checkbox",
+      "outputs": "Auth user/profile plus confirmation or newcomer destination",
+      "errorAndEmptyStates": "Show field errors, duplicate-email guidance, rate-limit errors and a retry path; never show successful creation after a failed request.",
+      "acceptanceCriteria": [
+        "Invalid/unticked registration makes no successful account.",
+        "Valid fixture registration preserves country, normalized phone and church."
+      ],
+      "relatedTables": [
+        "auth.users",
+        "public.user_profile"
+      ],
+      "api": [
+        "POST /auth/v1/signup"
+      ],
+      "components": [
+        "signupPage",
+        "field",
+        "phoneInput",
+        "passwordField",
+        "consentLabel"
+      ],
+      "tests": [
+        "e2e.mjs",
+        "registration-search.mjs",
+        "profile-onboarding.mjs",
+        "security-db.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A visitor. New accounts are bound to the Auth user; caller-supplied metadata cannot grant an admin role or bypass setup.",
+      "dependencies": [
+        "POST /auth/v1/signup"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "AUTH-003",
+      "name": "Email confirmation and resend",
+      "module": "Access",
+      "role": "An unconfirmed account holder",
+      "purpose": "confirm ownership of the email before entering member content",
+      "description": "Explain the confirmation step and resend an email link when requested.",
+      "userStory": "As an unconfirmed account holder, I want to confirm ownership of the email before entering member content.",
+      "functionalRequirements": [
+        "Explain the confirmation step and resend an email link when requested.",
+        "Consume valid callback tokens and reject expired/invalid links with useful recovery actions."
+      ],
+      "businessRules": "The production public settings report email auto-confirmation off. Administrators must not use the UI to bypass email ownership.",
+      "validation": "Validate email syntax, callback origin and token result; respect sending limits.",
+      "inputs": "Email/link and resend request",
+      "outputs": "Confirmed session or safe explanation",
+      "errorAndEmptyStates": "Differentiate email sending failure, expired link and invalid link; keep confirmation addresses out of URLs where supported.",
+      "acceptanceCriteria": [
+        "Unconfirmed credentials cannot enter member routes.",
+        "A failed send never claims that a message was delivered."
+      ],
+      "relatedTables": [
+        "auth.users",
+        "public.user_profile"
+      ],
+      "api": [
+        "POST /auth/v1/resend",
+        "GET /auth/v1/verify",
+        "/auth/callback"
+      ],
+      "components": [
+        "checkEmailPage",
+        "pendingPage",
+        "authCallbackPage",
+        "resend controls"
+      ],
+      "tests": [
+        "auth-callback.mjs",
+        "auth-email-errors.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An unconfirmed account holder. The production public settings report email auto-confirmation off. Administrators must not use the UI to bypass email ownership.",
+      "dependencies": [
+        "POST /auth/v1/resend",
+        "GET /auth/v1/verify",
+        "/auth/callback"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "AUTH-004",
+      "name": "Email/password login",
+      "module": "Access",
+      "role": "A registered account holder",
+      "purpose": "sign in and reach the permitted screen",
+      "description": "Provide labelled email/password fields, password visibility, recovery and registration links.",
+      "userStory": "As a registered account holder, I want to sign in and reach the permitted screen.",
+      "functionalRequirements": [
+        "Provide labelled email/password fields, password visibility, recovery and registration links.",
+        "Authenticate, fetch the trusted profile and apply member/admin/status destinations."
+      ],
+      "businessRules": "Suspended/rejected users cannot enter the app. A safe relative next destination does not bypass role, consent or setup guards.",
+      "validation": "Email syntax and nonempty password are checked before submission; server credentials remain authoritative.",
+      "inputs": "Email, password and optional relative next destination",
+      "outputs": "Session and correct route, or sanitized failure",
+      "errorAndEmptyStates": "Wrong credentials, unconfirmed email, missing profile and network failure each have clear feedback; preserve the ability to retry.",
+      "acceptanceCriteria": [
+        "Valid member/admin fixtures reach their permitted destination.",
+        "Invalid credentials and unauthorized routes are rejected."
+      ],
+      "relatedTables": [
+        "auth.users",
+        "public.user_profile"
+      ],
+      "api": [
+        "POST /auth/v1/token?grant_type=password",
+        "GET /auth/v1/user"
+      ],
+      "components": [
+        "loginPage",
+        "authShell",
+        "show/hide password",
+        "router guards"
+      ],
+      "tests": [
+        "e2e.mjs",
+        "profile-onboarding.mjs",
+        "auth-callback.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A registered account holder. Suspended/rejected users cannot enter the app. A safe relative next destination does not bypass role, consent or setup guards.",
+      "dependencies": [
+        "POST /auth/v1/token?grant_type=password",
+        "GET /auth/v1/user"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "AUTH-005",
+      "name": "Google sign-in and first-time consent",
+      "module": "Access",
+      "role": "A Google account holder",
+      "purpose": "sign in with Google while accepting PCEC requirements",
+      "description": "Start Google authorization through Supabase using the configured callback.",
+      "userStory": "As a google account holder, I want to sign in with google while accepting pcec requirements.",
+      "functionalRequirements": [
+        "Start Google authorization through Supabase using the configured callback.",
+        "For a first-time account, require the app consent flow before newcomer setup."
+      ],
+      "businessRules": "Google availability comes from the configured provider settings. Provider authentication does not itself grant admin or approved membership.",
+      "validation": "Validate callback state/result and explicit app consent; reject expired signup-context state.",
+      "inputs": "Provider action and consent state",
+      "outputs": "Returned session, consent screen or safe error",
+      "errorAndEmptyStates": "If Google is unavailable, explain that email login remains available; invalid callback recovery must not pretend to be a successful login.",
+      "acceptanceCriteria": [
+        "Consent is required in new Google signup fixtures.",
+        "Returned sessions still pass the same profile/status guards."
+      ],
+      "relatedTables": [
+        "auth.users",
+        "public.user_profile"
+      ],
+      "api": [
+        "GET /auth/v1/settings",
+        "GET /auth/v1/authorize?provider=google",
+        "/auth/callback"
+      ],
+      "components": [
+        "googleButton",
+        "finishSignupPage",
+        "consentLabel"
+      ],
+      "tests": [
+        "profile-onboarding.mjs",
+        "auth-callback.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A Google account holder. Google availability comes from the configured provider settings. Provider authentication does not itself grant admin or approved membership.",
+      "dependencies": [
+        "GET /auth/v1/settings",
+        "GET /auth/v1/authorize?provider=google",
+        "/auth/callback"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "AUTH-006",
+      "name": "Password recovery and change",
+      "module": "Access",
+      "role": "An account holder",
+      "purpose": "recover access or update a password through an authorized session",
+      "description": "Forgot password requests a recovery link; valid recovery opens the reset form.",
+      "userStory": "As an account holder, I want to recover access or update a password through an authorized session.",
+      "functionalRequirements": [
+        "Forgot password requests a recovery link; valid recovery opens the reset form.",
+        "Settings supports a matching new password for an authenticated account."
+      ],
+      "businessRules": "Managed Auth handles password storage/hashing; the frontend never implements its own password database. Real mailbox delivery remains an acceptance gate.",
+      "validation": "Valid email; minimum password length and matching confirmation; only a valid recovery/session can update credentials.",
+      "inputs": "Email or authorized new-password fields",
+      "outputs": "Recovery request result or updated credentials",
+      "errorAndEmptyStates": "Distinguish provider sending failure, rate limit and recovery-token failure; never expose SMTP diagnostics or secrets.",
+      "acceptanceCriteria": [
+        "Fixtures report safe, distinct send errors and reject mismatched passwords.",
+        "Unauthorized password changes are rejected."
+      ],
+      "relatedTables": [
+        "auth.users"
+      ],
+      "api": [
+        "POST /auth/v1/recover",
+        "PUT /auth/v1/user"
+      ],
+      "components": [
+        "forgotPasswordPage",
+        "resetPasswordPage",
+        "settingsPage"
+      ],
+      "tests": [
+        "auth-email-errors.mjs",
+        "auth-callback.mjs",
+        "security-web.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An account holder. Managed Auth handles password storage/hashing; the frontend never implements its own password database. Real mailbox delivery remains an acceptance gate.",
+      "dependencies": [
+        "POST /auth/v1/recover",
+        "PUT /auth/v1/user"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "AUTH-007",
+      "name": "Session renewal, routing and logout",
+      "module": "Access",
+      "role": "A signed-in member",
+      "purpose": "keep an authorized session and leave it safely",
+      "description": "Renew sessions through the existing request policy and route according to trusted profile state.",
+      "userStory": "As a signed-in member, I want to keep an authorized session and leave it safely.",
+      "functionalRequirements": [
+        "Renew sessions through the existing request policy and route according to trusted profile state.",
+        "Logout clears the local session and returns to login; pending/blocked/missing-profile screens remain distinct."
+      ],
+      "businessRules": "A router guard is UX only; database functions and RLS enforce permissions. User-editable metadata is never a role authority.",
+      "validation": "Reject invalid/external next links, stale/invalid tokens and disallowed account states.",
+      "inputs": "Session state, profile and destination",
+      "outputs": "Authorized route or account problem/logout destination",
+      "errorAndEmptyStates": "Expired sessions require sign-in; offline/API errors show a bounded retry rather than a permanently spinning screen.",
+      "acceptanceCriteria": [
+        "Member cannot enter admin workflows.",
+        "Suspension is enforced despite an earlier valid session."
+      ],
+      "relatedTables": [
+        "auth.users",
+        "public.user_profile"
+      ],
+      "api": [
+        "POST /auth/v1/token?grant_type=refresh_token",
+        "POST /auth/v1/logout"
+      ],
+      "components": [
+        "session.ts",
+        "router.ts",
+        "request-policy.ts"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "api-policy.mjs",
+        "navigation-recovery.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A signed-in member. A router guard is UX only; database functions and RLS enforce permissions. User-editable metadata is never a role authority.",
+      "dependencies": [
+        "POST /auth/v1/token?grant_type=refresh_token",
+        "POST /auth/v1/logout"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "PROF-001",
+      "name": "Newcomer profile setup",
+      "module": "Profiles",
+      "role": "A new or unfinished member",
+      "purpose": "complete profile details once before using the app",
+      "description": "Guide the member through name, birthday, contact, residence, church and review steps.",
+      "userStory": "As a new or unfinished member, I want to complete profile details once before using the app.",
+      "functionalRequirements": [
+        "Guide the member through name, birthday, contact, residence, church and review steps.",
+        "Save through the guarded setup RPC and return to the intended member destination."
+      ],
+      "businessRules": "Show setup only when the trusted required flag is true and no completion date exists. Returning/completed accounts use Edit Profile. Saved birthday is locked.",
+      "validation": "Validate a real nonfuture calendar birthday, name, phone/country consistency, location preferences and final confirmation.",
+      "inputs": "Setup details and sharing choices",
+      "outputs": "Atomic saved profile and completion marker",
+      "errorAndEmptyStates": "Retain the current wizard on failed save; unfinished accounts can resume. Do not persist draft birthdays in device storage.",
+      "acceptanceCriteria": [
+        "Newcomer must finish valid setup; existing/completed account does not repeat it.",
+        "A locked birthday cannot be replaced by client or ordinary admin editing."
+      ],
+      "relatedTables": [
+        "public.user_profile"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/complete_profile_setup"
+      ],
+      "components": [
+        "profileSetupPage",
+        "six-step wizard",
+        "review controls"
+      ],
+      "tests": [
+        "profile-onboarding.mjs",
+        "profile-onboarding-db.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A new or unfinished member. Show setup only when the trusted required flag is true and no completion date exists. Returning/completed accounts use Edit Profile. Saved birthday is locked.",
+      "dependencies": [
+        "POST /rest/v1/rpc/complete_profile_setup"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "PROF-002",
+      "name": "Profile view, edit and photo",
+      "module": "Profiles",
+      "role": "An approved member",
+      "purpose": "manage editable personal information and an avatar",
+      "description": "Show membership/profile actions and edit permitted fields.",
+      "userStory": "As an approved member, I want to manage editable personal information and an avatar.",
+      "functionalRequirements": [
+        "Show membership/profile actions and edit permitted fields.",
+        "Crop a profile photo, upload under the caller folder and save its URL only after successful upload."
+      ],
+      "businessRules": "A member edits only their own profile; role/status and birthday locks remain server controlled. Profile photos use the designated public avatar bucket.",
+      "validation": "Field lengths, allowed images, byte limits and file signatures; server verifies caller identity and upload quota.",
+      "inputs": "Profile form or image selection/crop",
+      "outputs": "Updated profile and avatar",
+      "errorAndEmptyStates": "Handle missing images, upload/save failure and crop cancellation without claiming success or replacing an existing image prematurely.",
+      "acceptanceCriteria": [
+        "Profile edits preserve unrelated role/status fields.",
+        "Cancel leaves the prior photo; accepted upload uses the owner folder."
+      ],
+      "relatedTables": [
+        "public.user_profile",
+        "storage.objects"
+      ],
+      "api": [
+        "GET/PATCH /rest/v1/user_profile",
+        "POST /functions/v1/upload-file"
+      ],
+      "components": [
+        "profilePage",
+        "editProfilePage",
+        "cropImage",
+        "avatar"
+      ],
+      "tests": [
+        "quality.mjs",
+        "profile-onboarding.mjs",
+        "security-edge.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. A member edits only their own profile; role/status and birthday locks remain server controlled. Profile photos use the designated public avatar bucket.",
+      "dependencies": [
+        "GET/PATCH /rest/v1/user_profile",
+        "POST /functions/v1/upload-file"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "PROF-003",
+      "name": "Discovery and shared profile privacy",
+      "module": "Profiles",
+      "role": "An approved member",
+      "purpose": "control profile discovery and shared birthday/location details",
+      "description": "Allow public/private discovery preference and explicit birthday/location sharing choices.",
+      "userStory": "As an approved member, I want to control profile discovery and shared birthday/location details.",
+      "functionalRequirements": [
+        "Allow public/private discovery preference and explicit birthday/location sharing choices.",
+        "Return shared profile details only through the server-filtered relationship-aware projection."
+      ],
+      "businessRules": "Private/unconfirmed profiles do not appear to strangers. Mutual follow, ownership, blocks and approved status determine permitted details; email/phone are not public directory fields.",
+      "validation": "Validate target identifiers and booleans; ignore caller attempts to request hidden private fields.",
+      "inputs": "Visibility/sharing preferences and permitted target",
+      "outputs": "Minimal discoverable/shared profile",
+      "errorAndEmptyStates": "Explain a hidden or unavailable profile without leaking private contact details; persist preferences after reload.",
+      "acceptanceCriteria": [
+        "Stranger cannot retrieve private/shared-only details by guessing an ID.",
+        "A saved private preference survives reload and removes discovery access."
+      ],
+      "relatedTables": [
+        "private.member_privacy",
+        "private.member_follows",
+        "public.user_profile",
+        "public.community_blocks"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/member_follows",
+        "POST /rest/v1/rpc/profile_details",
+        "POST /rest/v1/rpc/member_directory"
+      ],
+      "components": [
+        "settingsPage",
+        "memberPostsPage",
+        "profile sharing controls"
+      ],
+      "tests": [
+        "member-follows-db.mjs",
+        "profile-onboarding-db.mjs",
+        "social-privacy-db.mjs",
+        "community-social.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Private/unconfirmed profiles do not appear to strangers. Mutual follow, ownership, blocks and approved status determine permitted details; email/phone are not public directory fields.",
+      "dependencies": [
+        "POST /rest/v1/rpc/member_follows",
+        "POST /rest/v1/rpc/profile_details",
+        "POST /rest/v1/rpc/member_directory"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "ACCT-001",
+      "name": "Account deletion",
+      "module": "Profiles",
+      "role": "An account holder",
+      "purpose": "request deletion of the account and owned files safely",
+      "description": "Require the account-deletion workflow and explicit confirmation.",
+      "userStory": "As an account holder, I want to request deletion of the account and owned files safely.",
+      "functionalRequirements": [
+        "Require the account-deletion workflow and explicit confirmation.",
+        "Call the privileged deletion function using the caller session and documented record/file cleanup rules."
+      ],
+      "businessRules": "No user can delete another account by supplying an ID. Financial history may retain a donor-name snapshot while the account link is removed; retention policy needs owner acceptance.",
+      "validation": "Authenticate the caller, validate deletion confirmation and enforce service-side cleanup rules.",
+      "inputs": "Authorized deletion confirmation",
+      "outputs": "Deleted-account result or actionable failure",
+      "errorAndEmptyStates": "Explain irreversible impact before submission and show failures without false success. Do not run destructive production tests as routine QA.",
+      "acceptanceCriteria": [
+        "Anonymous/other-user deletion attempts fail in isolated tests.",
+        "Owned file cleanup follows the documented scope."
+      ],
+      "relatedTables": [
+        "auth.users",
+        "public.user_profile",
+        "private.donation_reports",
+        "storage.objects"
+      ],
+      "api": [
+        "POST /functions/v1/delete-account"
+      ],
+      "components": [
+        "deleteAccountPage",
+        "accountDeletedPage",
+        "confirmation dialog"
+      ],
+      "tests": [
+        "security-edge.mjs",
+        "security-db.mjs",
+        "security-web.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An account holder. No user can delete another account by supplying an ID. Financial history may retain a donor-name snapshot while the account link is removed; retention policy needs owner acceptance.",
+      "dependencies": [
+        "POST /functions/v1/delete-account"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "HOME-001",
+      "name": "Home and navigation",
+      "module": "Content",
+      "role": "An approved member",
+      "purpose": "find updates and core tasks from one readable home screen",
+      "description": "Show greeting, community highlights, upcoming events, dated latest news and community feed.",
+      "userStory": "As an approved member, I want to find updates and core tasks from one readable home screen.",
+      "functionalRequirements": [
+        "Show greeting, community highlights, upcoming events, dated latest news and community feed.",
+        "Provide Home, Chat, Donate, About and Profile tabs, with additional modules in Menu/desktop navigation."
+      ],
+      "businessRules": "Current content respects approved membership, post visibility, blocks and event lifecycle. Re-selecting the same tab must not discard a loaded feed unnecessarily.",
+      "validation": "Handle empty lists, unavailable optional cards and bounded pagination without horizontal overflow.",
+      "inputs": "Authorized content lists and navigation action",
+      "outputs": "Home cards and the selected permitted route",
+      "errorAndEmptyStates": "Show useful empty/retry states when a section cannot load; optional failures must not blank the whole app.",
+      "acceptanceCriteria": [
+        "Member can reach each available module on mobile and desktop.",
+        "Private/unavailable content is not exposed through highlights."
+      ],
+      "relatedTables": [
+        "public.announcements",
+        "public.events_feed",
+        "public.community_posts"
+      ],
+      "api": [
+        "GET /rest/v1/announcements",
+        "GET /rest/v1/events_feed",
+        "POST /rest/v1/rpc/community_timeline"
+      ],
+      "components": [
+        "homePage",
+        "appBar",
+        "bottomNav",
+        "menuPage",
+        "feed cards"
+      ],
+      "tests": [
+        "quality.mjs",
+        "responsive.mjs",
+        "feed-header.mjs",
+        "feed-experience.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Current content respects approved membership, post visibility, blocks and event lifecycle. Re-selecting the same tab must not discard a loaded feed unnecessarily.",
+      "dependencies": [
+        "GET /rest/v1/announcements",
+        "GET /rest/v1/events_feed",
+        "POST /rest/v1/rpc/community_timeline"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "NEWS-001",
+      "name": "Church news and announcements",
+      "module": "Content",
+      "role": "An approved member",
+      "purpose": "read dated church updates with their context and sources",
+      "description": "List current announcements and open full details with optional images.",
+      "userStory": "As an approved member, I want to read dated church updates with their context and sources.",
+      "functionalRequirements": [
+        "List current announcements and open full details with optional images.",
+        "Preserve publication context, source links and image credits when editorial content supplies them."
+      ],
+      "businessRules": "A member reads but cannot create or edit official announcements. News illustrations must not be misrepresented as photos of reported people/events.",
+      "validation": "Safely render text/links; handle absent or expired image URLs without breaking the article.",
+      "inputs": "Announcement identifier or list",
+      "outputs": "Dated article and permitted image",
+      "errorAndEmptyStates": "Show no-news, unavailable-image and not-found states; a failed detail read must not render another article.",
+      "acceptanceCriteria": [
+        "List/detail show the selected title/body/date.",
+        "Member writes are denied by server policies."
+      ],
+      "relatedTables": [
+        "public.announcements"
+      ],
+      "api": [
+        "GET /rest/v1/announcements"
+      ],
+      "components": [
+        "newsListPage",
+        "newsDetailPage",
+        "news card"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "quality.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. A member reads but cannot create or edit official announcements. News illustrations must not be misrepresented as photos of reported people/events.",
+      "dependencies": [
+        "GET /rest/v1/announcements"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "EVT-001",
+      "name": "Event discovery and lifecycle",
+      "module": "Content",
+      "role": "An approved member",
+      "purpose": "find upcoming and past gatherings with current details",
+      "description": "Show All/Upcoming/Past lists and event details with date, time and location.",
+      "userStory": "As an approved member, I want to find upcoming and past gatherings with current details.",
+      "functionalRequirements": [
+        "Show All/Upcoming/Past lists and event details with date, time and location.",
+        "Apply end/archive lifecycle to lists, highlights and registration availability."
+      ],
+      "businessRules": "Only authorized admins manage events. Published date/end-time rules, not client decoration, determine whether an event has ended.",
+      "validation": "Validate dates/end ordering and identifiers; enforce lifecycle server-side.",
+      "inputs": "Event filter or event ID",
+      "outputs": "Current event cards/details and registration availability",
+      "errorAndEmptyStates": "Handle no upcoming/past items, deleted events and network failure with clear states.",
+      "acceptanceCriteria": [
+        "Ended events cannot accept new registrations.",
+        "Expiry updates Home and feed framing without changing unrelated event records."
+      ],
+      "relatedTables": [
+        "public.events_feed"
+      ],
+      "api": [
+        "GET /rest/v1/events_feed",
+        "POST /rest/v1/rpc/event_lifecycle"
+      ],
+      "components": [
+        "eventsPage",
+        "eventDetailPage",
+        "eventMix"
+      ],
+      "tests": [
+        "event-lifecycle-db.mjs",
+        "feed-experience.mjs",
+        "responsive.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Only authorized admins manage events. Published date/end-time rules, not client decoration, determine whether an event has ended.",
+      "dependencies": [
+        "GET /rest/v1/events_feed",
+        "POST /rest/v1/rpc/event_lifecycle"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "EVT-002",
+      "name": "Event registration and cancellation",
+      "module": "Content",
+      "role": "An approved member",
+      "purpose": "register personal attendance intent and cancel it",
+      "description": "Register once for an eligible event and show the current registration state.",
+      "userStory": "As an approved member, I want to register personal attendance intent and cancel it.",
+      "functionalRequirements": [
+        "Register once for an eligible event and show the current registration state.",
+        "Cancel the caller registration when permitted."
+      ],
+      "businessRules": "Registrations belong to the authenticated member; duplicate and ended-event registrations are rejected. This is not a payment or scanned-attendance feature.",
+      "validation": "Validate caller/event relationship, uniqueness and server lifecycle.",
+      "inputs": "Event ID and register/cancel action",
+      "outputs": "Own registration state",
+      "errorAndEmptyStates": "Preserve the previous state on failed submission and provide retry; never report registration before success.",
+      "acceptanceCriteria": [
+        "Duplicate registration does not create a second record.",
+        "One member cannot cancel or forge another member registration."
+      ],
+      "relatedTables": [
+        "public.event_registrations",
+        "public.events_feed"
+      ],
+      "api": [
+        "GET/POST/DELETE /rest/v1/event_registrations"
+      ],
+      "components": [
+        "registration controls",
+        "event detail button"
+      ],
+      "tests": [
+        "event-lifecycle-db.mjs",
+        "security-db.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Registrations belong to the authenticated member; duplicate and ended-event registrations are rejected. This is not a payment or scanned-attendance feature.",
+      "dependencies": [
+        "GET/POST/DELETE /rest/v1/event_registrations"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "COM-001",
+      "name": "Post composer, photo and audience",
+      "module": "Community",
+      "role": "An approved member",
+      "purpose": "share a text or photo update with the intended audience",
+      "description": "Open a focused composer from Home/Community, accept text and one supported photo, and select audience.",
+      "userStory": "As an approved member, I want to share a text or photo update with the intended audience.",
+      "functionalRequirements": [
+        "Open a focused composer from Home/Community, accept text and one supported photo, and select audience.",
+        "Crop/compress/upload the photo through the existing protected upload path before creating the post."
+      ],
+      "businessRules": "The database supplies trusted author identity. Public means approved members, not the open internet. Friends-only content follows mutual relationships and blocks.",
+      "validation": "Posts up to 2,000 characters; one allowed image within the upload limit; permitted audience values and caller-bound author.",
+      "inputs": "Body, optional image and audience",
+      "outputs": "Created post with trusted author/image reference",
+      "errorAndEmptyStates": "Validation/upload/save errors leave a retry path; cancellation makes no post. Video posting is explicitly unavailable.",
+      "acceptanceCriteria": [
+        "Successful text/photo post appears with the correct author/audience.",
+        "Oversized/forged/unauthorized posts fail without leaking a private photo."
+      ],
+      "relatedTables": [
+        "public.community_posts",
+        "storage.objects"
+      ],
+      "api": [
+        "POST/PATCH /rest/v1/community_posts",
+        "POST /functions/v1/upload-file"
+      ],
+      "components": [
+        "openComposer",
+        "cropImage",
+        "audience select",
+        "post card"
+      ],
+      "tests": [
+        "feed-experience.mjs",
+        "community-actions-db.mjs",
+        "social-privacy-db.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. The database supplies trusted author identity. Public means approved members, not the open internet. Friends-only content follows mutual relationships and blocks.",
+      "dependencies": [
+        "POST/PATCH /rest/v1/community_posts",
+        "POST /functions/v1/upload-file"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "COM-002",
+      "name": "Latest and ranked feed, pagination and live updates",
+      "module": "Community",
+      "role": "An approved member",
+      "purpose": "browse permitted posts without losing place",
+      "description": "Provide chronological Latest and relationship/engagement-ranked For you views.",
+      "userStory": "As an approved member, I want to browse permitted posts without losing place.",
+      "functionalRequirements": [
+        "Provide chronological Latest and relationship/engagement-ranked For you views.",
+        "Page older content and refresh permitted updates using invalidations rather than broadcasting private bodies."
+      ],
+      "businessRules": "Ranking never expands visibility; source applies audience, blocks, hidden state and caller permissions before results. Current network access is required for fresh data.",
+      "validation": "Bound page sizes, validate cursors and cancel stale requests on navigation.",
+      "inputs": "Feed choice, cursor and invalidation",
+      "outputs": "Ordered permitted posts and next-page state",
+      "errorAndEmptyStates": "Show empty/caught-up/loading/retry states; reconnect refreshes without creating duplicate posts.",
+      "acceptanceCriteria": [
+        "Pagination retains all permitted fixture posts without duplicates.",
+        "Private posts never enter ranked results for a stranger."
+      ],
+      "relatedTables": [
+        "public.community_posts",
+        "public.community_reactions",
+        "public.community_comments",
+        "private.member_follows"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/community_timeline",
+        "POST /rest/v1/rpc/community_for_you",
+        "private Realtime feed invalidations"
+      ],
+      "components": [
+        "communityPage",
+        "post cards",
+        "Latest/For you",
+        "Load more"
+      ],
+      "tests": [
+        "feed-experience.mjs",
+        "community-social.mjs",
+        "social-privacy-db.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Ranking never expands visibility; source applies audience, blocks, hidden state and caller permissions before results. Current network access is required for fresh data.",
+      "dependencies": [
+        "POST /rest/v1/rpc/community_timeline",
+        "POST /rest/v1/rpc/community_for_you",
+        "private Realtime feed invalidations"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "COM-003",
+      "name": "Comments and threaded replies",
+      "module": "Community",
+      "role": "An approved member",
+      "purpose": "respond within a post discussion",
+      "description": "Show existing permitted comments and allow a comment or reply to a specific comment.",
+      "userStory": "As an approved member, I want to respond within a post discussion.",
+      "functionalRequirements": [
+        "Show existing permitted comments and allow a comment or reply to a specific comment.",
+        "Support authorized deletion and return updates without exposing hidden parent posts."
+      ],
+      "businessRules": "The caller is the trusted author. A reply remains bound to its post/parent; blocks and post visibility still apply.",
+      "validation": "Nonblank text up to 1,000 characters, valid parent/post relationship and caller authorization.",
+      "inputs": "Post/parent ID and comment body",
+      "outputs": "Saved comment/reply and updated count",
+      "errorAndEmptyStates": "Show no-comments, loading and failed-send states; preserve unsent text for an ordinary retry.",
+      "acceptanceCriteria": [
+        "Reply appears under the intended parent.",
+        "Forged author or hidden-post comments are denied."
+      ],
+      "relatedTables": [
+        "public.community_comments",
+        "public.community_posts"
+      ],
+      "api": [
+        "GET/POST/DELETE /rest/v1/community_comments",
+        "POST /rest/v1/rpc/community_reply"
+      ],
+      "components": [
+        "comment list",
+        "reply composer",
+        "Send comment"
+      ],
+      "tests": [
+        "community-actions-db.mjs",
+        "community-social.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. The caller is the trusted author. A reply remains bound to its post/parent; blocks and post visibility still apply.",
+      "dependencies": [
+        "GET/POST/DELETE /rest/v1/community_comments",
+        "POST /rest/v1/rpc/community_reply"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "COM-004",
+      "name": "Reactions and reactor list",
+      "module": "Community",
+      "role": "An approved member",
+      "purpose": "react to a post and see permitted reactions",
+      "description": "Provide quick reactions plus accessible extended choices through hold/keyboard controls.",
+      "userStory": "As an approved member, I want to react to a post and see permitted reactions.",
+      "functionalRequirements": [
+        "Provide quick reactions plus accessible extended choices through hold/keyboard controls.",
+        "Open a paged list of reacting members through a minimal server projection."
+      ],
+      "businessRules": "Reaction kinds and uniqueness are server enforced; viewing reactors does not bypass the post audience or profile projection.",
+      "validation": "Allowed reaction kind, valid visible post, caller identity and bounded pagination.",
+      "inputs": "Post ID and reaction action",
+      "outputs": "Own reaction, counts and reactor pages",
+      "errorAndEmptyStates": "Handle zero reactions, unavailable list and failed toggle without false success.",
+      "acceptanceCriteria": [
+        "Hold opens the chooser without also adding a reaction.",
+        "Anonymous/private-post reactor lookup is denied."
+      ],
+      "relatedTables": [
+        "public.community_reactions",
+        "public.community_posts",
+        "public.user_profile"
+      ],
+      "api": [
+        "POST/DELETE /rest/v1/community_reactions",
+        "POST /rest/v1/rpc/community_reactors"
+      ],
+      "components": [
+        "reaction buttons",
+        "reaction chooser",
+        "reactor sheet"
+      ],
+      "tests": [
+        "reaction-people-db.mjs",
+        "testing-feedback.mjs",
+        "community-social.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Reaction kinds and uniqueness are server enforced; viewing reactors does not bypass the post audience or profile projection.",
+      "dependencies": [
+        "POST/DELETE /rest/v1/community_reactions",
+        "POST /rest/v1/rpc/community_reactors"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "COM-005",
+      "name": "Saved posts, reposting and sharing",
+      "module": "Community",
+      "role": "An approved member",
+      "purpose": "return to useful posts and share a permitted reference",
+      "description": "Toggle saved/reposted state, list Saved posts, copy or natively share a post link, and send a link into an accessible chat.",
+      "userStory": "As an approved member, I want to return to useful posts and share a permitted reference.",
+      "functionalRequirements": [
+        "Toggle saved/reposted state, list Saved posts, copy or natively share a post link, and send a link into an accessible chat.",
+        "Use the current guarded action service with the documented compatibility fallback when unavailable."
+      ],
+      "businessRules": "Saved state is personal; reposting never grants a new audience access to the original. The server checks chat membership and original post visibility.",
+      "validation": "Valid post/action and authorized destination; deduplicate repeat actions and preserve mutation identity.",
+      "inputs": "Post/action and optional chat target",
+      "outputs": "Saved/reposted state or shared reference",
+      "errorAndEmptyStates": "Offer copy fallback when native share is unavailable; deleted/inaccessible saved items must not expose content.",
+      "acceptanceCriteria": [
+        "Toggling does not create duplicate saves/reposts.",
+        "Blocked/hidden originals remain inaccessible through a shared URL."
+      ],
+      "relatedTables": [
+        "private.community_saves",
+        "public.community_reposts",
+        "public.community_posts",
+        "public.chat_messages"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/community_actions",
+        "POST /rest/v1/chat_messages"
+      ],
+      "components": [
+        "share sheet",
+        "Saved posts",
+        "repost/save controls"
+      ],
+      "tests": [
+        "community-actions-db.mjs",
+        "community-social.mjs",
+        "feed-experience.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Saved state is personal; reposting never grants a new audience access to the original. The server checks chat membership and original post visibility.",
+      "dependencies": [
+        "POST /rest/v1/rpc/community_actions",
+        "POST /rest/v1/chat_messages"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "COM-006",
+      "name": "Post management, reports and blocking",
+      "module": "Community",
+      "role": "A content owner or authorized moderator",
+      "purpose": "manage content and report unwanted activity",
+      "description": "Permit supported owner edits/deletion and member reports or blocks.",
+      "userStory": "As a content owner or authorized moderator, I want to manage content and report unwanted activity.",
+      "functionalRequirements": [
+        "Permit supported owner edits/deletion and member reports or blocks.",
+        "Provide admin moderation/resolution without letting members moderate other users."
+      ],
+      "businessRules": "Owner/moderator checks run in the backend. Blocks apply in both directions to protected discovery/content access; reporting is not an automatic punishment.",
+      "validation": "Validate target, reason length and allowed operation; reject impersonation and unauthorized moderation.",
+      "inputs": "Content target, edit/report/block action and reason",
+      "outputs": "Updated authorized content, report or block state",
+      "errorAndEmptyStates": "Show removed/unavailable content safely and keep failed actions retryable.",
+      "acceptanceCriteria": [
+        "Member cannot delete or edit another member content.",
+        "Blocks and hidden state remove future protected reads."
+      ],
+      "relatedTables": [
+        "public.community_posts",
+        "public.community_reports",
+        "public.community_blocks"
+      ],
+      "api": [
+        "PATCH/DELETE /rest/v1/community_posts",
+        "POST /rest/v1/community_reports",
+        "POST/DELETE /rest/v1/community_blocks"
+      ],
+      "components": [
+        "Post options",
+        "report/block confirmations",
+        "adminCommunityPage"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "community-actions-db.mjs",
+        "social-privacy-db.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A content owner or authorized moderator. Owner/moderator checks run in the backend. Blocks apply in both directions to protected discovery/content access; reporting is not an automatic punishment.",
+      "dependencies": [
+        "PATCH/DELETE /rest/v1/community_posts",
+        "POST /rest/v1/community_reports",
+        "POST/DELETE /rest/v1/community_blocks"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "SOC-001",
+      "name": "Following, followers and suggestions",
+      "module": "Connections",
+      "role": "An approved member",
+      "purpose": "connect with people while respecting their privacy",
+      "description": "List following/followers and suggestions, follow/unfollow, follow back and reject an incoming follow.",
+      "userStory": "As an approved member, I want to connect with people while respecting their privacy.",
+      "functionalRequirements": [
+        "List following/followers and suggestions, follow/unfollow, follow back and reject an incoming follow.",
+        "Use mutual follows as friends for audiences and the group picker, while retaining legacy accepted-friendship compatibility."
+      ],
+      "businessRules": "No self follow or relationship with a blocked account; private-profile discovery and messaging rules remain server controlled.",
+      "validation": "Caller-bound relationship actions, approved/confirmed target and known action; list only minimal fields.",
+      "inputs": "Target/action or contact list request",
+      "outputs": "Relationship state and protected suggestions",
+      "errorAndEmptyStates": "Show no contacts/matches, hidden target and temporary-unavailable states without inventing relationships.",
+      "acceptanceCriteria": [
+        "Follow-back produces a mutual relationship for friend selection.",
+        "A stranger cannot follow a known private ID or read another person graph."
+      ],
+      "relatedTables": [
+        "private.member_follows",
+        "private.member_privacy",
+        "public.member_friendships",
+        "public.community_blocks"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/member_follows",
+        "POST /rest/v1/rpc/member_directory"
+      ],
+      "components": [
+        "friendsPage",
+        "directory search",
+        "profile connection buttons"
+      ],
+      "tests": [
+        "member-follows-db.mjs",
+        "social-privacy-db.mjs",
+        "community-social.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. No self follow or relationship with a blocked account; private-profile discovery and messaging rules remain server controlled.",
+      "dependencies": [
+        "POST /rest/v1/rpc/member_follows",
+        "POST /rest/v1/rpc/member_directory"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-001",
+      "name": "Shared Community Chat",
+      "module": "Conversations",
+      "role": "An approved member",
+      "purpose": "take part in the shared member conversation",
+      "description": "Load paged shared history and send a text message.",
+      "userStory": "As an approved member, I want to take part in the shared member conversation.",
+      "functionalRequirements": [
+        "Load paged shared history and send a text message.",
+        "Use trusted author/timestamp fields and private live invalidations."
+      ],
+      "businessRules": "Only approved/confirmed users read or send. Shared chat is not a private direct conversation or end-to-end encrypted service.",
+      "validation": "Nonblank text up to 1,000 characters; caller-bound identity; server limit of 20 messages per minute.",
+      "inputs": "Message body and mutation ID",
+      "outputs": "Stored message or retryable rejection",
+      "errorAndEmptyStates": "Keep the current draft after a failed send; show empty history, connection and retry state.",
+      "acceptanceCriteria": [
+        "Member can read/send; anonymous, pending and suspended users cannot.",
+        "Retry of the same mutation does not duplicate a message."
+      ],
+      "relatedTables": [
+        "public.chat_messages"
+      ],
+      "api": [
+        "GET/POST /rest/v1/chat_messages",
+        "private Realtime chat topics"
+      ],
+      "components": [
+        "chatPage",
+        "composer",
+        "paged history",
+        "connection status"
+      ],
+      "tests": [
+        "chat-db.mjs",
+        "chat-experience.mjs",
+        "community-social.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Only approved/confirmed users read or send. Shared chat is not a private direct conversation or end-to-end encrypted service.",
+      "dependencies": [
+        "GET/POST /rest/v1/chat_messages",
+        "private Realtime chat topics"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-002",
+      "name": "Direct messages and requests",
+      "module": "Conversations",
+      "role": "An approved member",
+      "purpose": "contact one permitted person privately",
+      "description": "Start a direct conversation from an allowed profile or New message search.",
+      "userStory": "As an approved member, I want to contact one permitted person privately.",
+      "functionalRequirements": [
+        "Start a direct conversation from an allowed profile or New message search.",
+        "Show an invitation/request where acceptance is required before messages become readable."
+      ],
+      "businessRules": "Server checks the caller, target visibility, blocks, relationship and the existing unique pair. App admins do not gain automatic access to private conversations.",
+      "validation": "Approved distinct target, permitted discovery/message rule and deduplicated direct pair.",
+      "inputs": "Target ID and request action",
+      "outputs": "Existing/new direct room or a pending request",
+      "errorAndEmptyStates": "Explain blocked/unavailable targets and pending requests without leaking history.",
+      "acceptanceCriteria": [
+        "Repeated open uses the same direct pair.",
+        "Request alone does not authorize private history or Realtime membership."
+      ],
+      "relatedTables": [
+        "private.direct_conversations",
+        "public.chat_rooms",
+        "public.chat_room_members"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/chat_groups",
+        "POST /rest/v1/rpc/member_follows"
+      ],
+      "components": [
+        "New message",
+        "messageMemberButton",
+        "request actions"
+      ],
+      "tests": [
+        "direct-messages-db.mjs",
+        "community-social.mjs",
+        "chat-experience.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Server checks the caller, target visibility, blocks, relationship and the existing unique pair. App admins do not gain automatic access to private conversations.",
+      "dependencies": [
+        "POST /rest/v1/rpc/chat_groups",
+        "POST /rest/v1/rpc/member_follows"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-003",
+      "name": "Private group creation and friend picker",
+      "module": "Conversations",
+      "role": "An approved member",
+      "purpose": "choose friends to invite into a new private group",
+      "description": "Expose New group in Chats, collect a name and let the creator search/select mutual friends.",
+      "userStory": "As an approved member, I want to choose friends to invite into a new private group.",
+      "functionalRequirements": [
+        "Expose New group in Chats, collect a name and let the creator search/select mutual friends.",
+        "Create once, send selected invitations and retry only unsent invitations after a partial failure."
+      ],
+      "businessRules": "Groups start private. Invitees accept before joining/history access. Selection is up to 20 per batch; server caps group membership and creation/invite rates.",
+      "validation": "Trimmed 1–80 character name, mutual-follow candidates, no self/duplicate selection; trusted backend permissions override the UI.",
+      "inputs": "Group name and selected friend IDs",
+      "outputs": "Private room plus pending invitations",
+      "errorAndEmptyStates": "Allow empty creation, no-friends guidance and friend-load retry; a partial send clearly states the room already exists.",
+      "acceptanceCriteria": [
+        "Cancelling creates no room.",
+        "A partial retry neither creates another room nor resends successful invitations."
+      ],
+      "relatedTables": [
+        "public.chat_rooms",
+        "public.chat_room_members",
+        "private.member_follows"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/chat_groups",
+        "POST /rest/v1/rpc/member_follows"
+      ],
+      "components": [
+        "openChatGroupForm",
+        "friend checkboxes",
+        "search",
+        "retry actions"
+      ],
+      "tests": [
+        "group-creation.mjs",
+        "chat-db.mjs",
+        "member-follows-db.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Groups start private. Invitees accept before joining/history access. Selection is up to 20 per batch; server caps group membership and creation/invite rates.",
+      "dependencies": [
+        "POST /rest/v1/rpc/chat_groups",
+        "POST /rest/v1/rpc/member_follows"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-004",
+      "name": "Group privacy and membership management",
+      "module": "Conversations",
+      "role": "A group owner or authorized group admin",
+      "purpose": "manage the group without exposing it to unintended people",
+      "description": "Accept/decline invitations; invite permitted people, rename and remove members.",
+      "userStory": "As a group owner or authorized group admin, I want to manage the group without exposing it to unintended people.",
+      "functionalRequirements": [
+        "Accept/decline invitations; invite permitted people, rename and remove members.",
+        "Let the owner manage public/friends/private discovery, promote/demote admins and transfer ownership; members can leave."
+      ],
+      "businessRules": "An owner must transfer ownership before leaving. Only authorized managers change membership; only the owner removes another group admin. Public/friends visibility is still within approved membership.",
+      "validation": "Allowed state/role transitions, target membership and server cap of 50 accepted/pending members; creation limited to five/day and invitations to 20/minute.",
+      "inputs": "Room, target and permitted management action",
+      "outputs": "Updated room/member state",
+      "errorAndEmptyStates": "Show pending/declined/removed/unavailable states; losing membership revokes subsequent history and live access.",
+      "acceptanceCriteria": [
+        "Ordinary member cannot invite/promote/remove others.",
+        "Former member and unaccepted invitee cannot read group messages."
+      ],
+      "relatedTables": [
+        "public.chat_rooms",
+        "public.chat_room_members"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/chat_groups"
+      ],
+      "components": [
+        "chatGroupSettingsPage",
+        "privacy select",
+        "member actions"
+      ],
+      "tests": [
+        "chat-db.mjs",
+        "social-privacy-db.mjs",
+        "community-social.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A group owner or authorized group admin. An owner must transfer ownership before leaving. Only authorized managers change membership; only the owner removes another group admin. Public/friends visibility is still within approved membership.",
+      "dependencies": [
+        "POST /rest/v1/rpc/chat_groups"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-005",
+      "name": "Message editing, emoji and footprints",
+      "module": "Conversations",
+      "role": "A conversation member",
+      "purpose": "compose with emoji and manage messages within the permitted rules",
+      "description": "Insert emoji and offer supported owner editing/unsend actions.",
+      "userStory": "As a conversation member, I want to compose with emoji and manage messages within the permitted rules.",
+      "functionalRequirements": [
+        "Insert emoji and offer supported owner editing/unsend actions.",
+        "Preserve a visible footprint when a message is unsent or moderated."
+      ],
+      "businessRules": "Only the trusted author or permitted room moderator may modify a message. Do not physically erase history through a raw client delete.",
+      "validation": "Message length, allowed action and author/room ownership checks are server enforced.",
+      "inputs": "Message ID, action and optional replacement text",
+      "outputs": "Updated message or unsent footprint",
+      "errorAndEmptyStates": "Reject inaccessible/removed targets; failed edits retain a retry path and do not silently alter history.",
+      "acceptanceCriteria": [
+        "Another member cannot edit or unsend the author message.",
+        "Unsend/moderation retains its footprint and does not leak removed body text."
+      ],
+      "relatedTables": [
+        "public.chat_messages"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/chat_message_action"
+      ],
+      "components": [
+        "message options",
+        "emoji picker",
+        "edit composer",
+        "footprint"
+      ],
+      "tests": [
+        "chat-db.mjs",
+        "chat-experience.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A conversation member. Only the trusted author or permitted room moderator may modify a message. Do not physically erase history through a raw client delete.",
+      "dependencies": [
+        "POST /rest/v1/rpc/chat_message_action"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-006",
+      "name": "Typing, reconnect and current-window drafts",
+      "module": "Conversations",
+      "role": "A conversation member",
+      "purpose": "know connection state and recover an interrupted conversation",
+      "description": "Show best-effort typing without transmitting draft text.",
+      "userStory": "As a conversation member, I want to know connection state and recover an interrupted conversation.",
+      "functionalRequirements": [
+        "Show best-effort typing without transmitting draft text.",
+        "Reconnect and refresh permitted history; keep a failed-send draft in the current window."
+      ],
+      "businessRules": "Private typing/live topics check accepted membership. Signals are ephemeral and expire; offline shell is not an offline message queue.",
+      "validation": "Throttle typing and history polling; stop listeners/polls on route exit, hidden tabs or unavailable sessions.",
+      "inputs": "Typing state, connection events and unsent current-window text",
+      "outputs": "Ephemeral status and refreshed history",
+      "errorAndEmptyStates": "Explain offline/reconnecting state; do not claim that closing an offline tab preserves all drafts.",
+      "acceptanceCriteria": [
+        "Pending/removed users cannot subscribe to private topics.",
+        "Reconnect refreshes history and retry does not duplicate a send."
+      ],
+      "relatedTables": [
+        "public.chat_messages",
+        "public.chat_room_members"
+      ],
+      "api": [
+        "private Realtime chat/typing channels",
+        "GET /rest/v1/chat_messages"
+      ],
+      "components": [
+        "typing indicator",
+        "status",
+        "composer",
+        "cleanup handlers"
+      ],
+      "tests": [
+        "chat-db.mjs",
+        "chat-experience.mjs",
+        "navigation-recovery.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A conversation member. Private typing/live topics check accepted membership. Signals are ephemeral and expire; offline shell is not an offline message queue.",
+      "dependencies": [
+        "private Realtime chat/typing channels",
+        "GET /rest/v1/chat_messages"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-007",
+      "name": "Delivery/read receipts and unread indicators",
+      "module": "Conversations",
+      "role": "A conversation member",
+      "purpose": "understand delivery and permitted read state accurately",
+      "description": "Record caller-bound delivered/read acknowledgements and show permitted receipt information.",
+      "userStory": "As a conversation member, I want to understand delivery and permitted read state accurately.",
+      "functionalRequirements": [
+        "Record caller-bound delivered/read acknowledgements and show permitted receipt information.",
+        "Paint unread indicators from message/preferences state and clear the relevant seen marker after reading."
+      ],
+      "businessRules": "Delivered does not prove a human read. Read receipts are optional; invitation alone cannot acknowledge private messages.",
+      "validation": "Validate message/room membership, caller identity and idempotent acknowledgement.",
+      "inputs": "Authorized acknowledgement and receipt preference",
+      "outputs": "Receipt projection and unread state",
+      "errorAndEmptyStates": "Missing Seen is not proof of unread status; acknowledge only while the app can legitimately mark the room seen.",
+      "acceptanceCriteria": [
+        "Receipt rows cannot be forged for another user.",
+        "Reading a recent fixture clears the appropriate chat indicator."
+      ],
+      "relatedTables": [
+        "private.chat_message_receipts",
+        "private.chat_preferences",
+        "public.chat_messages"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/chat_receipts",
+        "POST /rest/v1/rpc/chat_controls"
+      ],
+      "components": [
+        "message status",
+        "unread-dot",
+        "receipt settings"
+      ],
+      "tests": [
+        "chat-db.mjs",
+        "chat-controls-db.mjs",
+        "community-social.mjs",
+        "chat-experience.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A conversation member. Delivered does not prove a human read. Read receipts are optional; invitation alone cannot acknowledge private messages.",
+      "dependencies": [
+        "POST /rest/v1/rpc/chat_receipts",
+        "POST /rest/v1/rpc/chat_controls"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-008",
+      "name": "Inbox folders and conversation controls",
+      "module": "Conversations",
+      "role": "An approved member",
+      "purpose": "organize conversations and control unwanted requests",
+      "description": "Search/filter conversations and access Messages, Archived and Restricted folders.",
+      "userStory": "As an approved member, I want to organize conversations and control unwanted requests.",
+      "functionalRequirements": [
+        "Search/filter conversations and access Messages, Archived and Restricted folders.",
+        "Support per-user archive, mute, restriction, local conversation deletion boundary and receipt preference."
+      ],
+      "businessRules": "These are the caller preferences, not global room deletion. New content after a delete boundary follows the defined reappearance rules.",
+      "validation": "Known action, caller-bound room key and valid accepted/request relationship.",
+      "inputs": "Folder/search/filter and preference action",
+      "outputs": "Filtered inbox and persisted own settings",
+      "errorAndEmptyStates": "Show no matches or unavailable status; optional discovery failure must not prevent the inbox loading.",
+      "acceptanceCriteria": [
+        "One user cannot read/change another user preferences.",
+        "Muted/restricted/archived messages follow badge/filter behavior."
+      ],
+      "relatedTables": [
+        "private.chat_preferences",
+        "public.chat_rooms",
+        "public.chat_room_members"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/chat_controls",
+        "POST /rest/v1/rpc/chat_groups"
+      ],
+      "components": [
+        "chatGroupsPage",
+        "chat controls sheet",
+        "conversation search",
+        "swipe actions"
+      ],
+      "tests": [
+        "chat-controls-db.mjs",
+        "chat-experience.mjs",
+        "group-creation.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. These are the caller preferences, not global room deletion. New content after a delete boundary follows the defined reappearance rules.",
+      "dependencies": [
+        "POST /rest/v1/rpc/chat_controls",
+        "POST /rest/v1/rpc/chat_groups"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "CHAT-009",
+      "name": "Conversation abuse reports and moderation",
+      "module": "Conversations",
+      "role": "A member or authorized application admin",
+      "purpose": "report unwanted requests and review abuse with bounded access",
+      "description": "Allow an unwanted request or permitted message to be reported with a reason.",
+      "userStory": "As a member or authorized application admin, I want to report unwanted requests and review abuse with bounded access.",
+      "functionalRequirements": [
+        "Allow an unwanted request or permitted message to be reported with a reason.",
+        "Show the admin abuse queue and permitted resolution/moderation actions."
+      ],
+      "businessRules": "A report does not grant ordinary members or all app admins unrestricted private-group access. Report evidence and admin projections are intentionally bounded.",
+      "validation": "Nonempty bounded reason, report type and authorized target; caller identity is server derived.",
+      "inputs": "Report target/reason or admin resolution",
+      "outputs": "Private report and review state",
+      "errorAndEmptyStates": "Handle unavailable/duplicate targets and failed submission without pretending the report was delivered.",
+      "acceptanceCriteria": [
+        "Member cannot read another member reports or resolve the admin queue.",
+        "Unauthorized private message read remains denied after a report."
+      ],
+      "relatedTables": [
+        "private.chat_spam_reports",
+        "public.chat_messages"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/chat_controls"
+      ],
+      "components": [
+        "Report request",
+        "report sheet",
+        "adminChatReportsPage"
+      ],
+      "tests": [
+        "chat-controls-db.mjs",
+        "chat-experience.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A member or authorized application admin. A report does not grant ordinary members or all app admins unrestricted private-group access. Report evidence and admin projections are intentionally bounded.",
+      "dependencies": [
+        "POST /rest/v1/rpc/chat_controls"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "NOTIF-001",
+      "name": "Notifications and activity",
+      "module": "Community",
+      "role": "An approved member",
+      "purpose": "notice relevant updates and return to their source",
+      "description": "Open a dismissible notification sheet/page with links and available relationship/invitation actions.",
+      "userStory": "As an approved member, I want to notice relevant updates and return to their source.",
+      "functionalRequirements": [
+        "Open a dismissible notification sheet/page with links and available relationship/invitation actions.",
+        "Use private invalidation and per-device read markers to update badges."
+      ],
+      "businessRules": "Notifications are permission-filtered account activity, not a completed background-push service. Dismissing a sheet returns to its prior page.",
+      "validation": "Validate destination and authorization; invalidate stale data on relevant live events.",
+      "inputs": "Notification list and user action",
+      "outputs": "Linked permitted page and updated activity marker",
+      "errorAndEmptyStates": "Show no-notifications and failed-load states; an unavailable target does not expose its private content.",
+      "acceptanceCriteria": [
+        "Member sees only permitted activity.",
+        "Escape/Close returns focus without unintended navigation."
+      ],
+      "relatedTables": [
+        "public.announcements",
+        "public.community_comments",
+        "public.community_reactions",
+        "public.chat_room_members"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/community_activity",
+        "private activity Realtime channel"
+      ],
+      "components": [
+        "bellButton",
+        "notification sheet",
+        "notificationsPage"
+      ],
+      "tests": [
+        "community-actions-db.mjs",
+        "community-social.mjs",
+        "quality.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Notifications are permission-filtered account activity, not a completed background-push service. Dismissing a sheet returns to its prior page.",
+      "dependencies": [
+        "POST /rest/v1/rpc/community_activity",
+        "private activity Realtime channel"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "SEARCH-001",
+      "name": "Permission-aware global search",
+      "module": "Discovery",
+      "role": "An approved member",
+      "purpose": "find people, content and app pages from one search",
+      "description": "Search People, Posts, Events, News, Churches, Chats and Pages with category filters.",
+      "userStory": "As an approved member, I want to find people, content and app pages from one search.",
+      "functionalRequirements": [
+        "Search People, Posts, Events, News, Churches, Chats and Pages with category filters.",
+        "Debounce text, report partial source unavailability and cancel stale results after navigation."
+      ],
+      "businessRules": "Search is not a bypass for private/unconfirmed profiles, blocked content or private-room membership. Resources is not an active search category.",
+      "validation": "At least two characters, bounded text, escaped wildcard/reserved query characters and bounded per-source results.",
+      "inputs": "Search text/category",
+      "outputs": "Grouped permitted links and result/availability count",
+      "errorAndEmptyStates": "Explain short query, no matches and partially failed sources rather than returning a false empty success.",
+      "acceptanceCriteria": [
+        "A malicious or wildcard query remains literal and cannot widen access.",
+        "Removed Resources results/routes are absent."
+      ],
+      "relatedTables": [
+        "public.user_profile",
+        "public.community_posts",
+        "public.events_feed",
+        "public.announcements",
+        "public.churches",
+        "public.chat_rooms"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/member_directory",
+        "GET permitted PostgREST content",
+        "POST /rest/v1/rpc/chat_groups"
+      ],
+      "components": [
+        "searchPage",
+        "search categories",
+        "platform results"
+      ],
+      "tests": [
+        "registration-search.mjs",
+        "community-social.mjs",
+        "social-privacy-db.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Search is not a bypass for private/unconfirmed profiles, blocked content or private-room membership. Resources is not an active search category.",
+      "dependencies": [
+        "POST /rest/v1/rpc/member_directory",
+        "GET permitted PostgREST content",
+        "POST /rest/v1/rpc/chat_groups"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "PRAY-001",
+      "name": "Prayer requests and support",
+      "module": "Community",
+      "role": "An approved member",
+      "purpose": "share a prayer request, offer support and record an answer",
+      "description": "Create an optionally anonymous request, browse permitted requests and toggle prayer support.",
+      "userStory": "As an approved member, I want to share a prayer request, offer support and record an answer.",
+      "functionalRequirements": [
+        "Create an optionally anonymous request, browse permitted requests and toggle prayer support.",
+        "Let the owner mark answered with a note and authorize owner/admin removal or hiding."
+      ],
+      "businessRules": "Anonymous presentation does not remove the trusted server owner. Reporting/support must not expose private account details.",
+      "validation": "Required bounded title/body, optional bounded answer note and caller-bound request/support actions.",
+      "inputs": "Request text/anonymity, support or answered action",
+      "outputs": "Request/support counts and answer state",
+      "errorAndEmptyStates": "Provide empty, validation, failed action and hidden/deleted request states.",
+      "acceptanceCriteria": [
+        "Support toggles idempotently for the caller.",
+        "Another member cannot answer/delete the owner request."
+      ],
+      "relatedTables": [
+        "public.prayer_requests",
+        "public.prayer_supports"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/prayer_list",
+        "POST /rest/v1/rpc/prayer_create",
+        "POST /rest/v1/rpc/prayer_toggle",
+        "POST /rest/v1/rpc/prayer_set_answered",
+        "POST /rest/v1/rpc/prayer_delete",
+        "POST /rest/v1/rpc/prayer_hide"
+      ],
+      "components": [
+        "prayerPage",
+        "request form",
+        "support/answered controls"
+      ],
+      "tests": [
+        "community-extras-db.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Anonymous presentation does not remove the trusted server owner. Reporting/support must not expose private account details.",
+      "dependencies": [
+        "POST /rest/v1/rpc/prayer_list",
+        "POST /rest/v1/rpc/prayer_create",
+        "POST /rest/v1/rpc/prayer_toggle",
+        "POST /rest/v1/rpc/prayer_set_answered",
+        "POST /rest/v1/rpc/prayer_delete",
+        "POST /rest/v1/rpc/prayer_hide"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "DIR-001",
+      "name": "Church directory",
+      "module": "Content",
+      "role": "An approved member",
+      "purpose": "find published church information",
+      "description": "List/search churches and available region/featured information.",
+      "userStory": "As an approved member, I want to find published church information.",
+      "functionalRequirements": [
+        "List/search churches and available region/featured information.",
+        "Show permitted contact/location/website details maintained by admins."
+      ],
+      "businessRules": "Directory records are editorial information, not a public member-contact dump. Members cannot create administrative records.",
+      "validation": "Validate search length and safe external links; apply server read/write permissions.",
+      "inputs": "Search/filter or church identifier",
+      "outputs": "Matching church cards/details",
+      "errorAndEmptyStates": "Show no churches/no matches, unavailable records and safe external-link handling.",
+      "acceptanceCriteria": [
+        "Directory works at phone/desktop widths.",
+        "Member writes and unsafe links are rejected."
+      ],
+      "relatedTables": [
+        "public.churches"
+      ],
+      "api": [
+        "GET /rest/v1/churches"
+      ],
+      "components": [
+        "churchesPage",
+        "directory cards",
+        "region/search controls"
+      ],
+      "tests": [
+        "community-extras-db.mjs",
+        "responsive.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Directory records are editorial information, not a public member-contact dump. Members cannot create administrative records.",
+      "dependencies": [
+        "GET /rest/v1/churches"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "MEDIA-001",
+      "name": "Member photo gallery and upload",
+      "module": "Media",
+      "role": "An approved member",
+      "purpose": "share and view appropriate church photos",
+      "description": "List permitted media with short-lived signed URLs and captions; open a native viewer.",
+      "userStory": "As an approved member, I want to share and view appropriate church photos.",
+      "functionalRequirements": [
+        "List permitted media with short-lived signed URLs and captions; open a native viewer.",
+        "Accept one supported photo up to 5 MB; allow owner/admin deletion after confirmation."
+      ],
+      "businessRules": "New uploads are photo-only. Legacy video display does not mean new video upload or calls are enabled. Files stay in caller folders in the private media bucket.",
+      "validation": "Allowed PNG/JPEG/WebP type, signature/size/budget checks and caption up to 300 characters.",
+      "inputs": "Selected photo/caption or item action",
+      "outputs": "Stored media record/file or permitted viewer",
+      "errorAndEmptyStates": "Show no photos, missing/expired image and upload failure; remove an orphan upload if record creation fails.",
+      "acceptanceCriteria": [
+        "Unauthorized member cannot delete another owner file.",
+        "Invalid upload cannot create a successful media entry."
+      ],
+      "relatedTables": [
+        "public.media",
+        "storage.objects"
+      ],
+      "api": [
+        "GET/POST/DELETE /rest/v1/media",
+        "POST /functions/v1/upload-file",
+        "POST /storage/v1/object/sign/media/{path}"
+      ],
+      "components": [
+        "mediaPage",
+        "upload sheet",
+        "media tile",
+        "viewer"
+      ],
+      "tests": [
+        "community-extras-db.mjs",
+        "security-edge.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. New uploads are photo-only. Legacy video display does not mean new video upload or calls are enabled. Files stay in caller folders in the private media bucket.",
+      "dependencies": [
+        "GET/POST/DELETE /rest/v1/media",
+        "POST /functions/v1/upload-file",
+        "POST /storage/v1/object/sign/media/{path}"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "MEDIA-002",
+      "name": "Keyboard-accessible media navigation",
+      "module": "Media",
+      "role": "An approved member",
+      "purpose": "browse adjacent photos without repeatedly reopening the gallery",
+      "description": "Add Previous/Next, an item counter and Left/Right navigation to the existing Media sheet.",
+      "userStory": "As an approved member, I want to browse adjacent photos without repeatedly reopening the gallery.",
+      "functionalRequirements": [
+        "Add Previous/Next, an item counter and Left/Right navigation to the existing Media sheet.",
+        "Preserve captions/dates, wrap safely, stop legacy video on change/close and remove handlers on route exit."
+      ],
+      "businessRules": "Adapt the portfolio MediaDetail interaction using existing fetched/signed items. Do not change permissions, upload formats or database schema.",
+      "validation": "Ignore navigation keys in editable controls; handle empty/one-item lists and missing signed URLs.",
+      "inputs": "Current item and previous/next/key action",
+      "outputs": "Selected permitted item and announced counter",
+      "errorAndEmptyStates": "One item has no misleading active navigation; unavailable images show a fallback rather than a raw private path.",
+      "acceptanceCriteria": [
+        "Two-item fixture moves by button and keyboard and wraps correctly.",
+        "Close/route change removes listeners and stops playback."
+      ],
+      "relatedTables": [
+        "public.media"
+      ],
+      "api": [
+        "Existing listMedia and signed URLs; no new endpoint"
+      ],
+      "components": [
+        "media viewer",
+        "Previous/Next",
+        "live counter"
+      ],
+      "tests": [
+        "media-viewer.mjs",
+        "quality.mjs"
+      ],
+      "priority": "Medium",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Adapt the portfolio MediaDetail interaction using existing fetched/signed items. Do not change permissions, upload formats or database schema.",
+      "dependencies": [
+        "Existing listMedia and signed URLs; no new endpoint"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "MEM-001",
+      "name": "Membership and NDC information",
+      "module": "Content",
+      "role": "An approved member",
+      "purpose": "review church membership information and NDC updates",
+      "description": "Show the member church/renewal information and relevant membership/NDC posts.",
+      "userStory": "As an approved member, I want to review church membership information and ndc updates.",
+      "functionalRequirements": [
+        "Show the member church/renewal information and relevant membership/NDC posts.",
+        "Offer the existing contact workflow for renewal inquiries."
+      ],
+      "businessRules": "This is information and inquiry, not completed online membership billing or credential issuance. Members cannot edit official NDC publications.",
+      "validation": "Authorized profile/post reads, safe IDs and optional renewal dates.",
+      "inputs": "Own profile and membership/NDC post selection",
+      "outputs": "Membership card, updates and inquiry link",
+      "errorAndEmptyStates": "Handle missing church/renewal details and no current NDC posts without inventing credentials.",
+      "acceptanceCriteria": [
+        "Own membership details render without exposing another private profile.",
+        "Admin-managed NDC posts remain readable only under normal access rules."
+      ],
+      "relatedTables": [
+        "public.user_profile",
+        "public.membership_ndc"
+      ],
+      "api": [
+        "GET /rest/v1/user_profile",
+        "GET /rest/v1/membership_ndc"
+      ],
+      "components": [
+        "membershipPage",
+        "ndcListPage",
+        "membership card"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "quality.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. This is information and inquiry, not completed online membership billing or credential issuance. Members cannot edit official NDC publications.",
+      "dependencies": [
+        "GET /rest/v1/user_profile",
+        "GET /rest/v1/membership_ndc"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "DON-001",
+      "name": "Supplied payment QR and amount selection",
+      "module": "Giving",
+      "role": "An approved member",
+      "purpose": "pay an amount they can give using the supplied recipient QR",
+      "description": "Choose an active payment method and preset/custom amount, including the ₱10 preset.",
+      "userStory": "As an approved member, I want to pay an amount they can give using the supplied recipient qr.",
+      "functionalRequirements": [
+        "Choose an active payment method and preset/custom amount, including the ₱10 preset.",
+        "Save the original QR bytes, use native file sharing when supported, or open the full-size image for bank/wallet scanning/import."
+      ],
+      "businessRules": "Payment happens in the bank/e-wallet through the original Surgebox QR. Choosing an amount in PCEC does not alter the QR or prove transfer; the bank recipient/amount must be reviewed.",
+      "validation": "Positive bounded PHP amount; allowed image type and bounded download size; preserve original payment data.",
+      "inputs": "Payment method, amount and save/share action",
+      "outputs": "Original QR file and payment instructions",
+      "errorAndEmptyStates": "Explain download/share limitations, provide full-size fallback and retain the tab selection when returning from a wallet.",
+      "acceptanceCriteria": [
+        "Packaged and uploaded/signed QR downloads preserve original bytes.",
+        "Reported/confirmed payment state is not inferred from scanning or opening a bank app."
+      ],
+      "relatedTables": [
+        "public.donation_center",
+        "storage.objects"
+      ],
+      "api": [
+        "GET /rest/v1/donation_center",
+        "Signed/public QR URL GET"
+      ],
+      "components": [
+        "donatePage",
+        "amount chips",
+        "donationQrActions",
+        "payment instructions"
+      ],
+      "tests": [
+        "payment-qr.mjs",
+        "manual-donations.mjs",
+        "admin-donation-qr.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. Payment happens in the bank/e-wallet through the original Surgebox QR. Choosing an amount in PCEC does not alter the QR or prove transfer; the bank recipient/amount must be reviewed.",
+      "dependencies": [
+        "GET /rest/v1/donation_center",
+        "Signed/public QR URL GET"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "DON-002",
+      "name": "Donation report, receipt and own activity",
+      "module": "Giving",
+      "role": "An approved donor",
+      "purpose": "record a completed transfer without losing its evidence",
+      "description": "Collect actual paid amount, method, bank/e-wallet reference, paid date and optional note/private receipt.",
+      "userStory": "As an approved donor, I want to record a completed transfer without losing its evidence.",
+      "functionalRequirements": [
+        "Collect actual paid amount, method, bank/e-wallet reference, paid date and optional note/private receipt.",
+        "After successful submission open personal activity with reported and confirmed figures kept separate."
+      ],
+      "businessRules": "The server binds donor identity. A transaction/reference number is self-reported evidence, not independent payment verification. Only a confirmed report links to the ledger.",
+      "validation": "Validate amount/reference/date/method and receipt ownership/type/size; normalize duplicate reference checks server-side.",
+      "inputs": "Transfer report and optional receipt",
+      "outputs": "Private submitted report and own activity",
+      "errorAndEmptyStates": "Show failed/duplicate submissions without false success; failed receipt/report must not expose another donor files.",
+      "acceptanceCriteria": [
+        "A donor cannot impersonate or read another donor.",
+        "Submitting a report does not increase confirmed totals."
+      ],
+      "relatedTables": [
+        "private.donation_reports",
+        "public.donation_center",
+        "storage.objects"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/submit_donation_report",
+        "POST /rest/v1/rpc/donation_report_page",
+        "POST /functions/v1/upload-file"
+      ],
+      "components": [
+        "openDonationReport",
+        "donationActivityPage",
+        "private receipt controls"
+      ],
+      "tests": [
+        "manual-donations-db.mjs",
+        "manual-donations.mjs",
+        "donation-analytics.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An approved donor. The server binds donor identity. A transaction/reference number is self-reported evidence, not independent payment verification. Only a confirmed report links to the ledger.",
+      "dependencies": [
+        "POST /rest/v1/rpc/submit_donation_report",
+        "POST /rest/v1/rpc/donation_report_page",
+        "POST /functions/v1/upload-file"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "DON-003",
+      "name": "Finance review and confirmed donation ledger",
+      "module": "Giving",
+      "role": "An authorized application admin performing Finance duties",
+      "purpose": "reconcile reports to actual payment records",
+      "description": "Review reported amount/reference/receipt against bank/provider records and confirm or reject with a note.",
+      "userStory": "As an authorized application admin performing finance duties, I want to reconcile reports to actual payment records.",
+      "functionalRequirements": [
+        "Review reported amount/reference/receipt against bank/provider records and confirm or reject with a note.",
+        "Atomically write/link the confirmed transaction so repeats cannot double count."
+      ],
+      "businessRules": "Finance is an operational duty under the current admin role, not a separately implemented database role. No Surgebox API or automatic TN confirmation exists.",
+      "validation": "Admin authorization, current report state, evidence, matching amount/date and duplicate transaction protection.",
+      "inputs": "Report ID, verified decision and reconciliation details",
+      "outputs": "Reviewed report and at most one confirmed ledger entry",
+      "errorAndEmptyStates": "Concurrent/stale/duplicate review must not create duplicate gifts; explain mismatches rather than silently rewriting evidence.",
+      "acceptanceCriteria": [
+        "Member review and forged reviewer identity are denied.",
+        "Repeated/concurrent confirmation cannot add the same gift twice."
+      ],
+      "relatedTables": [
+        "private.donation_reports",
+        "private.donation_transactions"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/review_donation_report",
+        "POST /rest/v1/rpc/donation_report_page"
+      ],
+      "components": [
+        "adminDonationReportsPage",
+        "review sheet",
+        "receipt viewer"
+      ],
+      "tests": [
+        "manual-donations-db.mjs",
+        "manual-donations.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An authorized application admin performing Finance duties. Finance is an operational duty under the current admin role, not a separately implemented database role. No Surgebox API or automatic TN confirmation exists.",
+      "dependencies": [
+        "POST /rest/v1/rpc/review_donation_report",
+        "POST /rest/v1/rpc/donation_report_page"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "DON-004",
+      "name": "Donation analytics and export",
+      "module": "Giving",
+      "role": "An authorized application admin",
+      "purpose": "understand confirmed giving using bounded filters and reports",
+      "description": "Show range/campaign-filtered confirmed totals, trends, campaign summary and paged transactions.",
+      "userStory": "As an authorized application admin, I want to understand confirmed giving using bounded filters and reports.",
+      "functionalRequirements": [
+        "Show range/campaign-filtered confirmed totals, trends, campaign summary and paged transactions.",
+        "Export the permitted filtered view while keeping reported figures clearly separate."
+      ],
+      "businessRules": "Count confirmed ledger data according to status/refund rules. Raw references, receipts and donor details are not public/community statistics.",
+      "validation": "Validate date range, campaign/status and cursor; use integer minor currency units and bounded page sizes.",
+      "inputs": "Date/campaign/status filters and page/export action",
+      "outputs": "Permitted aggregate charts and transaction/export data",
+      "errorAndEmptyStates": "Handle empty ranges, invalid dates and failed analytics without stale totals presented as current.",
+      "acceptanceCriteria": [
+        "Anonymous/member access is denied.",
+        "Known fixture totals match confirmed/refunded transaction semantics and filter boundaries."
+      ],
+      "relatedTables": [
+        "private.donation_transactions",
+        "private.donation_sources"
+      ],
+      "api": [
+        "POST /rest/v1/rpc/donation_analytics",
+        "POST /rest/v1/rpc/donation_transaction_page"
+      ],
+      "components": [
+        "adminDonationAnalyticsPage",
+        "metrics",
+        "trend",
+        "campaign table",
+        "CSV export"
+      ],
+      "tests": [
+        "donation-analytics-db.mjs",
+        "donation-analytics.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An authorized application admin. Count confirmed ledger data according to status/refund rules. Raw references, receipts and donor details are not public/community statistics.",
+      "dependencies": [
+        "POST /rest/v1/rpc/donation_analytics",
+        "POST /rest/v1/rpc/donation_transaction_page"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "ADMIN-001",
+      "name": "Admin dashboard and member management",
+      "module": "Administration",
+      "role": "An authorized application admin",
+      "purpose": "review membership and reach administration tasks",
+      "description": "Show current admin navigation and scoped summary counts.",
+      "userStory": "As an authorized application admin, I want to review membership and reach administration tasks.",
+      "functionalRequirements": [
+        "Show current admin navigation and scoped summary counts.",
+        "Search/page new/all/unconfirmed/suspended members, mark reviewed, suspend and restore under existing rules."
+      ],
+      "businessRules": "The UI does not bypass email confirmation or offer member self-promotion. App roles are separate from Supabase/Vercel/DNS infrastructure access.",
+      "validation": "Bound/escape member search and keyset cursor; trusted admin session and allowed account transitions.",
+      "inputs": "Filter/search/cursor and permitted member action",
+      "outputs": "Member projection and updated review/status",
+      "errorAndEmptyStates": "Handle no matching members, invalid cursor and permission loss; a failed mutation must not claim the member changed.",
+      "acceptanceCriteria": [
+        "Members cannot invoke admin member actions.",
+        "Paging/search returns stable records without private-field expansion."
+      ],
+      "relatedTables": [
+        "public.user_profile",
+        "public.member_list"
+      ],
+      "api": [
+        "GET /rest/v1/member_list",
+        "PATCH /rest/v1/user_profile"
+      ],
+      "components": [
+        "adminDashboardPage",
+        "adminMembersPage",
+        "filters",
+        "member cards"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "member-pagination.mjs",
+        "responsive.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An authorized application admin. The UI does not bypass email confirmation or offer member self-promotion. App roles are separate from Supabase/Vercel/DNS infrastructure access.",
+      "dependencies": [
+        "GET /rest/v1/member_list",
+        "PATCH /rest/v1/user_profile"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "ADMIN-002",
+      "name": "Official content and church management",
+      "module": "Administration",
+      "role": "An authorized application admin",
+      "purpose": "maintain accurate official content and office information",
+      "description": "Create/edit/delete announcements, events, NDC posts and church records; update About/office details.",
+      "userStory": "As an authorized application admin, I want to maintain accurate official content and office information.",
+      "functionalRequirements": [
+        "Create/edit/delete announcements, events, NDC posts and church records; update About/office details.",
+        "Use current forms, optional image crop and protected uploads; expose event image-fit choice where supported."
+      ],
+      "businessRules": "Destructive actions require an explicit confirmation and server permissions. Editing content must not alter unrelated events/NDC data or create fake member accounts.",
+      "validation": "Required/bounded content fields, valid event dates/end order, allowed image signatures and safe website links.",
+      "inputs": "Validated content form or confirmed record action",
+      "outputs": "Persisted authorized content and list/detail refresh",
+      "errorAndEmptyStates": "Handle not-found, validation, crop cancellation, upload/save failure and lost admin access.",
+      "acceptanceCriteria": [
+        "Unauthorized writes fail even with direct API calls.",
+        "Cancelled image editing preserves the prior draft; saved data appears in the correct module."
+      ],
+      "relatedTables": [
+        "public.announcements",
+        "public.events_feed",
+        "public.membership_ndc",
+        "public.churches",
+        "public.about_pcec"
+      ],
+      "api": [
+        "Authorized POST/PATCH/DELETE /rest/v1/{content-table}",
+        "POST /functions/v1/upload-file"
+      ],
+      "components": [
+        "admin content forms",
+        "imageField",
+        "cropImage",
+        "adminAboutPage",
+        "adminChurchesPage"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "community-extras-db.mjs",
+        "feed-header.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An authorized application admin. Destructive actions require an explicit confirmation and server permissions. Editing content must not alter unrelated events/NDC data or create fake member accounts.",
+      "dependencies": [
+        "Authorized POST/PATCH/DELETE /rest/v1/{content-table}",
+        "POST /functions/v1/upload-file"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "ADMIN-003",
+      "name": "Payment options and lossless QR editor",
+      "module": "Administration",
+      "role": "An authorized application admin",
+      "purpose": "publish a usable supplied payment QR without changing its recipient data",
+      "description": "Manage payment labels/details/active state/order and choose an uploaded poster/QR.",
+      "userStory": "As an authorized application admin, I want to publish a usable supplied payment qr without changing its recipient data.",
+      "functionalRequirements": [
+        "Manage payment labels/details/active state/order and choose an uploaded poster/QR.",
+        "Extract, resize/position and save a square lossless image only when the decoded QR payload and quiet border remain valid."
+      ],
+      "businessRules": "Choosing/cropping is local until Save. Do not invent provider verification or upload an altered recipient payload. Cancel preserves the previous draft.",
+      "validation": "Supported image and size; readable QR; exact raw/binary payload equality; complete code and white quiet border.",
+      "inputs": "Payment option form and supplied image/crop",
+      "outputs": "Configured method and verified square QR image",
+      "errorAndEmptyStates": "Explain unreadable/clipped/oversized image; keep the editor open on invalid output and do not upload before saving.",
+      "acceptanceCriteria": [
+        "Clipped QR or missing quiet border cannot be accepted.",
+        "Saved PNG decodes to identical payment bytes and cancellation causes no upload."
+      ],
+      "relatedTables": [
+        "public.donation_center",
+        "storage.objects"
+      ],
+      "api": [
+        "Authorized POST/PATCH /rest/v1/donation_center",
+        "POST /functions/v1/upload-file"
+      ],
+      "components": [
+        "adminDonationsPage",
+        "donationQrField",
+        "cropImage"
+      ],
+      "tests": [
+        "admin-donation-qr.mjs",
+        "payment-qr.mjs",
+        "security-edge.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An authorized application admin. Choosing/cropping is local until Save. Do not invent provider verification or upload an altered recipient payload. Cancel preserves the previous draft.",
+      "dependencies": [
+        "Authorized POST/PATCH /rest/v1/donation_center",
+        "POST /functions/v1/upload-file"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "ADMIN-004",
+      "name": "Moderation and inquiry inbox",
+      "module": "Administration",
+      "role": "An authorized application admin",
+      "purpose": "review community concerns and member inquiries",
+      "description": "Review community reports/hide permitted content and resolve bounded chat abuse reports.",
+      "userStory": "As an authorized application admin, I want to review community concerns and member inquiries.",
+      "functionalRequirements": [
+        "Review community reports/hide permitted content and resolve bounded chat abuse reports.",
+        "Read incoming inquiries, mark read and perform permitted inbox management."
+      ],
+      "businessRules": "Moderation authority is server scoped. Inquiry receipt means stored in the app; automatic outbound email delivery is not implied.",
+      "validation": "Known target/action and admin role; preserve report ownership/audit fields and sanitize displayed text.",
+      "inputs": "Queue/filter and review/read action",
+      "outputs": "Updated moderation/inquiry state",
+      "errorAndEmptyStates": "Show empty queues, unavailable evidence and permission loss; do not publish private reports into the member feed.",
+      "acceptanceCriteria": [
+        "Member cannot read the admin inbox or resolve reports.",
+        "Allowed review/read actions persist only on their target."
+      ],
+      "relatedTables": [
+        "public.community_reports",
+        "private.chat_spam_reports",
+        "public.contact_us",
+        "public.community_posts"
+      ],
+      "api": [
+        "Authorized GET/PATCH /rest/v1/contact_us",
+        "Authorized community moderation",
+        "POST /rest/v1/rpc/chat_controls"
+      ],
+      "components": [
+        "adminCommunityPage",
+        "adminChatReportsPage",
+        "adminInboxPage"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "chat-controls-db.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An authorized application admin. Moderation authority is server scoped. Inquiry receipt means stored in the app; automatic outbound email delivery is not implied.",
+      "dependencies": [
+        "Authorized GET/PATCH /rest/v1/contact_us",
+        "Authorized community moderation",
+        "POST /rest/v1/rpc/chat_controls"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "HELP-001",
+      "name": "Help, office contact and feedback",
+      "module": "Support",
+      "role": "An approved member",
+      "purpose": "send an account or ministry inquiry through the app",
+      "description": "Show maintained office contact information and accept a subject/message inquiry.",
+      "userStory": "As an approved member, I want to send an account or ministry inquiry through the app.",
+      "functionalRequirements": [
+        "Show maintained office contact information and accept a subject/message inquiry.",
+        "Bind sender identity to the signed-in account and show success only after persistence."
+      ],
+      "businessRules": "This app uses its existing inquiry table, not the portfolio Formspree destination. Members cannot read other members private inquiries.",
+      "validation": "Required bounded message, safe subject handling and authenticated caller identity.",
+      "inputs": "Subject and inquiry text",
+      "outputs": "Stored inquiry and receipt feedback",
+      "errorAndEmptyStates": "Show required-field, network and failed-submit feedback; do not claim the office received email merely because an inquiry is stored.",
+      "acceptanceCriteria": [
+        "Saved inquiry contains the intended subject/body and caller ID.",
+        "Forged sender or other-user inbox reads are denied."
+      ],
+      "relatedTables": [
+        "public.contact_us",
+        "public.about_pcec"
+      ],
+      "api": [
+        "POST /rest/v1/contact_us",
+        "GET /rest/v1/about_pcec"
+      ],
+      "components": [
+        "contactPage",
+        "inquiry form",
+        "office details"
+      ],
+      "tests": [
+        "security-db.mjs",
+        "quality.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "An approved member. This app uses its existing inquiry table, not the portfolio Formspree destination. Members cannot read other members private inquiries.",
+      "dependencies": [
+        "POST /rest/v1/contact_us",
+        "GET /rest/v1/about_pcec"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "SYS-001",
+      "name": "Theme and readable responsive interface",
+      "module": "Experience",
+      "role": "A visitor or member",
+      "purpose": "use readable controls on the available device",
+      "description": "Provide light/dark/system preferences, bundled fonts/icons, semantic forms and visible focus.",
+      "userStory": "As a visitor or member, I want to use readable controls on the available device.",
+      "functionalRequirements": [
+        "Provide light/dark/system preferences, bundled fonts/icons, semantic forms and visible focus.",
+        "Use mobile Menu/bottom tabs and desktop navigation without horizontal overflow; auth cards follow the supplied light design."
+      ],
+      "businessRules": "Theme preference does not change authorization. Essential tasks must not depend on hover, animation, sound or precise gestures.",
+      "validation": "Readable editable text, labelled inputs, adequate targets, safe-area spacing and reduced-motion behavior.",
+      "inputs": "Theme/system preference and viewport",
+      "outputs": "Readable responsive layout",
+      "errorAndEmptyStates": "Unsupported decorative effects fall back to usable surfaces; missing fonts/icons must not block actions.",
+      "acceptanceCriteria": [
+        "320px through desktop and landscape flows have reachable actions.",
+        "Automated accessibility scans have no unresolved violations in covered screens."
+      ],
+      "relatedTables": [],
+      "api": [
+        "No new backend endpoint"
+      ],
+      "components": [
+        "theme.ts",
+        "styles.css",
+        "theme.css",
+        "auth.css",
+        "shared controls"
+      ],
+      "tests": [
+        "quality.mjs",
+        "responsive.mjs",
+        "feed-header.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A visitor or member. Theme preference does not change authorization. Essential tasks must not depend on hover, animation, sound or precise gestures.",
+      "dependencies": [
+        "No new backend endpoint"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "SYS-002",
+      "name": "Installable PWA and offline shell",
+      "module": "Experience",
+      "role": "A visitor or member",
+      "purpose": "open the app conveniently on a supported phone",
+      "description": "Provide install help, app-link QR and supported home-screen installation.",
+      "userStory": "As a visitor or member, I want to open the app conveniently on a supported phone.",
+      "functionalRequirements": [
+        "Provide install help, app-link QR and supported home-screen installation.",
+        "Cache interface assets for offline opening while keeping member API data out of general asset caches."
+      ],
+      "businessRules": "Offline opening is not offline submission, background sync, universal draft persistence or a native app-store release. Browser installation behavior varies.",
+      "validation": "Valid manifest/icons and independently decodable install QR; same-origin safe cache scope.",
+      "inputs": "Install action or offline navigation",
+      "outputs": "Install guidance/home-screen entry or cached interface",
+      "errorAndEmptyStates": "Explain offline limitations and unavailable install prompts; signed-in access remains governed by the existing session rules.",
+      "acceptanceCriteria": [
+        "Shell opens after losing connectivity.",
+        "Supabase requests and private receipts are not precached as public assets."
+      ],
+      "relatedTables": [],
+      "api": [
+        "Static manifest/service worker/install assets"
+      ],
+      "components": [
+        "installPage",
+        "qrMatrix",
+        "service worker"
+      ],
+      "tests": [
+        "qr.mjs",
+        "offline-shell.mjs",
+        "e2e.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A visitor or member. Offline opening is not offline submission, background sync, universal draft persistence or a native app-store release. Browser installation behavior varies.",
+      "dependencies": [
+        "Static manifest/service worker/install assets"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "SYS-003",
+      "name": "Controlled updates and navigation recovery",
+      "module": "Experience",
+      "role": "A visitor or member",
+      "purpose": "apply a new version without unexpected draft loss",
+      "description": "Publish exact build/release metadata and offer the current update dialog.",
+      "userStory": "As a visitor or member, I want to apply a new version without unexpected draft loss.",
+      "functionalRequirements": [
+        "Publish exact build/release metadata and offer the current update dialog.",
+        "Activate the new worker after the chosen update action and recover failed/stale route loads with a retry path."
+      ],
+      "businessRules": "Do not silently reload a tab with unfinished work. A changed service-worker comment alone is not a new product release.",
+      "validation": "Validate metadata/assets, identify the active release and clean stale caches on activation.",
+      "inputs": "Build metadata, waiting worker or navigation failure",
+      "outputs": "Update prompt, correct new shell or safe recovery",
+      "errorAndEmptyStates": "Handle missing metadata, late registration, failed asset fetch and interrupted navigation without infinite loops.",
+      "acceptanceCriteria": [
+        "Update preserves other tabs pending work according to current lifecycle tests.",
+        "Failed metadata/asset fetch does not activate a broken shell."
+      ],
+      "relatedTables": [],
+      "api": [
+        "GET /version.json",
+        "GET /sw.js",
+        "Versioned static assets"
+      ],
+      "components": [
+        "update-bootstrap",
+        "pwa.ts",
+        "router error recovery"
+      ],
+      "tests": [
+        "app-updates.mjs",
+        "navigation-recovery.mjs",
+        "release-check.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "A visitor or member. Do not silently reload a tab with unfinished work. A changed service-worker comment alone is not a new product release.",
+      "dependencies": [
+        "GET /version.json",
+        "GET /sw.js",
+        "Versioned static assets"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "SYS-004",
+      "name": "Request, file and service safeguards",
+      "module": "Platform",
+      "role": "An authorized caller or maintainer",
+      "purpose": "operate within permission, file and service limits",
+      "description": "Use bounded requests/timeouts/retries and server rate/upload budgets.",
+      "userStory": "As an authorized caller or maintainer, I want to operate within permission, file and service limits.",
+      "functionalRequirements": [
+        "Use bounded requests/timeouts/retries and server rate/upload budgets.",
+        "Validate upload bytes/type/size/folder, sign private file access and minimize audit/monitoring payloads."
+      ],
+      "businessRules": "Browser clients receive publishable keys only. Secret/service keys remain server-side; no monitoring payload should forward member text, payment evidence or credentials.",
+      "validation": "Caller identity, allowed origin/method, table/bucket role, content signature and bounded payload size.",
+      "inputs": "Authorized API/upload request or minimal audit event",
+      "outputs": "Permitted result, signed URL or bounded rejection",
+      "errorAndEmptyStates": "Return safe rate/size/permission/service errors; respect Retry-After and avoid endless retry or cost amplification.",
+      "acceptanceCriteria": [
+        "Cross-user/anonymous uploads and role escalation fail.",
+        "Local traffic tests honor request budgets; production capacity is not inferred from fixture throughput."
+      ],
+      "relatedTables": [
+        "private.request_limits",
+        "private.cost_usage",
+        "private.cost_alerts",
+        "private.discord_audit_outbox",
+        "storage.objects"
+      ],
+      "api": [
+        "POST /functions/v1/upload-file",
+        "Guarded internal quota/audit RPCs",
+        "Supabase REST/Auth/Storage"
+      ],
+      "components": [
+        "request-policy.ts",
+        "images.ts",
+        "Edge Functions",
+        "monitoring tools"
+      ],
+      "tests": [
+        "api-policy.mjs",
+        "security-edge.mjs",
+        "security-db.mjs",
+        "security-web.mjs",
+        "load.mjs",
+        "discord-audit.mjs"
+      ],
+      "priority": "Critical",
+      "status": "Implemented",
+      "permissionRequirements": "An authorized caller or maintainer. Browser clients receive publishable keys only. Secret/service keys remain server-side; no monitoring payload should forward member text, payment evidence or credentials.",
+      "dependencies": [
+        "POST /functions/v1/upload-file",
+        "Guarded internal quota/audit RPCs",
+        "Supabase REST/Auth/Storage"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "DOC-001",
+      "name": "Public app guides and advertising boundary",
+      "module": "Documentation",
+      "role": "A visitor",
+      "purpose": "understand the app without opening private member content",
+      "description": "Serve the overview, registration, installation and community/chat guides without login or JavaScript.",
+      "userStory": "As a visitor, I want to understand the app without opening private member content.",
+      "functionalRequirements": [
+        "Serve the overview, registration, installation and community/chat guides without login or JavaScript.",
+        "Provide separate About/Public guides links on login and App guides in Menu."
+      ],
+      "businessRules": "Ads remain disabled pending approval/consent. Disabled builds contain no ad units/loader; login, chat, profile, giving/admin are outside the ad integration.",
+      "validation": "Safe static links, readable text and fail-closed activation/CMP checks; do not send account data to an ad service.",
+      "inputs": "Guide link",
+      "outputs": "Public static article and related guidance",
+      "errorAndEmptyStates": "Guides remain readable offline/network-independent where cached; an unavailable ad must not leave a blocking banner.",
+      "acceptanceCriteria": [
+        "Static articles read without JavaScript or account access.",
+        "Disabled and private-route cases make no Google advertising requests."
+      ],
+      "relatedTables": [],
+      "api": [
+        "Static /guides/*.html",
+        "GET /ads-config.json only for eligible activated integration"
+      ],
+      "components": [
+        "public guides",
+        "guide index",
+        "privacy notice"
+      ],
+      "tests": [
+        "adsense.mjs",
+        "private-paths.mjs"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A visitor. Ads remain disabled pending approval/consent. Disabled builds contain no ad units/loader; login, chat, profile, giving/admin are outside the ad integration.",
+      "dependencies": [
+        "Static /guides/*.html",
+        "GET /ads-config.json only for eligible activated integration"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "DOC-002",
+      "name": "Requirements library and public feature inventory",
+      "module": "Documentation",
+      "role": "A maintainer or project reviewer",
+      "purpose": "find current requirements and evidence from one place",
+      "description": "Publish the six core documents plus audit, QA and portfolio mapping with Markdown downloads and diagrams.",
+      "userStory": "As a maintainer or project reviewer, I want to find current requirements and evidence from one place.",
+      "functionalRequirements": [
+        "Publish the six core documents plus audit, QA and portfolio mapping with Markdown downloads and diagrams.",
+        "Add a searchable/filterable feature index, implementation status and actual interface screenshot gallery to the update site."
+      ],
+      "businessRules": "The report is separate from member data. Historical audit scores retain their dates; planned/unverified integrations must not be labelled complete.",
+      "validation": "Valid document/feature links, no private logs/keys/records, honest screenshot provenance and accessible no-JavaScript reading.",
+      "inputs": "Document/feature query or status filter",
+      "outputs": "Relevant requirements, evidence and downloads",
+      "errorAndEmptyStates": "Offer clear no-match/clear-filter states; full documents remain available if filtering scripts fail.",
+      "acceptanceCriteria": [
+        "All PRD feature IDs appear in the index and every download resolves.",
+        "No production member data or private files enter public output."
+      ],
+      "relatedTables": [],
+      "api": [
+        "Separate static update site; no member API requests"
+      ],
+      "components": [
+        "documentation hub",
+        "feature filters",
+        "document pages",
+        "screenshot gallery"
+      ],
+      "tests": [
+        "Reporting-site layout/link/privacy checks"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A maintainer or project reviewer. The report is separate from member data. Historical audit scores retain their dates; planned/unverified integrations must not be labelled complete.",
+      "dependencies": [
+        "Separate static update site; no member API requests"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "PORT-001",
+      "name": "Complete PCEC portfolio case study",
+      "module": "Documentation",
+      "role": "A portfolio visitor",
+      "purpose": "understand the actual app features and engineering work",
+      "description": "Expand the PCEC project entry with the current feature groups, real stack, challenge/approach and verification scope.",
+      "userStory": "As a portfolio visitor, I want to understand the actual app features and engineering work.",
+      "functionalRequirements": [
+        "Expand the PCEC project entry with the current feature groups, real stack, challenge/approach and verification scope.",
+        "Add actual interface captures and links to the live app and documentation."
+      ],
+      "businessRules": "Keep testing-release/launch limitations visible. An isolated sample screenshot is not evidence of real member activity; do not publish private profiles, receipts or chats.",
+      "validation": "Existing portfolio component contracts, valid public links, captioned assets and no unrelated project changes.",
+      "inputs": "PCEC project entry/gallery selection",
+      "outputs": "Complete feature case study and screenshots",
+      "errorAndEmptyStates": "Gallery has a readable fallback/caption and accessible controls; missing assets fail checks before publication.",
+      "acceptanceCriteria": [
+        "Portfolio index opens the expanded PCEC entry and cycles through actual captures.",
+        "Every implemented feature group is represented without listing future work as shipped."
+      ],
+      "relatedTables": [],
+      "api": [
+        "Portfolio static assets and projectCatalog data"
+      ],
+      "components": [
+        "ProjectDetail",
+        "gallery tabs",
+        "feature list",
+        "project links"
+      ],
+      "tests": [
+        "Portfolio check-projects and browser checks"
+      ],
+      "priority": "High",
+      "status": "Implemented",
+      "permissionRequirements": "A portfolio visitor. Keep testing-release/launch limitations visible. An isolated sample screenshot is not evidence of real member activity; do not publish private profiles, receipts or chats.",
+      "dependencies": [
+        "Portfolio static assets and projectCatalog data"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "FUT-001",
+      "name": "Administrator MFA and recovery enforcement",
+      "module": "Future",
+      "role": "An administrator and infrastructure owner",
+      "purpose": "protect privileged app actions with an accepted second factor",
+      "description": "Plan managed-Auth second-factor enrollment/recovery and server assurance checks for privileged actions.",
+      "userStory": "As an administrator and infrastructure owner, I want to protect privileged app actions with an accepted second factor.",
+      "functionalRequirements": [
+        "Plan managed-Auth second-factor enrollment/recovery and server assurance checks for privileged actions.",
+        "Accept with named account owners before enforcing it on production admins."
+      ],
+      "businessRules": "Dashboard MFA is not app MFA. Never invent enrolled factors or silently lock out existing admins; enrollment credentials require the account owner.",
+      "validation": "Verified factor, fresh session/assurance and tested recovery policy.",
+      "inputs": "Owner-approved MFA enrollment and recovery process",
+      "outputs": "Enforced privileged-session assurance",
+      "errorAndEmptyStates": "Handle missing factor, stale assurance and recovery without a permanent administrative lockout.",
+      "acceptanceCriteria": [
+        "Privileged APIs reject insufficient assurance in a staging acceptance test.",
+        "A documented owner recovery drill succeeds."
+      ],
+      "relatedTables": [
+        "Managed Auth factor/session metadata"
+      ],
+      "api": [
+        "Managed Auth MFA API and future assurance-aware admin contract"
+      ],
+      "components": [
+        "Future MFA enrollment/challenge/recovery"
+      ],
+      "tests": [
+        "Not run: owner enrollment and server enforcement absent"
+      ],
+      "priority": "Critical",
+      "status": "Planned / owner acceptance required",
+      "permissionRequirements": "An administrator and infrastructure owner. Dashboard MFA is not app MFA. Never invent enrolled factors or silently lock out existing admins; enrollment credentials require the account owner.",
+      "dependencies": [
+        "Managed Auth MFA API and future assurance-aware admin contract"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "FUT-002",
+      "name": "Backup and isolated restore acceptance",
+      "module": "Future",
+      "role": "A maintainer and data owner",
+      "purpose": "recover the database and uploaded files after an incident",
+      "description": "Define encrypted database backup plus separate Storage-object backup, retention, custodian and access.",
+      "userStory": "As a maintainer and data owner, I want to recover the database and uploaded files after an incident.",
+      "functionalRequirements": [
+        "Define encrypted database backup plus separate Storage-object backup, retention, custodian and access.",
+        "Perform an isolated restore and verify account/content/file integrity without replacing production."
+      ],
+      "businessRules": "Do not treat a database snapshot as a file-object backup or publish backup credentials. Production restore requires a separate explicit decision.",
+      "validation": "Verify backup completeness, restore compatibility, integrity checks and restricted decryption access.",
+      "inputs": "Approved backup policy and isolated restoration run",
+      "outputs": "Evidence of recoverable records/files and recovery procedure",
+      "errorAndEmptyStates": "Alert on missing/failed backups and stop an invalid restore before production is affected.",
+      "acceptanceCriteria": [
+        "An isolated restored dataset passes integrity and access checks.",
+        "A representative uploaded file is retrievable after restoration."
+      ],
+      "relatedTables": [
+        "All application tables and Storage objects"
+      ],
+      "api": [
+        "Infrastructure backup/Storage tooling; no new member endpoint"
+      ],
+      "components": [
+        "Maintainer runbook and recovery evidence"
+      ],
+      "tests": [
+        "Not run: complete database-plus-file restore not supplied"
+      ],
+      "priority": "Critical",
+      "status": "Planned / external operations gate",
+      "permissionRequirements": "A maintainer and data owner. Do not treat a database snapshot as a file-object backup or publish backup credentials. Production restore requires a separate explicit decision.",
+      "dependencies": [
+        "Infrastructure backup/Storage tooling; no new member endpoint"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "FUT-003",
+      "name": "Verified provider payment integration",
+      "module": "Future",
+      "role": "Finance and the payment-provider owner",
+      "purpose": "confirm transfers only from trustworthy provider evidence",
+      "description": "Obtain the actual Surgebox/API or signed notification contract before building an adapter.",
+      "userStory": "As finance and the payment-provider owner, I want to confirm transfers only from trustworthy provider evidence.",
+      "functionalRequirements": [
+        "Obtain the actual Surgebox/API or signed notification contract before building an adapter.",
+        "Validate provider identity, amount/currency/status, signature, idempotency and refunds in a controlled integration."
+      ],
+      "businessRules": "Static QR scanning and a typed TN are not verification. Current manual reconciliation remains in service until the replacement is accepted.",
+      "validation": "Provider credentials/signature, event identity, transaction uniqueness, amount/currency and replay protection.",
+      "inputs": "Documented provider event/query and authenticated service",
+      "outputs": "Verified ledger status without duplicate gifts",
+      "errorAndEmptyStates": "Quarantine invalid/duplicate/mismatched events; never auto-confirm from a client claim.",
+      "acceptanceCriteria": [
+        "Provider sandbox transfer and duplicate/replay tests reconcile correctly.",
+        "Failure leaves a report pending rather than increasing confirmed totals."
+      ],
+      "relatedTables": [
+        "private.donation_sources",
+        "private.donation_transactions",
+        "private.donation_reports"
+      ],
+      "api": [
+        "Provider endpoint contract not supplied; no live adapter"
+      ],
+      "components": [
+        "Future Finance integration status"
+      ],
+      "tests": [
+        "Not run: no provider API credentials/contract"
+      ],
+      "priority": "High",
+      "status": "Blocked by unavailable provider contract",
+      "permissionRequirements": "Finance and the payment-provider owner. Static QR scanning and a typed TN are not verification. Current manual reconciliation remains in service until the replacement is accepted.",
+      "dependencies": [
+        "Provider endpoint contract not supplied; no live adapter"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "FUT-004",
+      "name": "Optional background reminders",
+      "module": "Future",
+      "role": "An opted-in member",
+      "purpose": "receive a useful reminder outside an open app",
+      "description": "Scope optional event/prayer reminders with subscriptions, revocation and minimal notification text.",
+      "userStory": "As an opted-in member, I want to receive a useful reminder outside an open app.",
+      "functionalRequirements": [
+        "Scope optional event/prayer reminders with subscriptions, revocation and minimal notification text.",
+        "Test supported browsers and expiry/delivery failure before enabling a push sender."
+      ],
+      "businessRules": "Existing notification badges are not background push. Permission must be requested in context; do not expose private prayer/chat details on a lock screen by default.",
+      "validation": "Opt-in subscription, trusted recipient, bounded delivery and revocation.",
+      "inputs": "Explicit subscription/reminder choice",
+      "outputs": "Accepted reminder delivery or safe unavailable state",
+      "errorAndEmptyStates": "Denied permission leaves the app usable; expired subscriptions are removed without repeated failures.",
+      "acceptanceCriteria": [
+        "Opt-out stops future reminders.",
+        "Supported-device acceptance verifies delivery and private-content minimization."
+      ],
+      "relatedTables": [
+        "Future subscription/reminder storage; no migration proposed here"
+      ],
+      "api": [
+        "Push service contract not selected"
+      ],
+      "components": [
+        "Future reminder opt-in/preferences"
+      ],
+      "tests": [
+        "Not run: background sender not implemented"
+      ],
+      "priority": "Medium",
+      "status": "Planned / service and consent needed",
+      "permissionRequirements": "An opted-in member. Existing notification badges are not background push. Permission must be requested in context; do not expose private prayer/chat details on a lock screen by default.",
+      "dependencies": [
+        "Push service contract not selected"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "FUT-005",
+      "name": "Durable offline submission queue",
+      "module": "Future",
+      "role": "A temporarily offline member",
+      "purpose": "submit only supported actions once connectivity and permission return",
+      "description": "Scope a small allowlist of offline actions with durable mutation IDs and explicit pending/cancelled/failed state.",
+      "userStory": "As a temporarily offline member, I want to submit only supported actions once connectivity and permission return.",
+      "functionalRequirements": [
+        "Scope a small allowlist of offline actions with durable mutation IDs and explicit pending/cancelled/failed state.",
+        "Revalidate the current session, audience and server permissions before replay."
+      ],
+      "businessRules": "The existing cached shell and current-tab draft are not a durable queue. Do not queue financial confirmations or privileged destructive actions by default.",
+      "validation": "Idempotency, expiry, record version, fresh authorization and a policy for locally stored sensitive drafts.",
+      "inputs": "Approved offline draft/action",
+      "outputs": "At most one accepted server mutation or clear conflict",
+      "errorAndEmptyStates": "Show conflict/suspension/expired-session failures without endless automatic resubmission.",
+      "acceptanceCriteria": [
+        "Reconnect replay is idempotent.",
+        "A revoked/suspended user cannot replay previously authorized work."
+      ],
+      "relatedTables": [
+        "Future client queue; existing server-owned records"
+      ],
+      "api": [
+        "Future action-specific idempotent contract"
+      ],
+      "components": [
+        "Future pending queue and conflict controls"
+      ],
+      "tests": [
+        "Not run: durable queue absent"
+      ],
+      "priority": "Medium",
+      "status": "Planned / separate data contract",
+      "permissionRequirements": "A temporarily offline member. The existing cached shell and current-tab draft are not a durable queue. Do not queue financial confirmations or privileged destructive actions by default.",
+      "dependencies": [
+        "Future action-specific idempotent contract"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    },
+    {
+      "id": "FUT-006",
+      "name": "Read-only bilingual help assistant",
+      "module": "Future",
+      "role": "A member with an approved support need",
+      "purpose": "find an answer from reviewed guidance without granting an AI write access",
+      "description": "Define an English/Filipino help corpus and an allowlist of fixed read-only retrieval operations.",
+      "userStory": "As a member with an approved support need, I want to find an answer from reviewed guidance without granting an ai write access.",
+      "functionalRequirements": [
+        "Define an English/Filipino help corpus and an allowlist of fixed read-only retrieval operations.",
+        "Require budget, data-purpose and privacy acceptance before adding any model/provider."
+      ],
+      "businessRules": "A portfolio AI demonstration does not authorize private-data disclosure. The model must not write SQL, change accounts, approve donations or send messages.",
+      "validation": "Approved corpus, safe retrieval scope, grounded answers, bounded requests and no cross-user private context.",
+      "inputs": "Support question and reviewed retrieval context",
+      "outputs": "Cited guidance or an explicit inability to answer",
+      "errorAndEmptyStates": "Unavailable/unverified answers fall back to existing guides and Contact Us.",
+      "acceptanceCriteria": [
+        "Adversarial prompts cannot obtain private records or invoke actions.",
+        "Answers identify their source and decline unsupported claims."
+      ],
+      "relatedTables": [
+        "Reviewed public guidance only unless separately approved"
+      ],
+      "api": [
+        "AI/provider contract not selected"
+      ],
+      "components": [
+        "Future optional help panel"
+      ],
+      "tests": [
+        "Not run: no AI integration implemented"
+      ],
+      "priority": "Low",
+      "status": "Planned / budget and privacy decision",
+      "permissionRequirements": "A member with an approved support need. A portfolio AI demonstration does not authorize private-data disclosure. The model must not write SQL, change accounts, approve donations or send messages.",
+      "dependencies": [
+        "AI/provider contract not selected"
+      ],
+      "sourceEvidence": "Inspected PCEC route/page/service and corresponding tests; external acceptance is separately recorded."
+    }
+  ]
+}

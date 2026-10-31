@@ -13,7 +13,7 @@ createServer((req,res)=>{
   if(path.split(/[\\/]/).some(s=>s.startsWith('.'))||path.startsWith('/scripts/')||path.startsWith('/node_modules/')){res.writeHead(404).end();return}
   if(path==='/')path='/index.html';
   const file=join(root,path),rel=relative(root,file);
-  const types={'.html':'text/html; charset=utf-8','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8'};
+  const types={'.html':'text/html; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.json':'application/json; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.md':'text/markdown; charset=utf-8'};
   if(isAbsolute(rel)||rel.startsWith('..')||!types[extname(file)]||!existsSync(file)||!statSync(file).isFile()){res.writeHead(404).end();return}
   res.writeHead(200,{...securityHeaders,'Content-Type':types[extname(file)],'Cache-Control':'no-store'});
   if(req.method==='HEAD'){res.end();return}createReadStream(file).pipe(res);

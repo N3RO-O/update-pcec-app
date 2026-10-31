@@ -208,19 +208,20 @@ tbody th{font-weight:700}
 
 <header class="top">
   <div class="wrap">
-    <div class="brandline"><img src="assets/pcec-logo-white.png" alt="PCEC"><span>PCEC Connect · Project update</span><span class="date">30 October 2026</span></div>
+    <div class="brandline"><img src="assets/pcec-logo-white.png" alt="PCEC"><span>PCEC Connect · Project update</span><span class="date">31 October 2026</span></div>
     <h1>The app is updated. Public launch still needs approval.</h1>
-    <p class="lede">Members can sign up, post, chat, pray and report a Surgebox donation for Finance to verify. The latest update removes Resources. Public launch is on hold while email delivery, recovery, administrator security and the member pilot are accepted.</p>
+    <p class="lede">Members can sign up, post, chat, pray and report a Surgebox donation for Finance to verify. The complete documentation now covers 60 current and proposed features, architecture, flows, design, database and implementation. Public launch still waits on real-service and owner acceptance.</p>
     <div class="cta">
       <a class="btn btn-light" href="https://pcec-connect.vercel.app" target="_blank" rel="noopener">Open the app ↗</a>
       <a class="btn btn-ghost" href="#install">Install on your phone</a>
+      <a class="btn btn-ghost" href="documentation.html">Read the complete documentation</a>
     </div>
   </div>
 </header>
 
 <nav class="nav" aria-label="Sections">
   <div class="wrap">
-    <a href="#summary">At a glance</a><a href="#today">What it does</a><a href="#latest">Recent changes</a><a href="#launch">Before launch</a><a href="#next">Next steps</a><a href="#decisions">Decisions</a><a href="#plan">Budget</a><a href="#install">Install</a><a href="#details">Reports</a>
+    <a href="#summary">At a glance</a><a href="#today">What it does</a><a href="#latest">Recent changes</a><a href="documentation.html">Documentation</a><a href="#launch">Before launch</a><a href="#next">Next steps</a><a href="#decisions">Decisions</a><a href="#plan">Budget</a><a href="#install">Install</a><a href="#details">Reports</a>
   </div>
 </nav>
 
@@ -250,7 +251,7 @@ tbody th{font-weight:700}
   <section id="today" aria-labelledby="today-h">
     <span class="eyebrow">What it does</span>
     <h2 id="today-h">What members can do today</h2>
-    <p class="intro">Everything below works in the testing app. Only approved PCEC members can see member content.</p>
+    <p class="intro">These features are implemented for member testing. The <a href="testing-qa.html">QA report</a> separates isolated checks, live reads and work still awaiting acceptance. Only approved PCEC members can see member content.</p>
     <div class="card panel">
       <ul class="ticks two">
         <li><div><b>Join easily.</b> <span>Sign up with email or Google, and stay signed in.</span></div></li>
@@ -274,6 +275,10 @@ tbody th{font-weight:700}
     <h2 id="latest-h">What changed since 13 October</h2>
     <p class="intro">Newest first. Feature updates and open launch requirements are tracked separately.</p>
     <div class="timeline">
+      <article class="card entry" id="oct31-documentation">
+        <time datetime="2026-10-31">31 Oct</time>
+        <div><h3>A complete, traceable project reference</h3><ul><li><a href="documentation.html">Nine documents</a>: product and technical requirements, app flows, UI/UX brief, database schema, implementation plan, system audit, QA and portfolio mapping.</li><li>60 feature specifications, all 59 app routes, role permissions, API contracts, and the source-derived 38-table/one-view schema. Current, proposed and externally blocked work stay labelled.</li><li>The paired login/signup design, friend-selected private groups and newcomer-only setup are documented. Media gains adjacent-item and keyboard browsing; giving/admin accessibility and cropper cancellation receive focused fixes.</li><li>The earlier unread test now follows the current Chats interface and passes at phone/desktop sizes. <a href="testing-qa.html">Read the current results and remaining limitations</a>; historical audit scores keep their original dates.</li><li>Actual interface captures use isolated sample data. No private member records, payment receipts or credentials are published.</li></ul></div>
+      </article>
       <article class="card entry" id="oct30-update">
         <time datetime="2026-10-30">30 Oct</time>
         <div><h3>A simpler app and a clear launch decision</h3><ul><li>Resources removed from member/admin pages and global search; the church directory and prayer requests remain.</li><li>Domain setup handover prepared: DNS belongs to the DNS provider, the app domain to Vercel, and sign-in URLs to Supabase. The app's own domain is still pending.</li><li><strong>Not production ready:</strong> the live dashboard shows no backups; Gmail SMTP has a deliverability warning. Email delivery/recovery, admin MFA, alerts and pilot acceptance still need evidence.</li><li>The current broad community test stops at an unread-message indicator. Passing focused checks do not close that regression.</li></ul></div>
@@ -429,8 +434,9 @@ tbody th{font-weight:700}
   <section id="details" aria-labelledby="details-h">
     <span class="eyebrow">Reports</span>
     <h2 id="details-h">Longer reports</h2>
-    <p class="intro">Detailed background from 5–6 October. Some details have changed since; this page is the current summary.</p>
+    <p class="intro">Start with the current documentation library. Older background reports remain available with their original evidence dates.</p>
     <div class="more">
+      <a class="card" href="documentation.html">Complete documentation<span>Six core documents, audit, QA, portfolio mapping, searchable features and actual interface captures.</span></a>
       <a class="card" href="system-guide.html">How the system works<span>Architecture, the community features, and a guide for members and the office.</span></a>
       <a class="card" href="production-readiness.html">Launch audit<span>The full 83-point readiness checklist.</span></a>
       <a class="card" href="email-preview.html">Account emails<span>Preview the eight PCEC-branded emails.</span></a>
@@ -439,7 +445,7 @@ tbody th{font-weight:700}
     </div>
   </section>
 
-  <p class="foot">Updated 30 October 2026. Current focused checks are described above; older test totals retain their earlier dates. Costs are estimates from the Strategic Infrastructure Plan and providers' public prices, not quotations or approved spending. Screens show sample data.</p>
+  <p class="foot">Updated 31 October 2026. Current test scope and limitations are in the QA document; older results retain their evidence dates. Costs remain historical planning estimates, not quotations or approved spending. App captures use isolated sample data; portfolio captures identify their public-site context.</p>
 </main>
 </body>
 </html>

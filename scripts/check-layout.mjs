@@ -86,7 +86,7 @@ try{
     assert.equal(await page.locator('#decisions .decision').count(),5);
     assert.equal(await page.locator('#install svg.qr').count(),1);
     assert.equal(await page.locator('.screens img').evaluate(i=>i.complete&&i.naturalWidth>0),true,'App screens picture loads');
-    for(const a of await page.locator('.nav a').all()){const h=await a.getAttribute('href');assert.equal(await page.locator(h).count(),1,'Section exists: '+h);}
+    for(const a of await page.locator('.nav a').all()){const h=await a.getAttribute('href');if(h.startsWith('#'))assert.equal(await page.locator(h).count(),1,'Section exists: '+h);else assert.equal((await page.request.get('http://localhost:5205/'+h)).status(),200,'Navigation page exists: '+h);}
     for(const a of await page.locator('#details a[href$=".html"]').all()){const h=await a.getAttribute('href');assert.equal((await page.request.get('http://localhost:5205/'+h)).status(),200,'Detail page exists: '+h);}
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     if(size.width===1440) await page.screenshot({path:shots+'launch-progress.png',fullPage:false});

@@ -1,6 +1,7 @@
 import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {buildDocumentation} from './build-documentation.mjs';
 
 await import('./build-emails.mjs');
 await import('./build-readiness.mjs');
@@ -31,4 +32,5 @@ for (const file of files) {
   if (/\son\w+\s*=/i.test(html)) throw new Error(`Inline event handler in ${file}; use addEventListener.`);
   await writeFile(join(output, file), html, 'utf8');
 }
-console.log(`Prepared ${files.length + scripts} public site files in dist/. Scripts are served from this site for CSP.`);
+await buildDocumentation(root,output);
+console.log(`Prepared ${files.length + scripts} public site files plus the documentation library in dist/. Scripts are served from this site for CSP.`);

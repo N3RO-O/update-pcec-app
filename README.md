@@ -1,5 +1,11 @@
 # PCEC Connect project update
 
+**31 October 2026:** `documentation.html` adds six core documents and three supporting reports, 60 individual feature specifications, the 59-route sitemap, source-derived schema, test evidence and actual interface captures. Open the [published library](https://update-pcec-app.vercel.app/documentation.html). The current QA report supersedes older regression observations below; historical audit scores retain their dates.
+
+The canonical documents are maintained in the app repository under `docs/`. This repository contains reviewed publication snapshots in `documents/`, so its deployment does not need access to private app source or a database. After approved documentation changes, copy the nine Markdown files and three catalogs to `documents/`; copy only reviewed interface captures to `assets/screenshots/` and update `documents/screenshots.json`.
+
+Run `npm ci`, `npm run build`, `npm run check`, and `npm run check:docs`. The last check covers all nine reading pages/downloads, feature filtering, feature anchors, no-JavaScript reading, screenshot resolution, narrow layouts and private-file denial. `npm run preview` serves the built whitelist locally. Commit source and reviewed assets; `dist/` is generated for Vercel.
+
 **30 October 2026:** summary, system guide and readiness follow-up describe
 Surgebox QR giving with manual Finance review, scanner/Resources removal and
 current launch gates. Read-only dashboard observations show Free, healthy, no

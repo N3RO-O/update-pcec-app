@@ -1,0 +1,300 @@
+{
+  "date": "2026-10-31",
+  "routes": [
+    {
+      "path": "/login",
+      "title": "Log In",
+      "access": "guest"
+    },
+    {
+      "path": "/welcome",
+      "title": "Welcome",
+      "access": "guest"
+    },
+    {
+      "path": "/install",
+      "title": "Install the App",
+      "access": "public"
+    },
+    {
+      "path": "/signup",
+      "title": "Sign Up",
+      "access": "guest"
+    },
+    {
+      "path": "/finish-signup",
+      "title": "Finish sign-up",
+      "access": "session"
+    },
+    {
+      "path": "/setup-profile",
+      "title": "Set up your profile",
+      "access": "member"
+    },
+    {
+      "path": "/check-email",
+      "title": "Check your email",
+      "access": "public"
+    },
+    {
+      "path": "/forgot-password",
+      "title": "Forgot password",
+      "access": "public"
+    },
+    {
+      "path": "/auth/callback",
+      "title": "Signing in",
+      "access": "public"
+    },
+    {
+      "path": "/reset-password",
+      "title": "New password",
+      "access": "session"
+    },
+    {
+      "path": "/pending",
+      "title": "Confirm your email",
+      "access": "session"
+    },
+    {
+      "path": "/blocked",
+      "title": "Account suspended",
+      "access": "session"
+    },
+    {
+      "path": "/account-problem",
+      "title": "Profile missing",
+      "access": "session"
+    },
+    {
+      "path": "/terms",
+      "title": "Terms of Service",
+      "access": "public"
+    },
+    {
+      "path": "/privacy",
+      "title": "Privacy Notice",
+      "access": "public"
+    },
+    {
+      "path": "/delete-account",
+      "title": "Delete your account",
+      "access": "public"
+    },
+    {
+      "path": "/account-deleted",
+      "title": "Account deleted",
+      "access": "public"
+    },
+    {
+      "path": "/",
+      "title": "PCEC Connect",
+      "access": "member"
+    },
+    {
+      "path": "/events",
+      "title": "Events",
+      "access": "member"
+    },
+    {
+      "path": "/events/:id",
+      "title": "Event",
+      "access": "member"
+    },
+    {
+      "path": "/about",
+      "title": "About PCEC",
+      "access": "member"
+    },
+    {
+      "path": "/donate",
+      "title": "Donate",
+      "access": "member"
+    },
+    {
+      "path": "/donate/activity",
+      "title": "My donation activity",
+      "access": "member"
+    },
+    {
+      "path": "/profile",
+      "title": "Profile",
+      "access": "member"
+    },
+    {
+      "path": "/chat",
+      "title": "Chat",
+      "access": "member"
+    },
+    {
+      "path": "/chat/:id",
+      "title": "Private chat",
+      "access": "member"
+    },
+    {
+      "path": "/saved",
+      "title": "Saved posts",
+      "access": "member"
+    },
+    {
+      "path": "/search",
+      "title": "Search",
+      "access": "member"
+    },
+    {
+      "path": "/chats",
+      "title": "Chat",
+      "access": "member"
+    },
+    {
+      "path": "/friends",
+      "title": "Friends",
+      "access": "member"
+    },
+    {
+      "path": "/chats/:id",
+      "title": "Group settings",
+      "access": "member"
+    },
+    {
+      "path": "/community",
+      "title": "Community Feed",
+      "access": "member"
+    },
+    {
+      "path": "/community/u/:id",
+      "title": "Posts",
+      "access": "member"
+    },
+    {
+      "path": "/community/post/:id",
+      "title": "Post",
+      "access": "member"
+    },
+    {
+      "path": "/notifications",
+      "title": "Notifications",
+      "access": "member"
+    },
+    {
+      "path": "/menu",
+      "title": "Menu",
+      "access": "member"
+    },
+    {
+      "path": "/news",
+      "title": "Latest News",
+      "access": "member"
+    },
+    {
+      "path": "/news/:id",
+      "title": "Announcement",
+      "access": "member"
+    },
+    {
+      "path": "/profile/edit",
+      "title": "Edit Profile",
+      "access": "member"
+    },
+    {
+      "path": "/membership",
+      "title": "Membership & NDC",
+      "access": "member"
+    },
+    {
+      "path": "/ndc",
+      "title": "NDC",
+      "access": "member"
+    },
+    {
+      "path": "/media",
+      "title": "Media",
+      "access": "member"
+    },
+    {
+      "path": "/contact",
+      "title": "Contact Us",
+      "access": "member"
+    },
+    {
+      "path": "/settings",
+      "title": "Settings",
+      "access": "member"
+    },
+    {
+      "path": "/prayer",
+      "title": "Prayer Requests",
+      "access": "member"
+    },
+    {
+      "path": "/churches",
+      "title": "Our Churches",
+      "access": "member"
+    },
+    {
+      "path": "/admin",
+      "title": "Admin",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/members",
+      "title": "Members",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/announcements",
+      "title": "Announcements",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/events",
+      "title": "Events",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/ndc",
+      "title": "NDC Posts",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/donations",
+      "title": "Donation payment options",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/donation-analytics",
+      "title": "Donation analytics",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/donation-reports",
+      "title": "Donation reports",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/inbox",
+      "title": "Inbox",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/community",
+      "title": "Community",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/chat-reports",
+      "title": "Chat reports",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/about",
+      "title": "About & Office Info",
+      "access": "admin"
+    },
+    {
+      "path": "/admin/churches",
+      "title": "Churches",
+      "access": "admin"
+    }
+  ]
+}

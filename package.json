@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node scripts/build-site.mjs",
     "preview": "node scripts/preview.mjs",
-    "check": "node scripts/check-layout.mjs"
+    "check": "node scripts/check-layout.mjs",
+    "check:docs": "node scripts/check-documentation.mjs"
   },
   "devDependencies": { "playwright": "1.63.0" },
   "engines": { "node": ">=20" }

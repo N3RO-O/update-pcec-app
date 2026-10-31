@@ -3,5 +3,8 @@
 node_modules
 dist
 screenshots/
+# Reviewed publication captures are source assets; local QA output stays ignored.
+!assets/screenshots/
+!assets/screenshots/**
 *.log
 .DS_Store

@@ -1,0 +1,5128 @@
+{
+  "date": "2026-10-31",
+  "evidence": "Isolated database reconstructed from checked-in schema and migrations; not a claim of full production catalog access.",
+  "migrationFiles": [
+    "20261002_member_list_email_confirmed.sql",
+    "20261002_auto_approve_confirmed_members.sql",
+    "20261002_community_feed.sql",
+    "20261002_community_feed_tuning.sql",
+    "20261002_community_limits.sql",
+    "20261002_community_blocks.sql",
+    "20261005033848_security_hardening.sql",
+    "20261005045707_api_cost_guardrails.sql",
+    "20261007044958_discord_audit_outbox.sql",
+    "20261007045144_discord_audit_server_policy.sql",
+    "20261013030000_prayer_resources_churches.sql",
+    "20261013060000_google_signup_and_church.sql",
+    "20261013144223_community_chat.sql",
+    "20261018065538_community_reaction_people.sql",
+    "20261018072407_community_chat_typing.sql",
+    "20261018073425_private_chat_groups_and_reactions.sql",
+    "20261018074216_social_privacy_and_suggestions.sql",
+    "20261020000718_chat_delivery_receipts.sql",
+    "20261020003017_direct_messages_profile_privacy.sql",
+    "20261020055932_member_follows.sql",
+    "20261020080412_community_actions_realtime.sql",
+    "20261020082352_community_comment_replies.sql",
+    "20261021004656_social_activity_notifications.sql",
+    "20261021021949_chat_inbox_controls.sql",
+    "20261021023257_event_lifecycle.sql",
+    "20261022001031_donation_analytics.sql",
+    "20261022234551_profile_onboarding.sql",
+    "20261028001340_manual_qr_donations.sql",
+    "20261029023908_chat_message_actions.sql"
+  ],
+  "tables": [
+    {
+      "schema": "private",
+      "name": "chat_message_receipts",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "message_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "delivered_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "clock_timestamp()"
+        },
+        {
+          "name": "read_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "chat_message_receipts_delivered_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL delivered_at"
+        },
+        {
+          "name": "chat_message_receipts_message_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (message_id) REFERENCES chat_messages(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_message_receipts_message_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL message_id"
+        },
+        {
+          "name": "chat_message_receipts_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (message_id, user_id)"
+        },
+        {
+          "name": "chat_message_receipts_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_message_receipts_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_message_receipts_pkey",
+          "definition": "CREATE UNIQUE INDEX chat_message_receipts_pkey ON private.chat_message_receipts USING btree (message_id, user_id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "chat_preferences",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "room_key",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "room_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "archived",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "muted",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "restricted",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "read_receipts",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "true"
+        },
+        {
+          "name": "deleted_before",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "chat_preferences_archived_not_null",
+          "type": "n",
+          "definition": "NOT NULL archived"
+        },
+        {
+          "name": "chat_preferences_check",
+          "type": "c",
+          "definition": "CHECK ((room_key = COALESCE((room_id)::text, 'community'::text)))"
+        },
+        {
+          "name": "chat_preferences_muted_not_null",
+          "type": "n",
+          "definition": "NOT NULL muted"
+        },
+        {
+          "name": "chat_preferences_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (user_id, room_key)"
+        },
+        {
+          "name": "chat_preferences_read_receipts_not_null",
+          "type": "n",
+          "definition": "NOT NULL read_receipts"
+        },
+        {
+          "name": "chat_preferences_restricted_not_null",
+          "type": "n",
+          "definition": "NOT NULL restricted"
+        },
+        {
+          "name": "chat_preferences_room_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_preferences_room_key_not_null",
+          "type": "n",
+          "definition": "NOT NULL room_key"
+        },
+        {
+          "name": "chat_preferences_updated_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL updated_at"
+        },
+        {
+          "name": "chat_preferences_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_preferences_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_preferences_pkey",
+          "definition": "CREATE UNIQUE INDEX chat_preferences_pkey ON private.chat_preferences USING btree (user_id, room_key)"
+        },
+        {
+          "name": "chat_preferences_room",
+          "definition": "CREATE INDEX chat_preferences_room ON private.chat_preferences USING btree (room_id) WHERE restricted"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "chat_spam_reports",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "reporter_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "room_key",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "room_title",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "room_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "message_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "author_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "report_type",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'message'::text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "clock_timestamp()"
+        },
+        {
+          "name": "resolved_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "chat_spam_reports_author_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (author_id) REFERENCES user_profile(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "chat_spam_reports_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "chat_spam_reports_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "chat_spam_reports_message_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (message_id) REFERENCES chat_messages(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "chat_spam_reports_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "chat_spam_reports_reason_check",
+          "type": "c",
+          "definition": "CHECK (((length(reason) >= 1) AND (length(reason) <= 500)))"
+        },
+        {
+          "name": "chat_spam_reports_reason_not_null",
+          "type": "n",
+          "definition": "NOT NULL reason"
+        },
+        {
+          "name": "chat_spam_reports_report_type_check",
+          "type": "c",
+          "definition": "CHECK ((report_type = ANY (ARRAY['message'::text, 'request'::text])))"
+        },
+        {
+          "name": "chat_spam_reports_report_type_not_null",
+          "type": "n",
+          "definition": "NOT NULL report_type"
+        },
+        {
+          "name": "chat_spam_reports_reporter_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (reporter_id) REFERENCES user_profile(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "chat_spam_reports_room_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (room_id) REFERENCES chat_rooms(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "chat_spam_reports_room_key_not_null",
+          "type": "n",
+          "definition": "NOT NULL room_key"
+        },
+        {
+          "name": "chat_spam_reports_room_title_not_null",
+          "type": "n",
+          "definition": "NOT NULL room_title"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_report_open",
+          "definition": "CREATE UNIQUE INDEX chat_report_open ON private.chat_spam_reports USING btree (reporter_id, room_key) WHERE (resolved_at IS NULL)"
+        },
+        {
+          "name": "chat_reports_recent",
+          "definition": "CREATE INDEX chat_reports_recent ON private.chat_spam_reports USING btree (created_at DESC)"
+        },
+        {
+          "name": "chat_spam_reports_pkey",
+          "definition": "CREATE UNIQUE INDEX chat_spam_reports_pkey ON private.chat_spam_reports USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "community_saves",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "post_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "community_saves_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "community_saves_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (user_id, post_id)"
+        },
+        {
+          "name": "community_saves_post_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (post_id) REFERENCES community_posts(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_saves_post_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL post_id"
+        },
+        {
+          "name": "community_saves_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_saves_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "community_saves_pkey",
+          "definition": "CREATE UNIQUE INDEX community_saves_pkey ON private.community_saves USING btree (user_id, post_id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "cost_alerts",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "dedupe_key",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "severity",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "first_seen",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "last_seen",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "cost_alerts_dedupe_key_not_null",
+          "type": "n",
+          "definition": "NOT NULL dedupe_key"
+        },
+        {
+          "name": "cost_alerts_first_seen_not_null",
+          "type": "n",
+          "definition": "NOT NULL first_seen"
+        },
+        {
+          "name": "cost_alerts_last_seen_not_null",
+          "type": "n",
+          "definition": "NOT NULL last_seen"
+        },
+        {
+          "name": "cost_alerts_message_not_null",
+          "type": "n",
+          "definition": "NOT NULL message"
+        },
+        {
+          "name": "cost_alerts_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (dedupe_key)"
+        },
+        {
+          "name": "cost_alerts_severity_check",
+          "type": "c",
+          "definition": "CHECK ((severity = ANY (ARRAY['warning'::text, 'critical'::text])))"
+        },
+        {
+          "name": "cost_alerts_severity_not_null",
+          "type": "n",
+          "definition": "NOT NULL severity"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "cost_alerts_pkey",
+          "definition": "CREATE UNIQUE INDEX cost_alerts_pkey ON private.cost_alerts USING btree (dedupe_key)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "cost_usage",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "scope",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "metric",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "window_start",
+          "type": "date",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "amount",
+          "type": "bigint",
+          "nullable": false,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "cost_usage_amount_check",
+          "type": "c",
+          "definition": "CHECK ((amount >= 0))"
+        },
+        {
+          "name": "cost_usage_amount_not_null",
+          "type": "n",
+          "definition": "NOT NULL amount"
+        },
+        {
+          "name": "cost_usage_metric_not_null",
+          "type": "n",
+          "definition": "NOT NULL metric"
+        },
+        {
+          "name": "cost_usage_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (scope, metric, window_start)"
+        },
+        {
+          "name": "cost_usage_scope_not_null",
+          "type": "n",
+          "definition": "NOT NULL scope"
+        },
+        {
+          "name": "cost_usage_window_start_not_null",
+          "type": "n",
+          "definition": "NOT NULL window_start"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "cost_usage_pkey",
+          "definition": "CREATE UNIQUE INDEX cost_usage_pkey ON private.cost_usage USING btree (scope, metric, window_start)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "direct_conversations",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "room_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "first_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "second_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "direct_conversations_check",
+          "type": "c",
+          "definition": "CHECK ((first_id < second_id))"
+        },
+        {
+          "name": "direct_conversations_first_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (first_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "direct_conversations_first_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL first_id"
+        },
+        {
+          "name": "direct_conversations_first_id_second_id_key",
+          "type": "u",
+          "definition": "UNIQUE (first_id, second_id)"
+        },
+        {
+          "name": "direct_conversations_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (room_id)"
+        },
+        {
+          "name": "direct_conversations_room_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "direct_conversations_room_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL room_id"
+        },
+        {
+          "name": "direct_conversations_second_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (second_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "direct_conversations_second_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL second_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "direct_conversations_first_id_second_id_key",
+          "definition": "CREATE UNIQUE INDEX direct_conversations_first_id_second_id_key ON private.direct_conversations USING btree (first_id, second_id)"
+        },
+        {
+          "name": "direct_conversations_pkey",
+          "definition": "CREATE UNIQUE INDEX direct_conversations_pkey ON private.direct_conversations USING btree (room_id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "discord_audit_outbox",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "clock_timestamp()"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "resource",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "delivered_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "discord_audit_outbox_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "discord_audit_outbox_kind_check",
+          "type": "c",
+          "definition": "CHECK ((kind = ANY (ARRAY['permission_change'::text, 'admin_action'::text])))"
+        },
+        {
+          "name": "discord_audit_outbox_kind_not_null",
+          "type": "n",
+          "definition": "NOT NULL kind"
+        },
+        {
+          "name": "discord_audit_outbox_occurred_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL occurred_at"
+        },
+        {
+          "name": "discord_audit_outbox_operation_check",
+          "type": "c",
+          "definition": "CHECK ((operation = ANY (ARRAY['INSERT'::text, 'UPDATE'::text, 'DELETE'::text])))"
+        },
+        {
+          "name": "discord_audit_outbox_operation_not_null",
+          "type": "n",
+          "definition": "NOT NULL operation"
+        },
+        {
+          "name": "discord_audit_outbox_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "discord_audit_outbox_resource_not_null",
+          "type": "n",
+          "definition": "NOT NULL resource"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "discord_audit_outbox_pkey",
+          "definition": "CREATE UNIQUE INDEX discord_audit_outbox_pkey ON private.discord_audit_outbox USING btree (id)"
+        },
+        {
+          "name": "discord_audit_pending",
+          "definition": "CREATE INDEX discord_audit_pending ON private.discord_audit_outbox USING btree (id) WHERE (delivered_at IS NULL)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "donation_reports",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "donor_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "donor_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "method_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "method_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "amount_minor",
+          "type": "bigint",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "payment_reference",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "reported_paid_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "receipt_path",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "donor_note",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'pending'::text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "reviewed_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "review_note",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "confirmed_amount_minor",
+          "type": "bigint",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "transaction_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "donation_reports_amount_minor_check",
+          "type": "c",
+          "definition": "CHECK (((amount_minor >= 1) AND (amount_minor <= '100000000000'::bigint)))"
+        },
+        {
+          "name": "donation_reports_amount_minor_not_null",
+          "type": "n",
+          "definition": "NOT NULL amount_minor"
+        },
+        {
+          "name": "donation_reports_check",
+          "type": "c",
+          "definition": "CHECK ((((status = 'pending'::text) AND (reviewed_at IS NULL) AND (transaction_id IS NULL)) OR ((status = 'rejected'::text) AND (reviewed_at IS NOT NULL) AND (transaction_id IS NULL)) OR ((status = 'confirmed'::text) AND (reviewed_at IS NOT NULL) AND (transaction_id IS NOT NULL) AND (confirmed_amount_minor IS NOT NULL))))"
+        },
+        {
+          "name": "donation_reports_confirmed_amount_minor_check",
+          "type": "c",
+          "definition": "CHECK (((confirmed_amount_minor >= 1) AND (confirmed_amount_minor <= '100000000000'::bigint)))"
+        },
+        {
+          "name": "donation_reports_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "donation_reports_donor_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (donor_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "donation_reports_donor_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL donor_name"
+        },
+        {
+          "name": "donation_reports_donor_note_check",
+          "type": "c",
+          "definition": "CHECK ((length(donor_note) <= 1000))"
+        },
+        {
+          "name": "donation_reports_donor_note_not_null",
+          "type": "n",
+          "definition": "NOT NULL donor_note"
+        },
+        {
+          "name": "donation_reports_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "donation_reports_method_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (method_id) REFERENCES donation_center(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "donation_reports_method_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL method_name"
+        },
+        {
+          "name": "donation_reports_payment_reference_check",
+          "type": "c",
+          "definition": "CHECK (((length(payment_reference) >= 3) AND (length(payment_reference) <= 200)))"
+        },
+        {
+          "name": "donation_reports_payment_reference_not_null",
+          "type": "n",
+          "definition": "NOT NULL payment_reference"
+        },
+        {
+          "name": "donation_reports_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "donation_reports_reported_paid_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL reported_paid_at"
+        },
+        {
+          "name": "donation_reports_review_note_check",
+          "type": "c",
+          "definition": "CHECK ((length(review_note) <= 1000))"
+        },
+        {
+          "name": "donation_reports_review_note_not_null",
+          "type": "n",
+          "definition": "NOT NULL review_note"
+        },
+        {
+          "name": "donation_reports_reviewed_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (reviewed_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "donation_reports_status_check",
+          "type": "c",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'rejected'::text])))"
+        },
+        {
+          "name": "donation_reports_status_not_null",
+          "type": "n",
+          "definition": "NOT NULL status"
+        },
+        {
+          "name": "donation_reports_transaction_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (transaction_id) REFERENCES private.donation_transactions(id)"
+        },
+        {
+          "name": "donation_reports_transaction_id_key",
+          "type": "u",
+          "definition": "UNIQUE (transaction_id)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "donation_report_reference_idx",
+          "definition": "CREATE UNIQUE INDEX donation_report_reference_idx ON private.donation_reports USING btree (method_id, lower(payment_reference)) WHERE (status = ANY (ARRAY['pending'::text, 'confirmed'::text]))"
+        },
+        {
+          "name": "donation_reports_donor_idx",
+          "definition": "CREATE INDEX donation_reports_donor_idx ON private.donation_reports USING btree (donor_id, created_at DESC, id DESC)"
+        },
+        {
+          "name": "donation_reports_method_idx",
+          "definition": "CREATE INDEX donation_reports_method_idx ON private.donation_reports USING btree (method_id)"
+        },
+        {
+          "name": "donation_reports_pkey",
+          "definition": "CREATE UNIQUE INDEX donation_reports_pkey ON private.donation_reports USING btree (id)"
+        },
+        {
+          "name": "donation_reports_reviewer_idx",
+          "definition": "CREATE INDEX donation_reports_reviewer_idx ON private.donation_reports USING btree (reviewed_by)"
+        },
+        {
+          "name": "donation_reports_status_idx",
+          "definition": "CREATE INDEX donation_reports_status_idx ON private.donation_reports USING btree (status, created_at DESC, id DESC)"
+        },
+        {
+          "name": "donation_reports_transaction_id_key",
+          "definition": "CREATE UNIQUE INDEX donation_reports_transaction_id_key ON private.donation_reports USING btree (transaction_id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "donation_sources",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "provider",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "is_connected",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "last_synced_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "donation_sources_display_name_check",
+          "type": "c",
+          "definition": "CHECK (((length(display_name) >= 1) AND (length(display_name) <= 160)))"
+        },
+        {
+          "name": "donation_sources_display_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL display_name"
+        },
+        {
+          "name": "donation_sources_is_connected_not_null",
+          "type": "n",
+          "definition": "NOT NULL is_connected"
+        },
+        {
+          "name": "donation_sources_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (provider)"
+        },
+        {
+          "name": "donation_sources_provider_check",
+          "type": "c",
+          "definition": "CHECK (((length(provider) >= 1) AND (length(provider) <= 100)))"
+        },
+        {
+          "name": "donation_sources_provider_not_null",
+          "type": "n",
+          "definition": "NOT NULL provider"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "donation_sources_pkey",
+          "definition": "CREATE UNIQUE INDEX donation_sources_pkey ON private.donation_sources USING btree (provider)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "donation_transactions",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "provider_transaction_id",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "reference",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "campaign_key",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'general'::text"
+        },
+        {
+          "name": "campaign_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'General Fund'::text"
+        },
+        {
+          "name": "donor_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "donor_key",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "donor_name",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "anonymous",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'PHP'::text"
+        },
+        {
+          "name": "amount_minor",
+          "type": "bigint",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "refunded_minor",
+          "type": "bigint",
+          "nullable": false,
+          "default_value": "0"
+        },
+        {
+          "name": "fee_minor",
+          "type": "bigint",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "paid_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "activity_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": "COALESCE(paid_at, created_at)"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "donation_transactions_amount_minor_check",
+          "type": "c",
+          "definition": "CHECK (((amount_minor > 0) AND (amount_minor <= '100000000000'::bigint)))"
+        },
+        {
+          "name": "donation_transactions_amount_minor_not_null",
+          "type": "n",
+          "definition": "NOT NULL amount_minor"
+        },
+        {
+          "name": "donation_transactions_anonymous_not_null",
+          "type": "n",
+          "definition": "NOT NULL anonymous"
+        },
+        {
+          "name": "donation_transactions_campaign_key_check",
+          "type": "c",
+          "definition": "CHECK (((length(campaign_key) >= 1) AND (length(campaign_key) <= 200)))"
+        },
+        {
+          "name": "donation_transactions_campaign_key_not_null",
+          "type": "n",
+          "definition": "NOT NULL campaign_key"
+        },
+        {
+          "name": "donation_transactions_campaign_name_check",
+          "type": "c",
+          "definition": "CHECK (((length(campaign_name) >= 1) AND (length(campaign_name) <= 200)))"
+        },
+        {
+          "name": "donation_transactions_campaign_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL campaign_name"
+        },
+        {
+          "name": "donation_transactions_check",
+          "type": "c",
+          "definition": "CHECK (((refunded_minor >= 0) AND (refunded_minor <= amount_minor)))"
+        },
+        {
+          "name": "donation_transactions_check1",
+          "type": "c",
+          "definition": "CHECK (((fee_minor >= 0) AND (fee_minor <= amount_minor)))"
+        },
+        {
+          "name": "donation_transactions_check2",
+          "type": "c",
+          "definition": "CHECK (((status <> ALL (ARRAY['paid'::text, 'refunded'::text])) OR (paid_at IS NOT NULL)))"
+        },
+        {
+          "name": "donation_transactions_check3",
+          "type": "c",
+          "definition": "CHECK (((refunded_minor = 0) OR (status = ANY (ARRAY['paid'::text, 'refunded'::text]))))"
+        },
+        {
+          "name": "donation_transactions_check4",
+          "type": "c",
+          "definition": "CHECK (((status <> 'refunded'::text) OR (refunded_minor = amount_minor)))"
+        },
+        {
+          "name": "donation_transactions_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "donation_transactions_currency_check",
+          "type": "c",
+          "definition": "CHECK ((currency = 'PHP'::text))"
+        },
+        {
+          "name": "donation_transactions_currency_not_null",
+          "type": "n",
+          "definition": "NOT NULL currency"
+        },
+        {
+          "name": "donation_transactions_donor_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (donor_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "donation_transactions_donor_key_check",
+          "type": "c",
+          "definition": "CHECK ((length(donor_key) <= 200))"
+        },
+        {
+          "name": "donation_transactions_donor_name_check",
+          "type": "c",
+          "definition": "CHECK ((length(donor_name) <= 200))"
+        },
+        {
+          "name": "donation_transactions_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "donation_transactions_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "donation_transactions_provider_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (provider) REFERENCES private.donation_sources(provider)"
+        },
+        {
+          "name": "donation_transactions_provider_not_null",
+          "type": "n",
+          "definition": "NOT NULL provider"
+        },
+        {
+          "name": "donation_transactions_provider_provider_transaction_id_key",
+          "type": "u",
+          "definition": "UNIQUE (provider, provider_transaction_id)"
+        },
+        {
+          "name": "donation_transactions_provider_transaction_id_check",
+          "type": "c",
+          "definition": "CHECK (((length(provider_transaction_id) >= 1) AND (length(provider_transaction_id) <= 200)))"
+        },
+        {
+          "name": "donation_transactions_provider_transaction_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL provider_transaction_id"
+        },
+        {
+          "name": "donation_transactions_reference_check",
+          "type": "c",
+          "definition": "CHECK ((length(reference) <= 240))"
+        },
+        {
+          "name": "donation_transactions_refunded_minor_not_null",
+          "type": "n",
+          "definition": "NOT NULL refunded_minor"
+        },
+        {
+          "name": "donation_transactions_status_check",
+          "type": "c",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'paid'::text, 'failed'::text, 'expired'::text, 'refunded'::text])))"
+        },
+        {
+          "name": "donation_transactions_status_not_null",
+          "type": "n",
+          "definition": "NOT NULL status"
+        },
+        {
+          "name": "donation_transactions_updated_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL updated_at"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "donation_activity_idx",
+          "definition": "CREATE INDEX donation_activity_idx ON private.donation_transactions USING btree (activity_at DESC, id DESC)"
+        },
+        {
+          "name": "donation_campaign_activity_idx",
+          "definition": "CREATE INDEX donation_campaign_activity_idx ON private.donation_transactions USING btree (campaign_key, activity_at DESC, id DESC)"
+        },
+        {
+          "name": "donation_donor_idx",
+          "definition": "CREATE INDEX donation_donor_idx ON private.donation_transactions USING btree (donor_id) WHERE (donor_id IS NOT NULL)"
+        },
+        {
+          "name": "donation_transactions_pkey",
+          "definition": "CREATE UNIQUE INDEX donation_transactions_pkey ON private.donation_transactions USING btree (id)"
+        },
+        {
+          "name": "donation_transactions_provider_provider_transaction_id_key",
+          "definition": "CREATE UNIQUE INDEX donation_transactions_provider_provider_transaction_id_key ON private.donation_transactions USING btree (provider, provider_transaction_id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "member_follows",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "follower_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "followed_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "member_follows_check",
+          "type": "c",
+          "definition": "CHECK ((follower_id <> followed_id))"
+        },
+        {
+          "name": "member_follows_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "member_follows_followed_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (followed_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "member_follows_followed_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL followed_id"
+        },
+        {
+          "name": "member_follows_follower_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (follower_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "member_follows_follower_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL follower_id"
+        },
+        {
+          "name": "member_follows_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (follower_id, followed_id)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "member_follows_incoming",
+          "definition": "CREATE INDEX member_follows_incoming ON private.member_follows USING btree (followed_id, created_at DESC)"
+        },
+        {
+          "name": "member_follows_pkey",
+          "definition": "CREATE UNIQUE INDEX member_follows_pkey ON private.member_follows USING btree (follower_id, followed_id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "member_privacy",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "is_private",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "member_privacy_is_private_not_null",
+          "type": "n",
+          "definition": "NOT NULL is_private"
+        },
+        {
+          "name": "member_privacy_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (user_id)"
+        },
+        {
+          "name": "member_privacy_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "member_privacy_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "member_privacy_pkey",
+          "definition": "CREATE UNIQUE INDEX member_privacy_pkey ON private.member_privacy USING btree (user_id)"
+        }
+      ]
+    },
+    {
+      "schema": "private",
+      "name": "request_limits",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "window_start",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "hits",
+          "type": "integer",
+          "nullable": false,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "request_limits_action_not_null",
+          "type": "n",
+          "definition": "NOT NULL action"
+        },
+        {
+          "name": "request_limits_hits_check",
+          "type": "c",
+          "definition": "CHECK ((hits > 0))"
+        },
+        {
+          "name": "request_limits_hits_not_null",
+          "type": "n",
+          "definition": "NOT NULL hits"
+        },
+        {
+          "name": "request_limits_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (user_id, action, window_start)"
+        },
+        {
+          "name": "request_limits_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "request_limits_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        },
+        {
+          "name": "request_limits_window_start_not_null",
+          "type": "n",
+          "definition": "NOT NULL window_start"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "request_limits_pkey",
+          "definition": "CREATE UNIQUE INDEX request_limits_pkey ON private.request_limits USING btree (user_id, action, window_start)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "about_pcec",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": false,
+          "default_value": "1"
+        },
+        {
+          "name": "org_name",
+          "type": "text",
+          "nullable": true,
+          "default_value": "'PCEC'::text"
+        },
+        {
+          "name": "about_text",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "office_contact_number",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "office_email",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "office_location",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "established_year",
+          "type": "integer",
+          "nullable": true,
+          "default_value": "1957"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "about_input_limits",
+          "type": "c",
+          "definition": "CHECK (((char_length(org_name) <= 200) AND (char_length(about_text) <= 20000) AND (char_length(office_contact_number) <= 100) AND (char_length(office_email) <= 254) AND (char_length(office_location) <= 2000))) NOT VALID"
+        },
+        {
+          "name": "about_pcec_id_check",
+          "type": "c",
+          "definition": "CHECK ((id = 1))"
+        },
+        {
+          "name": "about_pcec_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "about_pcec_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "about_pcec_pkey",
+          "definition": "CREATE UNIQUE INDEX about_pcec_pkey ON public.about_pcec USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "announcements",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "image_url",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "announcement_input_limits",
+          "type": "c",
+          "definition": "CHECK ((((char_length(btrim(title)) >= 1) AND (char_length(btrim(title)) <= 200)) AND (char_length(body) <= 10000) AND (char_length(image_url) <= 2048))) NOT VALID"
+        },
+        {
+          "name": "announcements_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "announcements_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "announcements_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "announcements_title_not_null",
+          "type": "n",
+          "definition": "NOT NULL title"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "announcements_pkey",
+          "definition": "CREATE UNIQUE INDEX announcements_pkey ON public.announcements USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "attendance",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "member_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "scanned_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "method",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'qr'::text"
+        },
+        {
+          "name": "scanned_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "attendance_event_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (event_id) REFERENCES events_feed(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "attendance_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "attendance_member_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (member_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "attendance_member_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL member_id"
+        },
+        {
+          "name": "attendance_method_check",
+          "type": "c",
+          "definition": "CHECK ((method = ANY (ARRAY['qr'::text, 'manual'::text])))"
+        },
+        {
+          "name": "attendance_method_not_null",
+          "type": "n",
+          "definition": "NOT NULL method"
+        },
+        {
+          "name": "attendance_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "attendance_scanned_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL scanned_at"
+        },
+        {
+          "name": "attendance_scanned_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (scanned_by) REFERENCES user_profile(id) ON DELETE SET NULL"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "attendance_pkey",
+          "definition": "CREATE UNIQUE INDEX attendance_pkey ON public.attendance USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "chat_messages",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "author_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "room_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "edited_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "unsent_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "chat_author_name_length",
+          "type": "c",
+          "definition": "CHECK ((char_length(author_name) <= 160))"
+        },
+        {
+          "name": "chat_body_length",
+          "type": "c",
+          "definition": "CHECK (((char_length(btrim(body)) >= 1) AND (char_length(btrim(body)) <= 1000)))"
+        },
+        {
+          "name": "chat_messages_author_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (author_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_messages_author_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL author_id"
+        },
+        {
+          "name": "chat_messages_author_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL author_name"
+        },
+        {
+          "name": "chat_messages_body_not_null",
+          "type": "n",
+          "definition": "NOT NULL body"
+        },
+        {
+          "name": "chat_messages_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "chat_messages_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "chat_messages_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "chat_messages_room_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_messages_author_idx",
+          "definition": "CREATE INDEX chat_messages_author_idx ON public.chat_messages USING btree (author_id)"
+        },
+        {
+          "name": "chat_messages_history_idx",
+          "definition": "CREATE INDEX chat_messages_history_idx ON public.chat_messages USING btree (created_at DESC, id DESC)"
+        },
+        {
+          "name": "chat_messages_pkey",
+          "definition": "CREATE UNIQUE INDEX chat_messages_pkey ON public.chat_messages USING btree (id)"
+        },
+        {
+          "name": "chat_messages_room_history_idx",
+          "definition": "CREATE INDEX chat_messages_room_history_idx ON public.chat_messages USING btree (room_id, created_at DESC, id DESC)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "chat_room_members",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "room_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'member'::text"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'invited'::text"
+        },
+        {
+          "name": "invited_by",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "invited_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "chat_room_members_invited_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL invited_at"
+        },
+        {
+          "name": "chat_room_members_invited_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (invited_by) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_room_members_invited_by_not_null",
+          "type": "n",
+          "definition": "NOT NULL invited_by"
+        },
+        {
+          "name": "chat_room_members_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (room_id, user_id)"
+        },
+        {
+          "name": "chat_room_members_role_check",
+          "type": "c",
+          "definition": "CHECK ((role = ANY (ARRAY['admin'::text, 'member'::text])))"
+        },
+        {
+          "name": "chat_room_members_role_not_null",
+          "type": "n",
+          "definition": "NOT NULL role"
+        },
+        {
+          "name": "chat_room_members_room_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_room_members_room_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL room_id"
+        },
+        {
+          "name": "chat_room_members_state_check",
+          "type": "c",
+          "definition": "CHECK ((state = ANY (ARRAY['invited'::text, 'accepted'::text, 'declined'::text, 'removed'::text])))"
+        },
+        {
+          "name": "chat_room_members_state_not_null",
+          "type": "n",
+          "definition": "NOT NULL state"
+        },
+        {
+          "name": "chat_room_members_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_room_members_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_room_members_pkey",
+          "definition": "CREATE UNIQUE INDEX chat_room_members_pkey ON public.chat_room_members USING btree (room_id, user_id)"
+        },
+        {
+          "name": "chat_room_members_user_idx",
+          "definition": "CREATE INDEX chat_room_members_user_idx ON public.chat_room_members USING btree (user_id, state)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "chat_rooms",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "owner_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "visibility",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'private'::text"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "chat_rooms_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "chat_rooms_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "chat_rooms_owner_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (owner_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "chat_rooms_owner_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL owner_id"
+        },
+        {
+          "name": "chat_rooms_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "chat_rooms_title_check",
+          "type": "c",
+          "definition": "CHECK (((char_length(btrim(title)) >= 1) AND (char_length(btrim(title)) <= 80)))"
+        },
+        {
+          "name": "chat_rooms_title_not_null",
+          "type": "n",
+          "definition": "NOT NULL title"
+        },
+        {
+          "name": "chat_rooms_visibility_check",
+          "type": "c",
+          "definition": "CHECK ((visibility = ANY (ARRAY['public'::text, 'friends'::text, 'private'::text])))"
+        },
+        {
+          "name": "chat_rooms_visibility_not_null",
+          "type": "n",
+          "definition": "NOT NULL visibility"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "chat_rooms_pkey",
+          "definition": "CREATE UNIQUE INDEX chat_rooms_pkey ON public.chat_rooms USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "churches",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "denomination",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "region",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "pastor",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "website",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "is_featured",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "churches_address_not_null",
+          "type": "n",
+          "definition": "NOT NULL address"
+        },
+        {
+          "name": "churches_city_not_null",
+          "type": "n",
+          "definition": "NOT NULL city"
+        },
+        {
+          "name": "churches_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "churches_created_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (created_by) REFERENCES user_profile(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "churches_denomination_not_null",
+          "type": "n",
+          "definition": "NOT NULL denomination"
+        },
+        {
+          "name": "churches_description_not_null",
+          "type": "n",
+          "definition": "NOT NULL description"
+        },
+        {
+          "name": "churches_email",
+          "type": "c",
+          "definition": "CHECK (((email = ''::text) OR (email ~* '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$'::text)))"
+        },
+        {
+          "name": "churches_email_not_null",
+          "type": "n",
+          "definition": "NOT NULL email"
+        },
+        {
+          "name": "churches_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "churches_is_featured_not_null",
+          "type": "n",
+          "definition": "NOT NULL is_featured"
+        },
+        {
+          "name": "churches_name_len",
+          "type": "c",
+          "definition": "CHECK (((char_length(btrim(name)) >= 2) AND (char_length(btrim(name)) <= 160)))"
+        },
+        {
+          "name": "churches_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL name"
+        },
+        {
+          "name": "churches_pastor_not_null",
+          "type": "n",
+          "definition": "NOT NULL pastor"
+        },
+        {
+          "name": "churches_phone_not_null",
+          "type": "n",
+          "definition": "NOT NULL phone"
+        },
+        {
+          "name": "churches_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "churches_region_not_null",
+          "type": "n",
+          "definition": "NOT NULL region"
+        },
+        {
+          "name": "churches_short_fields",
+          "type": "c",
+          "definition": "CHECK (((char_length(denomination) <= 80) AND (char_length(region) <= 60) AND (char_length(city) <= 80) AND (char_length(address) <= 240) AND (char_length(pastor) <= 120) AND (char_length(phone) <= 40) AND (char_length(email) <= 160) AND (char_length(description) <= 600)))"
+        },
+        {
+          "name": "churches_website",
+          "type": "c",
+          "definition": "CHECK (((website = ''::text) OR ((website ~ '^https://[^\\s/$.?#].[^\\s]*$'::text) AND (char_length(website) <= 300))))"
+        },
+        {
+          "name": "churches_website_not_null",
+          "type": "n",
+          "definition": "NOT NULL website"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "churches_name_idx",
+          "definition": "CREATE INDEX churches_name_idx ON public.churches USING btree (name)"
+        },
+        {
+          "name": "churches_pkey",
+          "definition": "CREATE UNIQUE INDEX churches_pkey ON public.churches USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "community_blocks",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "blocker_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "blocked_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "community_blocks_blocked_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (blocked_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_blocks_blocked_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL blocked_id"
+        },
+        {
+          "name": "community_blocks_blocker_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (blocker_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_blocks_blocker_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL blocker_id"
+        },
+        {
+          "name": "community_blocks_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "community_blocks_not_self",
+          "type": "c",
+          "definition": "CHECK ((blocker_id <> blocked_id))"
+        },
+        {
+          "name": "community_blocks_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (blocker_id, blocked_id)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "community_blocks_blocked_idx",
+          "definition": "CREATE INDEX community_blocks_blocked_idx ON public.community_blocks USING btree (blocked_id)"
+        },
+        {
+          "name": "community_blocks_pkey",
+          "definition": "CREATE UNIQUE INDEX community_blocks_pkey ON public.community_blocks USING btree (blocker_id, blocked_id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "community_comments",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "post_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "author_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "author_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "author_photo",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "reply_to",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "community_comments_author_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (author_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_comments_author_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL author_id"
+        },
+        {
+          "name": "community_comments_author_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL author_name"
+        },
+        {
+          "name": "community_comments_body_check",
+          "type": "c",
+          "definition": "CHECK (((char_length(btrim(body)) >= 1) AND (char_length(btrim(body)) <= 1000)))"
+        },
+        {
+          "name": "community_comments_body_not_null",
+          "type": "n",
+          "definition": "NOT NULL body"
+        },
+        {
+          "name": "community_comments_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "community_comments_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "community_comments_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "community_comments_post_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (post_id) REFERENCES community_posts(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_comments_post_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL post_id"
+        },
+        {
+          "name": "community_comments_reply_to_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (reply_to) REFERENCES community_comments(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "community_comment_parent",
+          "definition": "CREATE INDEX community_comment_parent ON public.community_comments USING btree (reply_to, created_at)"
+        },
+        {
+          "name": "community_comments_author_idx",
+          "definition": "CREATE INDEX community_comments_author_idx ON public.community_comments USING btree (author_id)"
+        },
+        {
+          "name": "community_comments_pkey",
+          "definition": "CREATE UNIQUE INDEX community_comments_pkey ON public.community_comments USING btree (id)"
+        },
+        {
+          "name": "community_comments_post_idx",
+          "definition": "CREATE INDEX community_comments_post_idx ON public.community_comments USING btree (post_id, created_at)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "community_posts",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "author_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "author_photo",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "image_path",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "hidden_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "hidden_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "audience",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'public'::text"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "community_image_owned",
+          "type": "c",
+          "definition": "CHECK (((image_path IS NULL) OR ((char_length(image_path) <= 240) AND (split_part(image_path, '/'::text, 1) = (author_id)::text) AND (image_path !~ '(^|/)\\.\\.(/|$)'::text)))) NOT VALID"
+        },
+        {
+          "name": "community_posts_audience_check",
+          "type": "c",
+          "definition": "CHECK ((audience = ANY (ARRAY['public'::text, 'friends'::text, 'private'::text])))"
+        },
+        {
+          "name": "community_posts_audience_not_null",
+          "type": "n",
+          "definition": "NOT NULL audience"
+        },
+        {
+          "name": "community_posts_author_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (author_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_posts_author_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL author_id"
+        },
+        {
+          "name": "community_posts_author_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL author_name"
+        },
+        {
+          "name": "community_posts_body_len",
+          "type": "c",
+          "definition": "CHECK ((char_length(body) <= 2000))"
+        },
+        {
+          "name": "community_posts_body_not_null",
+          "type": "n",
+          "definition": "NOT NULL body"
+        },
+        {
+          "name": "community_posts_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "community_posts_hidden_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (hidden_by) REFERENCES user_profile(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "community_posts_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "community_posts_not_empty",
+          "type": "c",
+          "definition": "CHECK (((char_length(btrim(body)) > 0) OR (image_path IS NOT NULL)))"
+        },
+        {
+          "name": "community_posts_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "community_posts_author_idx",
+          "definition": "CREATE INDEX community_posts_author_idx ON public.community_posts USING btree (author_id)"
+        },
+        {
+          "name": "community_posts_created_idx",
+          "definition": "CREATE INDEX community_posts_created_idx ON public.community_posts USING btree (created_at DESC)"
+        },
+        {
+          "name": "community_posts_hidden_by_idx",
+          "definition": "CREATE INDEX community_posts_hidden_by_idx ON public.community_posts USING btree (hidden_by) WHERE (hidden_by IS NOT NULL)"
+        },
+        {
+          "name": "community_posts_pkey",
+          "definition": "CREATE UNIQUE INDEX community_posts_pkey ON public.community_posts USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "community_reactions",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "post_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "community_reactions_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "community_reactions_kind_check",
+          "type": "c",
+          "definition": "CHECK ((kind = ANY (ARRAY['love'::text, 'pray'::text, 'amen'::text, 'like'::text, 'celebrate'::text, 'laugh'::text, 'wow'::text, 'sad'::text, 'support'::text])))"
+        },
+        {
+          "name": "community_reactions_kind_not_null",
+          "type": "n",
+          "definition": "NOT NULL kind"
+        },
+        {
+          "name": "community_reactions_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (post_id, user_id)"
+        },
+        {
+          "name": "community_reactions_post_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (post_id) REFERENCES community_posts(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_reactions_post_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL post_id"
+        },
+        {
+          "name": "community_reactions_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_reactions_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "community_reactions_pkey",
+          "definition": "CREATE UNIQUE INDEX community_reactions_pkey ON public.community_reactions USING btree (post_id, user_id)"
+        },
+        {
+          "name": "community_reactions_user_idx",
+          "definition": "CREATE INDEX community_reactions_user_idx ON public.community_reactions USING btree (user_id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "community_reports",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "post_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "reporter_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "resolved_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "resolved_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "community_reports_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "community_reports_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "community_reports_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "community_reports_post_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (post_id) REFERENCES community_posts(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_reports_post_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL post_id"
+        },
+        {
+          "name": "community_reports_post_id_reporter_id_key",
+          "type": "u",
+          "definition": "UNIQUE (post_id, reporter_id)"
+        },
+        {
+          "name": "community_reports_reason_check",
+          "type": "c",
+          "definition": "CHECK ((char_length(reason) <= 500))"
+        },
+        {
+          "name": "community_reports_reason_not_null",
+          "type": "n",
+          "definition": "NOT NULL reason"
+        },
+        {
+          "name": "community_reports_reporter_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (reporter_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_reports_reporter_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL reporter_id"
+        },
+        {
+          "name": "community_reports_resolved_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (resolved_by) REFERENCES user_profile(id) ON DELETE SET NULL"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "community_reports_open_idx",
+          "definition": "CREATE INDEX community_reports_open_idx ON public.community_reports USING btree (created_at) WHERE (resolved_at IS NULL)"
+        },
+        {
+          "name": "community_reports_pkey",
+          "definition": "CREATE UNIQUE INDEX community_reports_pkey ON public.community_reports USING btree (id)"
+        },
+        {
+          "name": "community_reports_post_id_reporter_id_key",
+          "definition": "CREATE UNIQUE INDEX community_reports_post_id_reporter_id_key ON public.community_reports USING btree (post_id, reporter_id)"
+        },
+        {
+          "name": "community_reports_post_idx",
+          "definition": "CREATE INDEX community_reports_post_idx ON public.community_reports USING btree (post_id)"
+        },
+        {
+          "name": "community_reports_reporter_idx",
+          "definition": "CREATE INDEX community_reports_reporter_idx ON public.community_reports USING btree (reporter_id)"
+        },
+        {
+          "name": "community_reports_resolved_by_idx",
+          "definition": "CREATE INDEX community_reports_resolved_by_idx ON public.community_reports USING btree (resolved_by) WHERE (resolved_by IS NOT NULL)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "community_reposts",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "post_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "community_reposts_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "community_reposts_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "community_reposts_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "community_reposts_post_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (post_id) REFERENCES community_posts(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_reposts_post_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL post_id"
+        },
+        {
+          "name": "community_reposts_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "community_reposts_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        },
+        {
+          "name": "community_reposts_user_id_post_id_key",
+          "type": "u",
+          "definition": "UNIQUE (user_id, post_id)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "community_reposts_pkey",
+          "definition": "CREATE UNIQUE INDEX community_reposts_pkey ON public.community_reposts USING btree (id)"
+        },
+        {
+          "name": "community_reposts_source",
+          "definition": "CREATE INDEX community_reposts_source ON public.community_reposts USING btree (post_id)"
+        },
+        {
+          "name": "community_reposts_time",
+          "definition": "CREATE INDEX community_reposts_time ON public.community_reposts USING btree (created_at DESC, id DESC)"
+        },
+        {
+          "name": "community_reposts_user_id_post_id_key",
+          "definition": "CREATE UNIQUE INDEX community_reposts_user_id_post_id_key ON public.community_reposts USING btree (user_id, post_id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "contact_us",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "is_read",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "contact_input_limits",
+          "type": "c",
+          "definition": "CHECK ((((char_length(btrim(name)) >= 1) AND (char_length(btrim(name)) <= 200)) AND (char_length(email) <= 254) AND (email ~ '^[^[:space:]@]+@[^[:space:]@]+\\.[^[:space:]@]+$'::text) AND ((char_length(btrim(message)) >= 1) AND (char_length(btrim(message)) <= 4200)))) NOT VALID"
+        },
+        {
+          "name": "contact_us_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "contact_us_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "contact_us_is_read_not_null",
+          "type": "n",
+          "definition": "NOT NULL is_read"
+        },
+        {
+          "name": "contact_us_message_not_null",
+          "type": "n",
+          "definition": "NOT NULL message"
+        },
+        {
+          "name": "contact_us_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "contact_us_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "contact_us_pkey",
+          "definition": "CREATE UNIQUE INDEX contact_us_pkey ON public.contact_us USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "donation_center",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "method_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "account_details",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "qr_code_url",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "true"
+        },
+        {
+          "name": "sort_order",
+          "type": "integer",
+          "nullable": false,
+          "default_value": "0"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "donation_center_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "donation_center_is_active_not_null",
+          "type": "n",
+          "definition": "NOT NULL is_active"
+        },
+        {
+          "name": "donation_center_method_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL method_name"
+        },
+        {
+          "name": "donation_center_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "donation_center_sort_order_not_null",
+          "type": "n",
+          "definition": "NOT NULL sort_order"
+        },
+        {
+          "name": "donation_input_limits",
+          "type": "c",
+          "definition": "CHECK ((((char_length(btrim(method_name)) >= 1) AND (char_length(btrim(method_name)) <= 200)) AND (char_length(account_details) <= 4000) AND (char_length(qr_code_url) <= 2048))) NOT VALID"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "donation_center_pkey",
+          "definition": "CREATE UNIQUE INDEX donation_center_pkey ON public.donation_center USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "event_registrations",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "event_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "event_registrations_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "event_registrations_event_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (event_id) REFERENCES events_feed(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "event_registrations_event_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL event_id"
+        },
+        {
+          "name": "event_registrations_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "event_registrations_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "event_registrations_user_id_event_id_key",
+          "type": "u",
+          "definition": "UNIQUE (user_id, event_id)"
+        },
+        {
+          "name": "event_registrations_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "event_registrations_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "event_registrations_pkey",
+          "definition": "CREATE UNIQUE INDEX event_registrations_pkey ON public.event_registrations USING btree (id)"
+        },
+        {
+          "name": "event_registrations_user_id_event_id_key",
+          "definition": "CREATE UNIQUE INDEX event_registrations_user_id_event_id_key ON public.event_registrations USING btree (user_id, event_id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "events_feed",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "image_url",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "event_date",
+          "type": "date",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "event_time",
+          "type": "time without time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "ends_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "event_end_after_start",
+          "type": "c",
+          "definition": "CHECK (((ends_at IS NULL) OR (ends_at > ((event_date + COALESCE(event_time, '00:00:00'::time without time zone)) AT TIME ZONE 'Asia/Manila'::text))))"
+        },
+        {
+          "name": "event_input_limits",
+          "type": "c",
+          "definition": "CHECK ((((char_length(btrim(title)) >= 1) AND (char_length(btrim(title)) <= 200)) AND (char_length(description) <= 10000) AND (char_length(location) <= 500) AND (char_length(image_url) <= 2048))) NOT VALID"
+        },
+        {
+          "name": "events_feed_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "events_feed_created_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (created_by) REFERENCES user_profile(id)"
+        },
+        {
+          "name": "events_feed_event_date_not_null",
+          "type": "n",
+          "definition": "NOT NULL event_date"
+        },
+        {
+          "name": "events_feed_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "events_feed_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "events_feed_title_not_null",
+          "type": "n",
+          "definition": "NOT NULL title"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "events_feed_pkey",
+          "definition": "CREATE UNIQUE INDEX events_feed_pkey ON public.events_feed USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "media",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "uploaded_by",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "media_type",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "caption",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "media_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "media_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "media_input_limits",
+          "type": "c",
+          "definition": "CHECK (((char_length(caption) <= 2000) AND (char_length(url) <= 240) AND (split_part(url, '/'::text, 1) = (uploaded_by)::text) AND (url !~ '(^|/)\\.\\.(/|$)'::text))) NOT VALID"
+        },
+        {
+          "name": "media_media_type_check",
+          "type": "c",
+          "definition": "CHECK ((media_type = ANY (ARRAY['photo'::text, 'video'::text])))"
+        },
+        {
+          "name": "media_media_type_not_null",
+          "type": "n",
+          "definition": "NOT NULL media_type"
+        },
+        {
+          "name": "media_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "media_uploaded_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (uploaded_by) REFERENCES user_profile(id)"
+        },
+        {
+          "name": "media_uploaded_by_not_null",
+          "type": "n",
+          "definition": "NOT NULL uploaded_by"
+        },
+        {
+          "name": "media_url_not_null",
+          "type": "n",
+          "definition": "NOT NULL url"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "media_pkey",
+          "definition": "CREATE UNIQUE INDEX media_pkey ON public.media USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "member_friendships",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "requester_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "recipient_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'pending'::text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "member_friendships_check",
+          "type": "c",
+          "definition": "CHECK ((requester_id <> recipient_id))"
+        },
+        {
+          "name": "member_friendships_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "member_friendships_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (requester_id, recipient_id)"
+        },
+        {
+          "name": "member_friendships_recipient_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (recipient_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "member_friendships_recipient_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL recipient_id"
+        },
+        {
+          "name": "member_friendships_requester_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (requester_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "member_friendships_requester_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL requester_id"
+        },
+        {
+          "name": "member_friendships_state_check",
+          "type": "c",
+          "definition": "CHECK ((state = ANY (ARRAY['pending'::text, 'accepted'::text, 'declined'::text])))"
+        },
+        {
+          "name": "member_friendships_state_not_null",
+          "type": "n",
+          "definition": "NOT NULL state"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "member_friendships_pair",
+          "definition": "CREATE UNIQUE INDEX member_friendships_pair ON public.member_friendships USING btree (LEAST(requester_id, recipient_id), GREATEST(requester_id, recipient_id))"
+        },
+        {
+          "name": "member_friendships_pkey",
+          "definition": "CREATE UNIQUE INDEX member_friendships_pkey ON public.member_friendships USING btree (requester_id, recipient_id)"
+        },
+        {
+          "name": "member_friendships_recipient",
+          "definition": "CREATE INDEX member_friendships_recipient ON public.member_friendships USING btree (recipient_id, state)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "member_list",
+      "rls": false,
+      "kind": "v",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "full_name",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "phone_country",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "phone_dial_code",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "profile_photo_url",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "church_name",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "reviewed_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "is_new_member",
+          "type": "boolean",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "new_member_days_left",
+          "type": "integer",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "email_confirmed_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [],
+      "indexes": []
+    },
+    {
+      "schema": "public",
+      "name": "membership_ndc",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "image_url",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "post_type",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "membership_ndc_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "membership_ndc_created_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (created_by) REFERENCES user_profile(id)"
+        },
+        {
+          "name": "membership_ndc_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "membership_ndc_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "membership_ndc_post_type_check",
+          "type": "c",
+          "definition": "CHECK ((post_type = ANY (ARRAY['event'::text, 'picture'::text, 'promotion'::text])))"
+        },
+        {
+          "name": "membership_ndc_post_type_not_null",
+          "type": "n",
+          "definition": "NOT NULL post_type"
+        },
+        {
+          "name": "membership_ndc_title_not_null",
+          "type": "n",
+          "definition": "NOT NULL title"
+        },
+        {
+          "name": "ndc_input_limits",
+          "type": "c",
+          "definition": "CHECK ((((char_length(btrim(title)) >= 1) AND (char_length(btrim(title)) <= 200)) AND (char_length(content) <= 10000) AND (char_length(image_url) <= 2048))) NOT VALID"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "membership_ndc_pkey",
+          "definition": "CREATE UNIQUE INDEX membership_ndc_pkey ON public.membership_ndc USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "prayer_requests",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "author_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "is_anonymous",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "answer_note",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "hidden_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "hidden_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "prayer_body_len",
+          "type": "c",
+          "definition": "CHECK ((char_length(body) <= 1500))"
+        },
+        {
+          "name": "prayer_note_len",
+          "type": "c",
+          "definition": "CHECK (((answer_note IS NULL) OR (char_length(answer_note) <= 500)))"
+        },
+        {
+          "name": "prayer_requests_author_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (author_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "prayer_requests_author_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL author_id"
+        },
+        {
+          "name": "prayer_requests_body_not_null",
+          "type": "n",
+          "definition": "NOT NULL body"
+        },
+        {
+          "name": "prayer_requests_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "prayer_requests_hidden_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (hidden_by) REFERENCES user_profile(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "prayer_requests_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "prayer_requests_is_anonymous_not_null",
+          "type": "n",
+          "definition": "NOT NULL is_anonymous"
+        },
+        {
+          "name": "prayer_requests_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "prayer_requests_title_not_null",
+          "type": "n",
+          "definition": "NOT NULL title"
+        },
+        {
+          "name": "prayer_title_len",
+          "type": "c",
+          "definition": "CHECK (((char_length(btrim(title)) >= 3) AND (char_length(btrim(title)) <= 120)))"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "prayer_requests_author_idx",
+          "definition": "CREATE INDEX prayer_requests_author_idx ON public.prayer_requests USING btree (author_id)"
+        },
+        {
+          "name": "prayer_requests_created_idx",
+          "definition": "CREATE INDEX prayer_requests_created_idx ON public.prayer_requests USING btree (created_at DESC)"
+        },
+        {
+          "name": "prayer_requests_pkey",
+          "definition": "CREATE UNIQUE INDEX prayer_requests_pkey ON public.prayer_requests USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "prayer_supports",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "prayer_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "prayer_supports_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "prayer_supports_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (prayer_id, user_id)"
+        },
+        {
+          "name": "prayer_supports_prayer_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (prayer_id) REFERENCES prayer_requests(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "prayer_supports_prayer_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL prayer_id"
+        },
+        {
+          "name": "prayer_supports_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES user_profile(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "prayer_supports_user_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL user_id"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "prayer_supports_pkey",
+          "definition": "CREATE UNIQUE INDEX prayer_supports_pkey ON public.prayer_supports USING btree (prayer_id, user_id)"
+        },
+        {
+          "name": "prayer_supports_user_idx",
+          "definition": "CREATE INDEX prayer_supports_user_idx ON public.prayer_supports USING btree (user_id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "resources",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": "gen_random_uuid()"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'general'::text"
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": "auth.uid()"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "resources_category",
+          "type": "c",
+          "definition": "CHECK ((category = ANY (ARRAY['documents'::text, 'discipleship'::text, 'prayer'::text, 'sermons'::text, 'worship'::text, 'training'::text, 'general'::text])))"
+        },
+        {
+          "name": "resources_category_not_null",
+          "type": "n",
+          "definition": "NOT NULL category"
+        },
+        {
+          "name": "resources_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "resources_created_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (created_by) REFERENCES user_profile(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "resources_desc_len",
+          "type": "c",
+          "definition": "CHECK ((char_length(description) <= 600))"
+        },
+        {
+          "name": "resources_description_not_null",
+          "type": "n",
+          "definition": "NOT NULL description"
+        },
+        {
+          "name": "resources_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "resources_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "resources_title_len",
+          "type": "c",
+          "definition": "CHECK (((char_length(btrim(title)) >= 3) AND (char_length(btrim(title)) <= 140)))"
+        },
+        {
+          "name": "resources_title_not_null",
+          "type": "n",
+          "definition": "NOT NULL title"
+        },
+        {
+          "name": "resources_url",
+          "type": "c",
+          "definition": "CHECK (((url ~ '^https://[^\\s/$.?#].[^\\s]*$'::text) AND (char_length(url) <= 600)))"
+        },
+        {
+          "name": "resources_url_not_null",
+          "type": "n",
+          "definition": "NOT NULL url"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "resources_created_idx",
+          "definition": "CREATE INDEX resources_created_idx ON public.resources USING btree (created_at DESC)"
+        },
+        {
+          "name": "resources_pkey",
+          "definition": "CREATE UNIQUE INDEX resources_pkey ON public.resources USING btree (id)"
+        }
+      ]
+    },
+    {
+      "schema": "public",
+      "name": "user_profile",
+      "rls": true,
+      "kind": "r",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "default_value": null
+        },
+        {
+          "name": "full_name",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "profile_photo_url",
+          "type": "text",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'member'::text"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'pending'::text"
+        },
+        {
+          "name": "church_name",
+          "type": "text",
+          "nullable": true,
+          "default_value": "''::text"
+        },
+        {
+          "name": "membership_renewal_date",
+          "type": "date",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "terms_accepted",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "default_value": "now()"
+        },
+        {
+          "name": "phone_country",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "phone_dial_code",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "reviewed_by",
+          "type": "uuid",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "birth_date",
+          "type": "date",
+          "nullable": true,
+          "default_value": null
+        },
+        {
+          "name": "show_birthday",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "residence_country",
+          "type": "text",
+          "nullable": false,
+          "default_value": "'PH'::text"
+        },
+        {
+          "name": "city",
+          "type": "text",
+          "nullable": false,
+          "default_value": "''::text"
+        },
+        {
+          "name": "show_location",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "false"
+        },
+        {
+          "name": "profile_setup_required",
+          "type": "boolean",
+          "nullable": false,
+          "default_value": "true"
+        },
+        {
+          "name": "profile_setup_completed_at",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "default_value": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "profile_input_limits",
+          "type": "c",
+          "definition": "CHECK ((((char_length(full_name) >= 1) AND (char_length(full_name) <= 200)) AND (char_length(email) <= 254) AND (char_length(phone) <= 32) AND (char_length(address) <= 2000) AND (char_length(church_name) <= 200) AND (char_length(phone_country) <= 2) AND (char_length(phone_dial_code) <= 8) AND (char_length(profile_photo_url) <= 2048))) NOT VALID"
+        },
+        {
+          "name": "profile_setup_details_valid",
+          "type": "c",
+          "definition": "CHECK ((((birth_date IS NULL) OR ((birth_date >= '1900-01-01'::date) AND (birth_date <= ((now() AT TIME ZONE 'Asia/Manila'::text))::date))) AND (residence_country ~ '^[A-Z]{2}$'::text) AND (length(city) <= 100)))"
+        },
+        {
+          "name": "user_profile_city_not_null",
+          "type": "n",
+          "definition": "NOT NULL city"
+        },
+        {
+          "name": "user_profile_created_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL created_at"
+        },
+        {
+          "name": "user_profile_email_not_null",
+          "type": "n",
+          "definition": "NOT NULL email"
+        },
+        {
+          "name": "user_profile_full_name_not_null",
+          "type": "n",
+          "definition": "NOT NULL full_name"
+        },
+        {
+          "name": "user_profile_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "user_profile_id_not_null",
+          "type": "n",
+          "definition": "NOT NULL id"
+        },
+        {
+          "name": "user_profile_phone_country_not_null",
+          "type": "n",
+          "definition": "NOT NULL phone_country"
+        },
+        {
+          "name": "user_profile_phone_dial_code_not_null",
+          "type": "n",
+          "definition": "NOT NULL phone_dial_code"
+        },
+        {
+          "name": "user_profile_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "user_profile_profile_setup_required_not_null",
+          "type": "n",
+          "definition": "NOT NULL profile_setup_required"
+        },
+        {
+          "name": "user_profile_residence_country_not_null",
+          "type": "n",
+          "definition": "NOT NULL residence_country"
+        },
+        {
+          "name": "user_profile_reviewed_by_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (reviewed_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "user_profile_role_check",
+          "type": "c",
+          "definition": "CHECK ((role = ANY (ARRAY['member'::text, 'admin'::text])))"
+        },
+        {
+          "name": "user_profile_role_not_null",
+          "type": "n",
+          "definition": "NOT NULL role"
+        },
+        {
+          "name": "user_profile_show_birthday_not_null",
+          "type": "n",
+          "definition": "NOT NULL show_birthday"
+        },
+        {
+          "name": "user_profile_show_location_not_null",
+          "type": "n",
+          "definition": "NOT NULL show_location"
+        },
+        {
+          "name": "user_profile_status_check",
+          "type": "c",
+          "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'suspended'::text])))"
+        },
+        {
+          "name": "user_profile_status_not_null",
+          "type": "n",
+          "definition": "NOT NULL status"
+        },
+        {
+          "name": "user_profile_terms_accepted_not_null",
+          "type": "n",
+          "definition": "NOT NULL terms_accepted"
+        },
+        {
+          "name": "user_profile_updated_at_not_null",
+          "type": "n",
+          "definition": "NOT NULL updated_at"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "user_profile_pkey",
+          "definition": "CREATE UNIQUE INDEX user_profile_pkey ON public.user_profile USING btree (id)"
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "schema": "private",
+      "name": "are_friends",
+      "arguments": "p_other uuid",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "blocked_by_post_author",
+      "arguments": "p_post uuid",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "broadcast_chat_change",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "broadcast_feed_change",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "broadcast_save_change",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "broadcast_social_activity",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "capture_discord_audit",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_controls",
+      "arguments": "p_action text, p_room uuid DEFAULT NULL::uuid, p_text text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_group_topic",
+      "arguments": "p_typing boolean",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_groups",
+      "arguments": "p_action text, p_room uuid DEFAULT NULL::uuid, p_target uuid DEFAULT NULL::uuid, p_text text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_groups_before_dm",
+      "arguments": "p_action text, p_room uuid DEFAULT NULL::uuid, p_target uuid DEFAULT NULL::uuid, p_text text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_groups_core",
+      "arguments": "p_action text, p_room uuid DEFAULT NULL::uuid, p_target uuid DEFAULT NULL::uuid, p_text text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_history_visible",
+      "arguments": "p_room uuid, p_at timestamp with time zone",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_member",
+      "arguments": "p_room uuid",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_member_before_dm",
+      "arguments": "p_room uuid",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_message_action",
+      "arguments": "p_action text, p_id uuid, p_body text DEFAULT ''::text, p_expected_edit timestamp with time zone DEFAULT NULL::timestamp with time zone",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_message_profiles",
+      "arguments": "p_ids uuid[]",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_receipts",
+      "arguments": "p_message_ids uuid[], p_read_ids uuid[] DEFAULT '{}'::uuid[]",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "chat_sending_allowed",
+      "arguments": "p_room uuid",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_actions",
+      "arguments": "p_action text, p_post uuid DEFAULT NULL::uuid, p_ids uuid[] DEFAULT '{}'::uuid[]",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_activity",
+      "arguments": "",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_post_visible",
+      "arguments": "p_id uuid",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_rate_limit",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_reactors",
+      "arguments": "p_post_id uuid, p_after uuid DEFAULT NULL::uuid, p_limit integer DEFAULT 51",
+      "returns": "TABLE(user_id uuid, kind text, display_name text, photo_url text)",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_repost_author",
+      "arguments": "p_repost uuid",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_set_author",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "community_sync_author",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "complete_profile_setup",
+      "arguments": "p_name text, p_birthday date, p_phone text, p_phone_country text, p_dial text, p_country text, p_city text, p_church text, p_show_birthday boolean, p_show_location boolean",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "consume_limit",
+      "arguments": "p_user uuid, p_action text, p_limit integer, p_seconds integer",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "current_user_role",
+      "arguments": "",
+      "returns": "text",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "current_user_status",
+      "arguments": "",
+      "returns": "text",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "directory_visible",
+      "arguments": "p_user uuid",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "donation_bounds",
+      "arguments": "p_from date, p_through date",
+      "returns": "void",
+      "security_definer": false
+    },
+    {
+      "schema": "private",
+      "name": "donation_changed",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "follow_member",
+      "arguments": "p_target uuid",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "guard_chat_room",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": false
+    },
+    {
+      "schema": "private",
+      "name": "guard_post_update",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": false
+    },
+    {
+      "schema": "private",
+      "name": "handle_new_user",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "handle_user_email_confirmed",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "is_admin",
+      "arguments": "",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "is_approved",
+      "arguments": "",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "member_directory",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_query text DEFAULT ''::text, p_private boolean DEFAULT NULL::boolean",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "member_follows",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_query text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "member_write_limit",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "post_audience_allowed",
+      "arguments": "p_author uuid, p_audience text",
+      "returns": "boolean",
+      "security_definer": false
+    },
+    {
+      "schema": "private",
+      "name": "prepare_chat_footprint",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": false
+    },
+    {
+      "schema": "private",
+      "name": "prepare_chat_message",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "prepare_comment_reply",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "profile_details",
+      "arguments": "p_target uuid",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "protect_profile_fields",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "protect_profile_setup",
+      "arguments": "",
+      "returns": "trigger",
+      "security_definer": false
+    },
+    {
+      "schema": "private",
+      "name": "review_donation_report",
+      "arguments": "p_id uuid, p_decision text, p_amount_minor bigint, p_paid_at timestamp with time zone, p_reference text, p_note text",
+      "returns": "uuid",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "social_members",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_search text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "social_members_before_follows",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_search text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "social_members_before_privacy",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_search text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "submit_donation_report",
+      "arguments": "p_id uuid, p_method_id uuid, p_amount_minor bigint, p_payment_reference text, p_paid_at timestamp with time zone, p_receipt_path text, p_note text",
+      "returns": "uuid",
+      "security_definer": true
+    },
+    {
+      "schema": "private",
+      "name": "user_email_confirmed_at",
+      "arguments": "uid uuid",
+      "returns": "timestamp with time zone",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "ack_discord_audit_batch",
+      "arguments": "event_ids bigint[]",
+      "returns": "void",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "chat_controls",
+      "arguments": "p_action text, p_room uuid DEFAULT NULL::uuid, p_text text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "chat_groups",
+      "arguments": "p_action text, p_room uuid DEFAULT NULL::uuid, p_target uuid DEFAULT NULL::uuid, p_text text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "chat_message_action",
+      "arguments": "p_action text, p_id uuid, p_body text DEFAULT ''::text, p_expected_edit timestamp with time zone DEFAULT NULL::timestamp with time zone",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "chat_message_profiles",
+      "arguments": "p_ids uuid[]",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "chat_receipts",
+      "arguments": "p_message_ids uuid[], p_read_ids uuid[] DEFAULT '{}'::uuid[]",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "community_actions",
+      "arguments": "p_action text, p_post uuid DEFAULT NULL::uuid, p_ids uuid[] DEFAULT '{}'::uuid[]",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "community_activity",
+      "arguments": "",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "community_for_you",
+      "arguments": "",
+      "returns": "SETOF community_posts",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "community_reactors",
+      "arguments": "p_post_id uuid, p_after uuid DEFAULT NULL::uuid, p_limit integer DEFAULT 51",
+      "returns": "TABLE(user_id uuid, kind text, display_name text, photo_url text)",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "community_reply",
+      "arguments": "p_post uuid, p_parent uuid, p_body text",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "community_timeline",
+      "arguments": "p_before timestamp with time zone DEFAULT NULL::timestamp with time zone, p_author uuid DEFAULT NULL::uuid, p_limit integer DEFAULT 20, p_key text DEFAULT NULL::text",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "complete_profile_setup",
+      "arguments": "p_name text, p_birthday date, p_phone text, p_phone_country text, p_dial text, p_country text, p_city text, p_church text, p_show_birthday boolean, p_show_location boolean",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "consume_request_limit",
+      "arguments": "p_user uuid, p_action text",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "consume_upload_budget",
+      "arguments": "p_user uuid, p_bytes bigint",
+      "returns": "boolean",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "donation_analytics",
+      "arguments": "p_from date, p_through date, p_campaign text DEFAULT NULL::text",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "donation_report_page",
+      "arguments": "p_admin boolean DEFAULT false, p_status text DEFAULT NULL::text, p_before_at timestamp with time zone DEFAULT NULL::timestamp with time zone, p_before_id uuid DEFAULT NULL::uuid",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "donation_transaction_page",
+      "arguments": "p_from date, p_through date, p_campaign text DEFAULT NULL::text, p_status text DEFAULT NULL::text, p_before_at timestamp with time zone DEFAULT NULL::timestamp with time zone, p_before_id uuid DEFAULT NULL::uuid",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "event_lifecycle",
+      "arguments": "p_action text, p_event uuid DEFAULT NULL::uuid, p_ends_at timestamp with time zone DEFAULT NULL::timestamp with time zone",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "get_cost_control_status",
+      "arguments": "",
+      "returns": "jsonb",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "get_discord_audit_batch",
+      "arguments": "",
+      "returns": "TABLE(id bigint, occurred_at timestamp with time zone, kind text, resource text, operation text)",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "member_directory",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_query text DEFAULT ''::text, p_private boolean DEFAULT NULL::boolean",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "member_follows",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_query text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "prayer_create",
+      "arguments": "p_title text, p_body text DEFAULT ''::text, p_anonymous boolean DEFAULT false",
+      "returns": "uuid",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "prayer_delete",
+      "arguments": "p_id uuid",
+      "returns": "void",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "prayer_hide",
+      "arguments": "p_id uuid, p_hidden boolean",
+      "returns": "void",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "prayer_list",
+      "arguments": "p_filter text DEFAULT 'active'::text, p_before timestamp with time zone DEFAULT NULL::timestamp with time zone, p_limit integer DEFAULT 30",
+      "returns": "TABLE(id uuid, title text, body text, created_at timestamp with time zone, answered_at timestamp with time zone, answer_note text, is_anonymous boolean, author_id uuid, author_name text, author_photo text, is_mine boolean, prayed_count integer, i_prayed boolean, is_hidden boolean)",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "prayer_set_answered",
+      "arguments": "p_id uuid, p_answered boolean, p_note text DEFAULT NULL::text",
+      "returns": "void",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "prayer_toggle",
+      "arguments": "p_id uuid",
+      "returns": "TABLE(prayed boolean, prayed_count integer)",
+      "security_definer": true
+    },
+    {
+      "schema": "public",
+      "name": "profile_details",
+      "arguments": "p_target uuid",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "review_donation_report",
+      "arguments": "p_id uuid, p_decision text, p_amount_minor bigint DEFAULT NULL::bigint, p_paid_at timestamp with time zone DEFAULT NULL::timestamp with time zone, p_reference text DEFAULT NULL::text, p_note text DEFAULT ''::text",
+      "returns": "uuid",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "social_members",
+      "arguments": "p_action text, p_target uuid DEFAULT NULL::uuid, p_search text DEFAULT ''::text",
+      "returns": "jsonb",
+      "security_definer": false
+    },
+    {
+      "schema": "public",
+      "name": "submit_donation_report",
+      "arguments": "p_id uuid, p_method_id uuid, p_amount_minor bigint, p_payment_reference text, p_paid_at timestamp with time zone, p_receipt_path text DEFAULT NULL::text, p_note text DEFAULT ''::text",
+      "returns": "uuid",
+      "security_definer": false
+    }
+  ],
+  "enums": [],
+  "buckets": [
+    {
+      "id": "announcement-images",
+      "name": "announcement-images",
+      "public": false,
+      "file_size_limit": 5242880,
+      "allowed_mime_types": [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp"
+      ]
+    },
+    {
+      "id": "community-photos",
+      "name": "community-photos",
+      "public": false,
+      "file_size_limit": 5242880,
+      "allowed_mime_types": [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp"
+      ]
+    },
+    {
+      "id": "donation-receipts",
+      "name": "donation-receipts",
+      "public": false,
+      "file_size_limit": 5242880,
+      "allowed_mime_types": [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp"
+      ]
+    },
+    {
+      "id": "media",
+      "name": "media",
+      "public": false,
+      "file_size_limit": 5242880,
+      "allowed_mime_types": [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp"
+      ]
+    },
+    {
+      "id": "profile-photos",
+      "name": "profile-photos",
+      "public": true,
+      "file_size_limit": 5242880,
+      "allowed_mime_types": [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp"
+      ]
+    }
+  ]
+}
