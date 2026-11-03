@@ -139,3 +139,19 @@ POST /functions/v1/upload-file accepts the existing bucket/path/file multipart c
 Targets: representative staging LCP ≤2.5s, interaction response ≤200ms and ordinary read API p95 ≤1s under a documented approved workload. These are targets, not production benchmark results. Preserve bounded list pages, keyset cursors, short-lived URL batching, image compression/lazy loading, bundled fonts and event cleanup. The baseline build has about 161 interface files/~2.02MB; that is build output, not a claim about every page's network cost.
 
 Build with npm run typecheck and npm run build using the accepted HTTPS site origin. Verify release notes/package/worker/version alignment, headers, private-path denial and current client update behavior. Verify email/Google callback allowlists, function origins and install metadata on the final domain. Deploy the app, reporting site and portfolio independently. No schema migration is needed for the scoped gallery/docs/accessibility work; a future data change requires advisors, a reviewed versioned migration, backup and a rollback/forward-fix plan.
+
+## Observability verification — 3 November 2026
+
+The app has partial operational coverage. Existing scripts and provider dashboards do not establish an always-running production monitoring service.
+
+| Capability | Evidence and current limit | Remaining acceptance |
+| --- | --- | --- |
+| Logs | Supabase service/Auth logs; a restricted database audit outbox; sanitized console errors. `monitoring/discord-audit.mjs` and `monitoring/discord-logs.mjs` forward selected summaries. | Agree retention and a named responder. Neither local worker was running at this inspection; its availability depends on this computer. |
+| Metrics | Upload/request counters, budget thresholds and internal cost alerts exist in `20261005045707_api_cost_guardrails.sql`. | Production request rate, latency, error rate and availability time series with dashboards are not implemented in this repository. Donation totals are business analytics, not service-health metrics. |
+| Distributed traces | No tracing SDK, spans or trace-context propagation was found in app, Edge Function or monitoring source. | Instrument critical operations and verify a request across client/server boundaries before claiming tracing. |
+| Correlation IDs | No shared application request/correlation ID propagation or support-facing incident reference was found. | Carry a non-sensitive ID through request, server log and safe error response. Provider-generated log IDs alone do not provide app-wide correlation. |
+| Alerts | The audit worker implements DOWN after three failed probes and RECOVERED after two good probes, plus selected audit events. Earlier Discord delivery/synthetic transitions were demonstrated in TEST. | Always-on supervision, token renewal, a named recipient and a current outage/usage delivery exercise remain open. The Auth-log token was documented to expire on 30 October; renewal has not been verified. |
+| SLOs | The performance targets above are proposed acceptance thresholds. | Define service indicators, objectives, measurement windows, error budgets, ownership and breach alerts; no measured production SLO is accepted. |
+| Error trapping | Page/startup/Edge Function catches provide safe messages and selected console errors. | A centralized exception tracker and verified uncaught-error/rejection capture are absent. If “trap” means SNMP traps, no SNMP trap integration exists; that is a separate network-monitoring requirement. |
+
+Before broader release, establish a small continuous monitoring baseline: availability and critical-flow probes, request/error/latency metrics, correlated safe errors, supervised alert delivery and agreed service objectives. Add tracing where cross-service diagnosis requires it. Never include passwords, tokens, member content or payment evidence in general telemetry.

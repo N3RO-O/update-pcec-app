@@ -1,5 +1,7 @@
 # PCEC Connect project update
 
+**3 November 2026:** the owner-authorized content/account reset is complete, retaining two admins and the donation QR after a restricted database/file snapshot. Admin password sign-in and recovery-email delivery to the checked Gmail inbox were verified. This is not a completed recovery-link journey, scheduled backup/restore service or MFA enforcement. The launch checklist now reflects the resolved unread regression and the dated Chromium/WebKit results, with the Firefox environment limitation explicit. Technical requirements document the partial logging/usage/alert coverage and missing distributed tracing, shared correlation IDs and measured SLOs. No personal accounts, credentials or backup data are published.
+
 **31 October 2026:** `documentation.html` adds six core documents and three supporting reports, 60 individual feature specifications, the 59-route sitemap, source-derived schema, test evidence and actual interface captures. Open the [published library](https://update-pcec-app.vercel.app/documentation.html). The current QA report supersedes older regression observations below; historical audit scores retain their dates.
 
 The canonical documents are maintained in the app repository under `docs/`. This repository contains reviewed publication snapshots in `documents/`, so its deployment does not need access to private app source or a database. After approved documentation changes, copy the nine Markdown files and three catalogs to `documents/`; copy only reviewed interface captures to `assets/screenshots/` and update `documents/screenshots.json`.
@@ -11,9 +13,9 @@ Surgebox QR giving with manual Finance review, scanner/Resources removal and
 current launch gates. Read-only dashboard observations show Free, healthy, no
 backups, Gmail SMTP with a deliverability warning, and leaked-password protection
 disabled. Historical audit scores retain their original dates. No passwords,
-member records or private receipt files are published. The current broad
-community regression stops at an unread indicator; focused checks alone are
-not launch approval.
+member records or private receipt files are published. At that inspection the broad
+community regression stopped at an unread indicator; the 31 October QA results
+supersede that failure. Focused checks alone are not launch approval.
 
 
 This is the project report and account-email review pack for PCEC. It is separate from the member app itself.
